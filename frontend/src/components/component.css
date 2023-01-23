@@ -5,7 +5,7 @@
 /* #region General */
 :root {
     --black-color: #1B1B1B;
-    --white-color: white;
+    --white-color: #E9E9E9;
     --gradient-color: linear-gradient(180deg, #274AA6 0%, #9B19A7 45.83%, #DC3636 100%);
 
     --font-primary: 'Space Grotesk', sans-serif;
@@ -17,22 +17,40 @@
     --side-padding: 10vw;
     --button-sizing: 50px;
     --button-radius: 15px;
+
+    --dropdown-radius:
+}
+.view-container {
+    width: 400px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4em 0px;
+}
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--white-color);
+    font-family: var(--font-primary);
+    line-height: normal;
+    padding: 0.5em 0px;
+}
+a {
+    text-decoration: none;
 }
 /* #endregion */
 
 /* #region Header */
 .header {
-    height: 10vh;
-    padding: 1em;
+    height: 50px;
     justify-content: center;
     width: 100%;
 }
-
 .header img {
-    height: 100%;
+    height: 50px;
     width: auto;
 }
-
 /* #endregion */
 
 /* #region Song */
@@ -58,49 +76,61 @@
     text-align: left;
 
     box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
+    transition: 0.15s;
+
+    position: relative;
+    top: 0px;
 }
-
-
+.song-unit:hover {
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.5);
+    top: -2px;
+}
 .artist-info {
     display: flex;
     flex-direction: column;
     justify-content: center;
     margin-left: 0.25em;
 }
-
 .song-title {
     font-weight: var(--font-primary-weight);
     font-size: 20px;
     margin-bottom: 0.1em;
 }
-
 .artist-title {
     font-weight: var(--font-secondary-weight);
     font-size: 14px;
 }
-
 .song-image-container {
     height: var(--song-image-size);
     width: var(--song-image-size);
 }
-
 .song-unit .card-img {
     --song-image-size: calc(var(--song-height) - 2 * var(--song-padding));
     height: var(--song-image-size);
     width: auto;
     border-radius: 5px;
 }
-
-.song-unit .card .card-title {
-
-}
-
-.song-unit .card .card-subtitle {
-
-}
 /* #endregion */
 
 /* #region Feature Dropdowns */
+.feature-dropdowns {
+    margin-top: 5em;
+}
+.hstack {
+    flex-wrap: wrap;
+    justify-content: center;
+
+    width: 100%;
+    column-gap: 3.5em;
+    row-gap: 1.25em;
+    margin: 0.5em 0px;
+}
+.dropdown-menu {
+    max-width: 80px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+    margin: 0;
+}
 .dropdown button {
     background-color: rgba(0, 0, 0, 0.35);
     border: none;
@@ -108,6 +138,83 @@
 
     font-family: var(--font-primary);
     font-weight: var(--font-primary-weight);
-    width: 100px;
+    width: 125px;
+}
+.dropdown-toggle.btn.btn-primary {
+    display: flex;
+    padding-left: 12px;
+    padding-right: 12px;
+    justify-content: space-between;
+    align-items: center;
+}
+.dropdown-toggle.btn.btn-primary:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.btn-primary.dropdown-toggle:focus, .dropdown-toggle.btn.btn-primary:hover, .btn-primary:focus, .btn-primary.dropdown-toggle {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: var(--white-color);
+}
+.btn-primary:active, .btn:focus {
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.5);
+}
+.show > .btn-primary.dropdown-toggle:focus, .show > .btn-primary:focus, .show > .btn-primary.dropdown-toggle, .btn-check:active + .btn-primary:focus {
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.5);
+}
+.btn-check:checked + .btn-primary:focus, .btn-check:active + .btn-primary:focus, .btn-primary:active:focus, .btn-primary.active:focus, .show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.5) !important;
+}
+.show > .dropdown-toggle::after {
+    rotate: 0deg;
+}
+.dropdown-toggle::after {
+    border-top: 0.3em solid;
+    border-right: 0.375em solid transparent;
+    border-bottom: 0;
+    border-left: 0.375em solid transparent;
+    rotate: -90deg;
+
+    transition: ease 0.25s;
 }
 /* #endregion */
+
+/* #region Match Button */
+.match-button {
+    position: relative;
+    border: none;
+    line-height: normal;
+
+    height: 45px;
+    width: 10rem;
+    font-weight: 700;
+    font-size: 2rem;
+    font-family: var(--font-primary);
+
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    color: var(--white-color);
+
+    border-radius: var(--button-radius);
+    -webkit-border-radius: var(--button-radius); 
+    -moz-border-radius: var(--button-radius); 
+    transition: 0.15s;
+    margin-top: 2em;
+
+    top: 0px;
+}
+.match-button:hover {
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.5);
+    top: -2px;
+}
+/* #endregion */
+
+/* #region Screen Splits */
+@media screen and (min-height: 701px) {
+    .view-container {
+        justify-content: center;
+    }
+}
+/* #endregion */
+

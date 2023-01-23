@@ -4,18 +4,21 @@ import Card from 'react-bootstrap/Card';
 function Song(props) {
     const songName = props.songName;
     const artistName = props.artistName;
+    const link = props.link;
     const img = props.img;
 
     return (
-        <Card className="song-unit">
-            <div className = "artist-info">
-                <div className="song-title">{songName}</div>
-                <div className="artist-title">{artistName}</div>
-            </div>
-            <div className = "song-image-container">
-                <Card.Img src={require(`../images/${img}.png`)}></Card.Img>
-            </div>
-        </Card>
+        <a href={link} target="_blank" rel="noopener noreferrer">
+            <Card className="song-unit">
+                <div className = "artist-info">
+                    <div className="song-title">{songName}</div>
+                    <div className="artist-title">{artistName}</div>
+                </div>
+                <div className = "song-image-container">
+                    <Card.Img src={require(`../images/${img}.png`)}></Card.Img>
+                </div>
+            </Card>
+        </a>
     );
 }
 

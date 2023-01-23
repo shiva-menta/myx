@@ -1,11 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --black-color: #1B1B1B;
+  --white-color: #E9E9E9;
+  --gradient-color: linear-gradient(180deg, #274AA6 0%, #9B19A7 45.83%, #DC3636 100%);
+
+  --font-primary: 'Space Grotesk', sans-serif;
+  
+  --font-primary-size: 5rem;
+  --font-primary-weight: 700;
+  --font-secondary-weight: 400;
+
+  --side-padding: 10vw;
+  --button-sizing: 50px;
+  --button-radius: 15px;
+}
+
 .App {
   text-align: center;
   background: linear-gradient(180deg, #274AA6 0%, #9B19A7 45.83%, #DC3636 100%);
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+
+.page-title {
+  font-weight: 700;
+  font-size: 2.6rem;
+  color: var(--white-color);
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  font-family: var(--font-primary);
+  margin: 1em 0px 0.5em 0px;
 }
 
 .App-logo {
@@ -41,4 +69,10 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@media screen and (min-height: 701px) {
+    .App {
+      height: 100vh;
+    }
 }
