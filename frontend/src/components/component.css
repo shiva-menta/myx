@@ -1,0 +1,113 @@
+/* #region Google Fonts Imports */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+/* #endregion */
+
+/* #region General */
+:root {
+    --black-color: #1B1B1B;
+    --white-color: white;
+    --gradient-color: linear-gradient(180deg, #274AA6 0%, #9B19A7 45.83%, #DC3636 100%);
+
+    --font-primary: 'Space Grotesk', sans-serif;
+    
+    --font-primary-size: 5rem;
+    --font-primary-weight: 700;
+    --font-secondary-weight: 400;
+
+    --side-padding: 10vw;
+    --button-sizing: 50px;
+    --button-radius: 15px;
+}
+/* #endregion */
+
+/* #region Header */
+.header {
+    height: 10vh;
+    padding: 1em;
+    justify-content: center;
+    width: 100%;
+}
+
+.header img {
+    height: 100%;
+    width: auto;
+}
+
+/* #endregion */
+
+/* #region Song */
+.song-unit {
+    --song-width: 300px;
+    --song-height: 90px;
+    --song-padding: 0.75em;
+
+    background-color: rgba(0, 0, 0, 0.4);
+    color: var(--white-color);
+    font-family: var(--font-primary);
+    border-radius: 15px;
+    line-height: normal;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    justify-self: center;
+    align-self: center;
+    width: var(--song-width);
+    height: var(--song-height);
+    padding: var(--song-padding);
+    text-align: left;
+
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
+}
+
+
+.artist-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 0.25em;
+}
+
+.song-title {
+    font-weight: var(--font-primary-weight);
+    font-size: 20px;
+    margin-bottom: 0.1em;
+}
+
+.artist-title {
+    font-weight: var(--font-secondary-weight);
+    font-size: 14px;
+}
+
+.song-image-container {
+    height: var(--song-image-size);
+    width: var(--song-image-size);
+}
+
+.song-unit .card-img {
+    --song-image-size: calc(var(--song-height) - 2 * var(--song-padding));
+    height: var(--song-image-size);
+    width: auto;
+    border-radius: 5px;
+}
+
+.song-unit .card .card-title {
+
+}
+
+.song-unit .card .card-subtitle {
+
+}
+/* #endregion */
+
+/* #region Feature Dropdowns */
+.dropdown button {
+    background-color: rgba(0, 0, 0, 0.35);
+    border: none;
+    border-radius: 20px;
+
+    font-family: var(--font-primary);
+    font-weight: var(--font-primary-weight);
+    width: 100px;
+}
+/* #endregion */
