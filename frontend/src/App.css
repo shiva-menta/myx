@@ -62,6 +62,26 @@
   color: #61dafb;
 }
 
+.nav-button-group {
+  margin-top: 25px;
+  width: 350px;
+}
+
+.btn-primary, .btn-primary:focus {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+  border-color: rgba(0, 0, 0, 0.35) !important;
+  color: white;
+  box-shadow: none !important;
+}
+
+.nav-button-group > .btn-check:checked + .btn-primary, .nav-button-group > .btn-check:active + .btn-primary, .nav-button-group > .btn-primary:active, 
+.nav-button-group > .btn-primary.active, .nav-button-group > .show > .btn-primary.dropdown-toggle {
+  background-color: rgba(0, 0, 0, 0.65) !important;
+  border-color: rgba(0, 0, 0, 0.65) !important;
+  color: white;
+  box-shadow: none !important;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
