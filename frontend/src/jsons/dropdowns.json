@@ -3,7 +3,7 @@
         "options" : ["Pop", "Hip-Hop / Rap", "Rock", "Country", "EDM", "R&B", "Latin", "Metal", "Alternative", "Blues"]
     },
     "Time" : {
-        "options" : ["1980s", "1990s", "2000s", "2010s", "2020s"]
+        "options" : ["2000s", "2010s"]
     },
     "Key" : {
         "options" : ["Exact", "Tight", "Flexible"]
