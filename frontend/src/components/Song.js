@@ -15,7 +15,7 @@ function Song(props) {
                     <div className="artist-title">{artistName}</div>
                 </div>
                 <div className = "song-image-container">
-                    <Card.Img src={require(`../images/${img}.png`)}></Card.Img>
+                    <Card.Img src={img === 'none' ? require(`../images/${img}.png`) : img}></Card.Img>
                 </div>
             </Card>
         </a>

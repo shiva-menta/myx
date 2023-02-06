@@ -1,12 +1,16 @@
 import React from 'react';
 import Song from './Song.js'
 
-function SongDisplay() {
+function SongDisplay(props) {
+    const songName = props.songName;
+    const artistName = props.artistName;
+    const link = props.link;
+    const img = props.img;
+
     return (
         <div className="song-display">
             <div className="section-title">choose instrumental...</div>
-            <Song songName="Chopper" artistName="Mo Falk" img="chopper" link="https://open.spotify.com/album/7Iw2wdmbXeA28ZQ1Mo0RlM"/>
-            {/* <Song songName="Break My Heart" artistName="Dua Lipa" img="break_my_heart"/> */}
+            <Song songName={songName} artistName={artistName} img={img} link={link}/>
         </div>
     );
 }

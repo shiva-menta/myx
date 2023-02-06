@@ -54,6 +54,12 @@ a {
 /* #endregion */
 
 /* #region Search */
+.song-select-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
 .song-search-container {
     display: inline-flex;
     align-items: center;
@@ -66,20 +72,32 @@ a {
     -webkit-border-radius: 50rem; 
     -moz-border-radius: 50rem; 
 }
-.song-search-container > svg {
+.song-search-container > button {
+    z-index: 5;
     position: absolute;
-    width: 1.25rem;
-    left: 0.75rem;
+    height: 40px;
+    width: 2.5rem;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-top-left-radius: 50rem;
+    border-bottom-left-radius: 50rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.song-search-container > button > svg {
     color: white;
+    width: 1.25rem;
 }
 .song-search-bar {
     z-index: 1;
     
     width: 100%;
-    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    padding: 0.5rem 1rem 0.5rem 3.25rem;
 
-    background-color: transparent;
     color: white;
+    background-color: transparent;
     font-family: var(--font-primary);
     font-weight: var(--font-primary-weight);
     border: none;
