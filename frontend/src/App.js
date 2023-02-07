@@ -13,9 +13,10 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import { BsMusicNoteList } from 'react-icons/bs';
 import { FaRecordVinyl } from 'react-icons/fa';
 import { AiOutlineSearch } from 'react-icons/ai';
+import ApiInfo from './config.json'
 
-const CLIENT_ID = "d2189be583a44756a8ef811f3e764397";
-const CLIENT_SECRET = "25774d6f8ca646c3bbc4ac58e02dfd20";
+const CLIENT_ID = ApiInfo['CLIENT_ID'];
+const CLIENT_SECRET = ApiInfo['CLIENT_SECRET'];
 
 function App() {
   // const [radioValue, setRadioValue] = useState('match');
@@ -74,7 +75,6 @@ function App() {
   }
 
   function updateSelectedSong(idx) {
-    console.log(songResults[idx])
     setSelectedSong(songResults[idx]);
   }
 
@@ -97,7 +97,6 @@ function App() {
       })
   }
 
-  console.log(songResults)
   return (
     <div className="App">
       <div className="view-container">
