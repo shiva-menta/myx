@@ -97,6 +97,7 @@ function App() {
       })
   }
 
+  console.log(selectedSong)
   return (
     <div className="App">
       <div className="view-container">
