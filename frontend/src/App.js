@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header from './components/Header.js'
-import SongDisplay from './components/SongDisplay.js'
+import Song from './components/Song.js'
 import FeatureDropdowns from './components/FeatureDropdowns';
 import 'bootstrap/dist/css/bootstrap.css';
 import './components/component.css'
@@ -24,11 +24,16 @@ function App() {
   const [accessToken, setAccessToken] = useState('');
   const [songResults, setSongResults] = useState([]);
   const [selectedSong, setSelectedSong] = useState({});
+  const [dropdownData, setDropdownData] = useState([]);
 
   const radios = [
     { icon: <BsMusicNoteList/>, value: 'list' },
     { icon: <FaRecordVinyl/>, value: 'match' }
   ];
+
+  const updateDropdownData = (data) => {
+    setDropdownData(data);
+  }
 
   // Spotify useEffect
   useEffect(() => {
@@ -97,34 +102,47 @@ function App() {
       })
   }
 
-  console.log(selectedSong)
+  // Request Match
+  function getAcapellas() {
+    if (selectedSong != undefined && Object.keys(selectedSong).length != 0 && dropdownData.every(item => item !== "")) {
+
+    } else {
+      
+    }
+  }
+
   return (
     <div className="App">
       <div className="view-container">
         <Header/>
         <div className="page-title">[acapella match]</div>
-        <div className="song-select-container">
-          <div className="song-search-container">
-            <button className="search-button" onClick={() => {search()}}>
-              <AiOutlineSearch/>	  
-            </button>
-            <input id="team-search" type="test" className="song-search-bar" placeholder="Search by title" onChange={(evt) => {setSearchState(evt.target.value)}}/>
+        <div className="song-select">
+          <div className="section-title">1. choose instrumental...</div>
+          <div className="song-select-container">
+            <div className="song-search-container">
+              <button className="search-button" onClick={() => {search()}}>
+                <AiOutlineSearch/>	  
+              </button>
+              <input id="team-search" type="test" className="song-search-bar" placeholder="Search by title" onChange={(evt) => {setSearchState(evt.target.value)}}/>
+            </div>
+            <DropdownButton id='dropdown-button' title="">
+              {(selectedSong != undefined && Object.keys(selectedSong).length != 0) && songResults.map((song, idx) => (
+                <Dropdown.Item onClick={() => {updateSelectedSong(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
+              ))}
+            </DropdownButton>
           </div>
-          <DropdownButton id='dropdown-button' title="">
-            {(selectedSong != undefined && Object.keys(selectedSong).length != 0) && songResults.map((song, idx) => (
-              <Dropdown.Item onClick={() => {updateSelectedSong(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
-            ))}
-          </DropdownButton>
+          
+          {selectedSong === undefined || Object.keys(selectedSong).length === 0 ?
+            <Song songName="N/A" artistName="N/A" img="none" link=""/>
+          :
+            <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
+          }
         </div>
-        
-        {selectedSong === undefined || Object.keys(selectedSong).length === 0 ?
-          <SongDisplay songName="N/A" artistName="N/A" link="" img="none"/>
-        :
-          <SongDisplay songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
-        }
-        
-        <FeatureDropdowns/>
-        <button className="match-button">match</button>
+        <FeatureDropdowns callback={updateDropdownData}/>
+        <div className="match">
+          <div className="section-title">3. match...</div>
+          <button className="match-button" onClick={() => {getAcapellas()}}>match</button>
+        </div>
         {/* <ButtonGroup className="nav-button-group">
           {radios.map((radio, idx) => (
             <ToggleButton

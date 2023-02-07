@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Stack from 'react-bootstrap/Stack'
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
 import DropdownList from '../jsons/dropdowns.json'
 import Form from 'react-bootstrap/Form';
 
-function FeatureDropdowns() {
+function FeatureDropdowns({callback}) {
     // Variables
     const dropdowns = [];
     var items = [];
@@ -14,14 +12,32 @@ function FeatureDropdowns() {
     const [genreValue, setGenreValue] = useState("");
     const [timeValue, setTimeValue] = useState("");
     const [keyValue, setKeyValue] = useState("");
-    const [bpmValue, setBpmValue] = useState("");
+    const [bpmValue, setBPMValue] = useState("");
+
+    useEffect(() => {
+        callback([genreValue, timeValue, keyValue, bpmValue])
+    }, [genreValue, timeValue, keyValue, bpmValue])
+
+    // onChanges
+    const handleGenreChange = (event) => {
+        setGenreValue(event.target.value)
+    }
+    const handleTimeChange = (event) => {
+        setTimeValue(event.target.value)
+    }
+    const handleKeyChange = (event) => {
+        setKeyValue(event.target.value)
+    }
+    const handleBPMChange = (event) => {
+        setBPMValue(event.target.value)
+    }
 
     // Executed Code
     items = DropdownList["Genre"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
     );
-    dropdowns.push(<Form.Select className="feature-dropdown arrow-color">
-        <option>Genre</option>
+    dropdowns.push(<Form.Select className="feature-dropdown arrow-color" onChange={handleGenreChange}>
+        <option value="">Genre</option>
         {items}
     </Form.Select>);
 
@@ -29,8 +45,8 @@ function FeatureDropdowns() {
     items = DropdownList["Time"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
     );
-    dropdowns.push(<Form.Select className="feature-dropdown">
-        <option>Time</option>
+    dropdowns.push(<Form.Select className="feature-dropdown" onChange={handleTimeChange}>
+        <option value="">Time</option>
         {items}
     </Form.Select>);
 
@@ -38,8 +54,8 @@ function FeatureDropdowns() {
     items = DropdownList["Key"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
     );
-    dropdowns.push(<Form.Select className="feature-dropdown">
-        <option>Key</option>
+    dropdowns.push(<Form.Select className="feature-dropdown" onChange={handleKeyChange}>
+        <option value="">Key</option>
         {items}
     </Form.Select>);
 
@@ -47,8 +63,8 @@ function FeatureDropdowns() {
     items = DropdownList["BPM"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
     );
-    dropdowns.push(<Form.Select className="feature-dropdown">
-        <option>BPM</option>
+    dropdowns.push(<Form.Select className="feature-dropdown" onChange={handleBPMChange}>
+        <option value="">BPM</option>
         {items}
     </Form.Select>);
 
@@ -57,7 +73,7 @@ function FeatureDropdowns() {
     // Render Function
     return (
         <div className="feature-dropdowns">
-            <div className="section-title">acapella parameters</div>
+            <div className="section-title">2. pick acapella parameters...</div>
             <Stack direction="horizontal">{dropdowns}</Stack>
         </div>
     );

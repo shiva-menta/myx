@@ -54,11 +54,17 @@ a {
 /* #endregion */
 
 /* #region Search */
+.song-select {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 .song-select-container {
     width: 100%;
     display: flex;
     justify-content: center;
     gap: 1em;
+    margin-bottom: 1em;
 }
 .song-search-container {
     display: inline-flex;
@@ -171,7 +177,7 @@ a {
 
 /* #region Feature Dropdowns */
 .feature-dropdowns {
-    margin-top: 5em;
+    margin-top: 3em;
 }
 .hstack {
     flex-wrap: wrap;
@@ -199,6 +205,9 @@ a {
 /* #endregion */
 
 /* #region Match Button */
+.match {
+    margin-top: 2em;
+}
 .match-button {
     position: relative;
     border: none;
@@ -219,7 +228,6 @@ a {
     -webkit-border-radius: var(--button-radius); 
     -moz-border-radius: var(--button-radius); 
     transition: 0.15s;
-    margin-top: 2em;
 
     top: 0px;
 }
