@@ -1,9 +1,7 @@
 import os
-import json
 from app import app, db, DB_FILE
 import requests
 import pandas as pd
-from lxml import html
 from time import sleep
 from creds import CLIENT_ID, CLIENT_SECRET
 
@@ -11,7 +9,6 @@ from creds import CLIENT_ID, CLIENT_SECRET
 # ––––– Environment Setup –––––
 
 
-DB_FILE = "songs.db"
 AUTH_URL = 'https://accounts.spotify.com/api/token'
 BASE_URL = 'https://api.spotify.com/v1/'
 SEARCH_URL = 'https://api.spotify.com/v1/search?q='
@@ -112,6 +109,14 @@ def delete_duplicates():
 
     df.to_csv('acapellas.csv', index=False)
 
+def create_pitchmap_keys():
+    df = pd.read_csv('src/acapellas.csv')
+
+    for index, row in df.iterrows():
+        df.at[index, 'adj_key'] = (1 - int(row['mode'])) * 12 + int(row['key'])
+
+    df.to_csv('acapellas.csv', index=False)
+
 
 # ––––– Model Loading Functions –––––
 
@@ -129,7 +134,8 @@ def load_songs():
             "decade": get_decade(row['year']),
             "bpm": int(row['tempo']),
             "popularity": int(row['popularity']),
-            "genres": row['genre'].split(', ')
+            "genres": row['genre'].split(', '),
+            "adj_key": row['adj_key']
         })
 
 def add_acapella(song_dict):
@@ -144,11 +150,15 @@ def add_acapella(song_dict):
         decade=song_dict['decade'],
         bpm=song_dict['bpm'],
         popularity=song_dict['popularity'],
-        mode=song_dict['mode']
+        mode=song_dict['mode'],
+        adj_key=song_dict['adj_key']
     )
     db.session.add(new_acapella)
 
-    for genre_name in genres:
+    for genre_val in genres:
+        if genre_val not in genre_map:
+            continue
+        genre_name = genre_map[genre_val]
         genre = Genre.query.filter_by(name=genre_name).first()
         if not genre:
             genre = Genre(name=genre_name)
@@ -174,7 +184,7 @@ def get_decade(year):
 
 if __name__ == '__main__':
     # get_access_token()
-
+    # create_pitchmap_keys()
     file_path = os.path.join('./instance', DB_FILE)
     if os.path.exists(file_path):
         os.remove(file_path)

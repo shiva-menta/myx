@@ -26,6 +26,7 @@ class Acapella(db.Model):
     genres = db.relationship('Genre', secondary=genres, lazy='subquery', backref=db.backref('genres', lazy=True))
     popularity = db.Column(db.Integer, nullable=False)
     mode = db.Column(db.Integer, nullable=False)
+    adj_key = db.Column(db.Integer, nullable=False)
 
     def serialize(self):
         return {
