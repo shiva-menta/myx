@@ -1,6 +1,6 @@
 {
     "Genre" : {
-        "options" : ["Pop", "Hip-Hop / Rap", "Rock", "Country", "EDM", "R&B", "Latin", "Metal", "Folk", "Blues"]
+        "options" : ["Pop", "Hip-Hop / Rap", "Rock", "Country", "EDM", "R&B", "Latin", "Metal", "Blues"]
     },
     "Time" : {
         "options" : ["2000s", "2010s"]

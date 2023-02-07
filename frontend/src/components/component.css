@@ -245,3 +245,27 @@ a {
 }
 /* #endregion */
 
+.plus-container {
+    margin: 1em;
+}
+.section-text {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    color: var(--white-color);
+}
+.mix-instructions-container {
+    margin-top: 2em;
+}
+.select-page-container {
+    height: 640px;
+}
+.results-page-container {
+    height: 640px;
+    padding-top: 2em;
+}
+.acapella-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}

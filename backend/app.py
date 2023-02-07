@@ -63,6 +63,18 @@ genre_map = {
     "rock": "rock"
 }
 
+input_map = {
+    "Pop": "pop",
+    "Hip-Hop / Rap": "hip-hop",
+    "Rock": "rock",
+    "Country": "country",
+    "EDM": "edm",
+    "R&B": "r&b",
+    "Latin": "latin",
+    "Metal": "metal",
+    "Blues": "blues"
+}
+
 # ––––– Functions –––––
 def get_access_token():
     global access_token, headers
@@ -140,7 +152,7 @@ def get_spotify_song_data(track_uri):
     return r.json()
 
 def get_match_uris(instr_data, req_data):
-    sel_genre, sel_decade, sel_key, sel_bpm, sel_limit = req_data['genre'], req_data['decade'], req_data['key'], req_data['bpm'], req_data['limit']
+    sel_genre, sel_decade, sel_key, sel_bpm, sel_limit = input_map[req_data['genre']], int(req_data['decade']), req_data['key'], req_data['bpm'], req_data['limit']
     lo_bpm, hi_bpm = get_bpm_range(int(instr_data['tempo']), sel_bpm)
     key = pitchmap_key(instr_data['key'], instr_data['mode'])
     keys = {key: value for key, value in get_key_range(key, sel_key)}
@@ -170,11 +182,11 @@ acapella_args = reqparse.RequestParser()
 acapella_args.add_argument("uri", type=str, help="URI of instrumental song is required.", required=True)
 acapella_args.add_argument("bpm", type=str, help="BPM range of acapellas is required.", required=True)
 acapella_args.add_argument("genre", type=str, help="Genre of acapellas is required.", required=True)
-acapella_args.add_argument("decade", type=int, help="Decade range of acapellas is required.", required=True)
+acapella_args.add_argument("decade", type=str, help="Decade range of acapellas is required.", required=True)
 acapella_args.add_argument("key", type=str, help="Key range of acapellas is required.", required=True)
 acapella_args.add_argument("limit", type=int, help="Return limit of acapellas is required.", required=True)
 
-@app.route('/acapella-match', methods=['GET'])
+@app.route('/acapella-match', methods=['POST'])
 def get_acapellas():
     data = acapella_args.parse_args()
     instr_uri = data['uri']
@@ -189,6 +201,14 @@ def get_acapellas():
         res.append(tuple([acapella.uri, key_dict[acapella.adj_key], acapella.bpm - instr_data['tempo']]))
 
     return jsonify(res), 200
+
+# CORS Errors
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 
 if __name__ == '__main__':
     get_access_token()

@@ -43,7 +43,7 @@ function FeatureDropdowns({callback}) {
 
     items = [];
     items = DropdownList["Time"].options.map((item) => 
-        <option key={item} value={item}>{item}</option>
+        <option key={item} value={item.slice(0, 4)}>{item}</option>
     );
     dropdowns.push(<Form.Select className="feature-dropdown" onChange={handleTimeChange}>
         <option value="">Time</option>
