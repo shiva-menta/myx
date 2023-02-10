@@ -14,6 +14,7 @@ function FeatureDropdowns({callback}) {
     const [keyValue, setKeyValue] = useState("");
     const [bpmValue, setBPMValue] = useState("");
 
+    // UseEffect (update callback function for parent state)
     useEffect(() => {
         callback([genreValue, timeValue, keyValue, bpmValue])
     }, [genreValue, timeValue, keyValue, bpmValue])
@@ -33,6 +34,7 @@ function FeatureDropdowns({callback}) {
     }
 
     // Executed Code
+    // Genre Dropdown
     items = DropdownList["Genre"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
     );
@@ -40,7 +42,7 @@ function FeatureDropdowns({callback}) {
         <option value="">Genre</option>
         {items}
     </Form.Select>);
-
+    // Time Dropdown
     items = [];
     items = DropdownList["Time"].options.map((item) => 
         <option key={item} value={item.slice(0, 4)}>{item}</option>
@@ -49,7 +51,7 @@ function FeatureDropdowns({callback}) {
         <option value="">Time</option>
         {items}
     </Form.Select>);
-
+    // Key Dropdown
     items = [];
     items = DropdownList["Key"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
@@ -58,7 +60,7 @@ function FeatureDropdowns({callback}) {
         <option value="">Key</option>
         {items}
     </Form.Select>);
-
+    // BPM Dropdown
     items = [];
     items = DropdownList["BPM"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
@@ -67,8 +69,6 @@ function FeatureDropdowns({callback}) {
         <option value="">BPM</option>
         {items}
     </Form.Select>);
-
-    
 
     // Render Function
     return (

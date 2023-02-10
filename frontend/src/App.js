@@ -15,35 +15,43 @@ import { FaRecordVinyl } from 'react-icons/fa';
 import { AiOutlineSearch, AiOutlinePlus } from 'react-icons/ai';
 import ApiInfo from './config.json'
 
+// Spotify ID Imports
 const CLIENT_ID = ApiInfo['CLIENT_ID'];
 const CLIENT_SECRET = ApiInfo['CLIENT_SECRET'];
 
 function App() {
+  // useStates
+  // Page State
   // const [radioValue, setRadioValue] = useState('match');
   const [isSelectPage, setIsSelectPage] = useState(true);
   
+  // Search State
   const [searchState, setSearchState] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [songResults, setSongResults] = useState([]);
   const [selectedSong, setSelectedSong] = useState({});
   const [dropdownData, setDropdownData] = useState([]);
 
+  // Acapella State
   const [acapellas, setAcapellas] = useState([]);
   const [selectedAcapella, setSelectedAcapella] = useState({});
   
-
   const radios = [
     { icon: <BsMusicNoteList/>, value: 'list' },
     { icon: <FaRecordVinyl/>, value: 'match' }
   ];
 
+  // Callback Function
   const updateDropdownData = (data) => {
     setDropdownData(data);
   }
 
+  // Spotify URL Information
   const api_url = 'http://127.0.0.1:5000/acapella-match';
   const base_url = 'https://api.spotify.com/v1/'
 
+
+  // useEffects
   // Spotify useEffect
   useEffect(() => {
     var authParameters = {
@@ -58,43 +66,26 @@ function App() {
       .then(result => result.json())
       .then(data => setAccessToken(data.access_token))
   }, []);
-
-  useEffect(() => {
-    let searchBox = document.querySelector(".song-search-container");
-    if (searchBox != null){
-      searchBox.style.backgroundColor = "rgba(0,0,0, 0.35)";
-
-      searchBox.addEventListener("mousedown", function() {
-        searchBox.style.backgroundColor = "rgba(0,0,0, 0.5)";
-      })
-      document.addEventListener("mousedown", function(event) {
-        if (event.target.closest(".song-search-container")) return;
-        searchBox.style.backgroundColor = "rgba(0,0,0, 0.35)";
-      })
-    }
-  })
-  
+  // Update Selected Song useEffect
   useEffect(() => {
     updateSelectedSong(0);
   }, [songResults]);
 
-  // useEffect(() => {
-  //   updateSelectedAcapella(0);
-  // }, [acapellas])
 
-  function extractSongData(songList) {
-    return songList.map(data => 
-      ({
-        artists: data.artists.map(artist => artist.name),
-        name: data.name,
-        link: data.external_urls.spotify,
-        image: data.album.images[1].url,
-        uri: data.uri
-      })
-    );
+  // Functions
+  function updateSelectedSong(idx) {
+    setSelectedSong(songResults[idx]);
   }
 
-  function extractSingleSongData(data) {
+  function updateSelectedAcapella(idx) {
+    setSelectedAcapella(acapellas[idx]);
+  }
+
+  function isSongSelected() {
+    return selectedSong != undefined && Object.keys(selectedSong).length != 0;
+  }
+
+  function extractSongData(data) {
     return {
         artists: data.artists.map(artist => artist.name),
         name: data.name,
@@ -104,7 +95,11 @@ function App() {
       }
   }
 
-  async function getAcapellaData(trackUri) {
+  function extractSongListData(songList) {
+    return songList.map(data => extractSongData(data));
+  }
+
+  async function getAcapellaDataFromURI(trackUri) {
     var trackId = trackUri.split(":")[2]
     var searchParameters = {
       method: 'GET',
@@ -120,12 +115,12 @@ function App() {
     return data;
   }
 
-  async function getAllAcapellaData(acapellaData) {
+  async function updateAllAcapellaData(acapellaURIs) {
     var res = [];
 
-    for (const data of acapellaData) {
-      const songData = await getAcapellaData(data[0]);
-      const songInfo = extractSingleSongData(songData);
+    for (const data of acapellaURIs) {
+      const songData = await getAcapellaDataFromURI(data[0]);
+      const songInfo = extractSongData(songData);
       res.push({
           artists: songInfo.artists,
           name: songInfo.name,
@@ -139,16 +134,7 @@ function App() {
 
     setAcapellas(res);
     setSelectedAcapella(res[0])
-    console.log(res);
     setIsSelectPage(false);
-  }
-
-  function updateSelectedSong(idx) {
-    setSelectedSong(songResults[idx]);
-  }
-
-  function updateSelectedAcapella(idx) {
-    setSelectedAcapella(acapellas[idx]);
   }
 
   // Search
@@ -166,13 +152,13 @@ function App() {
     var trackIDs = await fetch('https://api.spotify.com/v1/search?q=' + searchState + '&type=track&limit=10', searchParameters)
       .then(response => response.json())
       .then(data => {
-        setSongResults(extractSongData(data.tracks.items));
+        setSongResults(extractSongListData(data.tracks.items));
       })
   }
 
   // Request Match
   function getAcapellas() {
-    if (selectedSong != undefined && Object.keys(selectedSong).length != 0 && dropdownData.every(item => item !== "")) {
+    if (isSongSelected() && dropdownData.every(item => item !== "")) {
       const data = {
         uri: selectedSong.uri,
         bpm: dropdownData[3],
@@ -191,7 +177,7 @@ function App() {
       })
         .then(res => res.json())
         .then(data => {
-          getAllAcapellaData(data)
+          updateAllAcapellaData(data)
         })
         .catch(error => console.error(error))
     } else {
@@ -216,13 +202,13 @@ function App() {
                   <input id="team-search" type="test" className="song-search-bar" placeholder="Search by title" onChange={(evt) => {setSearchState(evt.target.value)}}/>
                 </div>
                 <DropdownButton id='dropdown-button' title="">
-                  {(selectedSong != undefined && Object.keys(selectedSong).length != 0) && songResults.map((song, idx) => (
+                  {isSongSelected() && songResults.map((song, idx) => (
                     <Dropdown.Item onClick={() => {updateSelectedSong(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
                   ))}
                 </DropdownButton>
               </div>
               
-              {selectedSong === undefined || Object.keys(selectedSong).length === 0 ?
+              {!isSongSelected() ?
                 <Song songName="N/A" artistName="N/A" img="none" link=""/>
               :
                 <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
@@ -244,7 +230,7 @@ function App() {
             <div className="acapella-container">
               <div className="section-title">acapella</div>
               <DropdownButton id='dropdown-button' title="">
-                {(selectedAcapella != undefined && Object.keys(selectedAcapella).length != 0) && acapellas.map((song, idx) => (
+                {isSongSelected() && acapellas.map((song, idx) => (
                   <Dropdown.Item onClick={() => {updateSelectedAcapella(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
                 ))}
               </DropdownButton>
