@@ -178,23 +178,30 @@ def main():
     return jsonify({"message": "Welcome to the Myx API!"}), 200
 
 # Acapellas Endpoint
-acapella_args = reqparse.RequestParser()
-acapella_args.add_argument("uri", type=str, help="URI of instrumental song is required.", required=True)
-acapella_args.add_argument("bpm", type=str, help="BPM range of acapellas is required.", required=True)
-acapella_args.add_argument("genre", type=str, help="Genre of acapellas is required.", required=True)
-acapella_args.add_argument("decade", type=str, help="Decade range of acapellas is required.", required=True)
-acapella_args.add_argument("key", type=str, help="Key range of acapellas is required.", required=True)
-acapella_args.add_argument("limit", type=int, help="Return limit of acapellas is required.", required=True)
-
-@app.route('/acapella-match', methods=['POST'])
+@app.route('/get-acapellas', methods=['GET'])
 def get_acapellas():
-    data = acapella_args.parse_args()
-    instr_uri = data['uri']
+    uri = request.args.get("uri")
+    bpm = request.args.get("bpm")
+    genre = request.args.get("genre")
+    decade = request.args.get("decade")
+    key = request.args.get("key")
+    limit = request.args.get("limit")
+
+    if uri is None or bpm is None or genre is None or decade is None or key is None or limit is None:
+        return "All parameters are required: uri, bpm, genre, decade, key, limit", 400
 
     # get spotify data for song
-    instr_data = get_spotify_song_data(instr_uri)
+    instr_data = get_spotify_song_data(uri)
 
     # find matches
+    data = {
+        "uri": uri,
+        "bpm": bpm,
+        "genre": genre,
+        "decade": decade,
+        "key": key,
+        "limit": limit
+    }
     acapellas, key_dict = get_match_uris(instr_data, data)
     res = []
     for acapella in acapellas:

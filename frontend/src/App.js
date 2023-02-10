@@ -47,7 +47,7 @@ function App() {
   }
 
   // Spotify URL Information
-  const api_url = 'http://127.0.0.1:5000/acapella-match';
+  const api_url = 'http://127.0.0.1:5000/get-acapellas?';
   const base_url = 'https://api.spotify.com/v1/'
 
 
@@ -159,21 +159,11 @@ function App() {
   // Request Match
   function getAcapellas() {
     if (isSongSelected() && dropdownData.every(item => item !== "")) {
-      const data = {
-        uri: selectedSong.uri,
-        bpm: dropdownData[3],
-        genre: dropdownData[0],
-        decade: dropdownData[1],
-        key: dropdownData[2],
-        limit: 10
-      }
-
-      var acapellas = fetch(api_url, {
-        method: 'POST',
+      var acapellas = fetch(api_url + 'uri=' + selectedSong.uri + '&bpm=' + dropdownData[3] + '&genre=' + dropdownData[0] + '&decade=' + dropdownData[1] + '&key=' + dropdownData[2] + '&limit=10', {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+        }
       })
         .then(res => res.json())
         .then(data => {
