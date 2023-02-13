@@ -31,6 +31,9 @@ function App() {
   const [songResults, setSongResults] = useState([]);
   const [selectedSong, setSelectedSong] = useState({});
   const [dropdownData, setDropdownData] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('Select all parameters.');
+  const [searchWarning, setSearchWarning] = useState(false);
+  const [dropdownWarning, setDropdownWarning] = useState(false);
 
   // Acapella State
   const [acapellas, setAcapellas] = useState([]);
@@ -73,8 +76,23 @@ function App() {
 
 
   // Functions
+  function formatBPM(bpm) {
+    if (bpm > 0) {
+      return "+" + Math.round(bpm).toString();
+    } else {
+      return Math.round(bpm).toString();
+    }
+  }
+
   function updateSelectedSong(idx) {
     setSelectedSong(songResults[idx]);
+    if (songResults.length > 0) {
+      if (songResults[idx].instrumentalness < 0.3) {
+        setSearchWarning(true);
+      } else {
+        setSearchWarning(false);
+      }
+    }
   }
 
   function updateSelectedAcapella(idx) {
@@ -151,8 +169,20 @@ function App() {
 
     var trackIDs = await fetch('https://api.spotify.com/v1/search?q=' + searchState + '&type=track&limit=10', searchParameters)
       .then(response => response.json())
-      .then(data => {
-        setSongResults(extractSongListData(data.tracks.items));
+      .then(async data => {
+        let extractedSongListData = extractSongListData(data.tracks.items);
+        let trackURIs = extractedSongListData.map(track => track.uri.split(":")[2]);
+        let trackFeatures = await fetch(`https://api.spotify.com/v1/audio-features/?ids=${trackURIs.join(',')}`, searchParameters)
+          .then(response => response.json())
+          .then(data => {
+            let instrumentalValues = data.audio_features.map(feature => feature.instrumentalness);
+            extractedSongListData.forEach((track, index) => {
+              track.instrumentalness = instrumentalValues[index];
+            });
+            return extractedSongListData;
+          });
+        
+        setSongResults(trackFeatures);
       })
   }
 
@@ -165,12 +195,22 @@ function App() {
             'Content-Type': 'application/json'
         }
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw Error(res.statusText);
+          }
+          return res.json()
+        })
         .then(data => {
           updateAllAcapellaData(data)
         })
-        .catch(error => console.error(error))
+        .catch(error => {
+          setDropdownWarning(true);
+          setErrorMessage("No results found. Please try again.");
+        })
     } else {
+      setDropdownWarning(true);
+      setErrorMessage("Select all parameters.");
       console.log("Incomplete request.")
     }
   }
@@ -182,14 +222,14 @@ function App() {
         {isSelectPage ?
           <div className="select-page-container">
             <div className="page-title">[acapella match]</div>
-            <div className="song-select">
+            <div className="song-select-container">
               <div className="section-title">1. choose instrumental...</div>
-              <div className="song-select-container">
-                <div className="song-search-container">
+              <div className="song-select">
+                <div className="song-search-bar">
                   <button className="search-button" onClick={() => {search()}}>
                     <AiOutlineSearch/>	  
                   </button>
-                  <input id="team-search" type="test" className="song-search-bar" placeholder="Search by title" onChange={(evt) => {setSearchState(evt.target.value)}}/>
+                  <input id="team-search" type="test" className="song-search-input" placeholder="Search by title" onChange={(evt) => {setSearchState(evt.target.value)}}/>
                 </div>
                 <DropdownButton id='dropdown-button' title="">
                   {isSongSelected() && songResults.map((song, idx) => (
@@ -203,11 +243,15 @@ function App() {
               :
                 <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
               }
+              {searchWarning && <div className="warning">Your track has vocals which could clash with the acapella.</div>}
             </div>
-            <FeatureDropdowns callback={updateDropdownData}/>
+            <div className='feature-select-container'>
+              <FeatureDropdowns callback={updateDropdownData}/>
+              {dropdownWarning && <div className="warning">{errorMessage}</div>}
+            </div>
             <div className="match">
               <div className="section-title">3. match...</div>
-              <button className="match-button" onClick={() => {getAcapellas()}}>match</button>
+              <button className="action-button" onClick={() => {getAcapellas()}}>match</button>
             </div>
           </div>
         :
@@ -228,8 +272,24 @@ function App() {
             <Song songName={selectedAcapella.name} artistName={selectedAcapella.artists.join(', ')} link={selectedAcapella.link} img={selectedAcapella.image}/>
             <div className="mix-instructions-container">
               <div className="section-title">mix instructions:</div>
-              <div className="section-text">{`change bpm ${Math.round(selectedAcapella.bpm_shift)} and key ${selectedAcapella.key_shift}`}</div>
+              <div className="section-text">{`change bpm ${formatBPM(selectedAcapella.bpm_shift)} and key ${selectedAcapella.key_shift}`}</div>
             </div>
+            <div className="playlist-add">add to playlist</div>
+            <button className="action-button" 
+              onClick={() => {
+                setSearchState("");
+                setSongResults([]);
+                setSelectedSong({});
+                setSelectedAcapella({});
+                setDropdownData([]);
+                setSearchWarning(false);
+                setDropdownWarning(false);
+                setAcapellas([]);
+                setIsSelectPage(true);
+              }}
+            >
+              reset
+            </button>
           </div>
         }
         {/* <ButtonGroup className="nav-button-group">

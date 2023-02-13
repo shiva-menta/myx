@@ -27,6 +27,9 @@ class Acapella(db.Model):
     popularity = db.Column(db.Integer, nullable=False)
     mode = db.Column(db.Integer, nullable=False)
     adj_key = db.Column(db.Integer, nullable=False)
+    danceability = db.Column(db.Float, nullable=False)
+    energy = db.Column(db.Float, nullable=False)
+    valence = db.Column(db.Float, nullable=False)
 
     def serialize(self):
         return {
@@ -36,7 +39,12 @@ class Acapella(db.Model):
             'key': self.key,
             'decade': self.decade,
             'bpm': self.bpm,
-            'genre': self.genre
+            'genre': self.genre,
+            'popularity': self.popularity,
+            'mode': self.mode,
+            'danceability': self.danceability,
+            'energy': self.energy,
+            'valence': self.valence
         }
 
 # Genres Model

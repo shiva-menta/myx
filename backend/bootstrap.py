@@ -61,7 +61,7 @@ def clean_acapella_csv():
     filtered_df.to_csv('acapellas.csv', index=False)
 
 def add_song_uris():
-    df = pd.read_csv('src/acapellas.csv')
+    df = pd.read_csv('src/new_songs.csv')
 
     for index, row in df.iterrows():
         if index % 150 == 0 and index != 0:
@@ -69,7 +69,7 @@ def add_song_uris():
         df.at[index, 'uri'] = calc_uri_column(row)
         print(index)
 
-    df.to_csv('acapellas.csv', index=False)
+    df.to_csv('src/new_songs.csv', index=False)
 
 def calc_uri_column(row):
     return get_spotify_song_data(row['song'], row['artist'])
@@ -104,38 +104,93 @@ def get_song_genres():
     print(list(genres))
 
 def delete_duplicates():
-    df = pd.read_csv('src/acapellas.csv')
+    df = pd.read_csv('src/updated_acapellas.csv')
     df = df.drop_duplicates(subset='uri', keep='first')
 
-    df.to_csv('acapellas.csv', index=False)
+    df.to_csv('src/updated_acapellas.csv', index=False)
 
 def create_pitchmap_keys():
-    df = pd.read_csv('src/acapellas.csv')
+    df = pd.read_csv('src/updated_acapellas.csv')
 
     for index, row in df.iterrows():
         df.at[index, 'adj_key'] = (1 - int(row['mode'])) * 12 + int(row['key'])
 
-    df.to_csv('acapellas.csv', index=False)
+    df.to_csv('src/updated_acapellas.csv', index=False)
+
+def get_spotify_song_data(track_uri):
+    track_id = track_uri.split(':')[2]
+    r = requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
+    data = r.json()
+    return {
+        "danceability": data['danceability'],
+        "energy": data['energy'],
+        "key": data['key'],
+        "mode": data['mode'],
+        "instrumentalness": data['instrumentalness'],
+        "bpm": data['tempo'],
+        "valence": data['valence']
+    }
+
+def get_spotify_song_info(track_uri):
+    track_id = track_uri.split(':')[2]
+    r = requests.get(BASE_URL + 'tracks/' + track_id, headers=headers)
+    data = r.json()
+    return {
+        "title": data['name'],
+        "artist": [artist['name'] for artist in data['artists']],
+        "year": data['album']['release_date'][:4],
+        "popularity": data['popularity'],
+        "link": data['external_urls']['spotify'],
+        "image": data['album']['images'][1]['url']
+    }
+
+def get_relevant_track_data(track_uri):
+    features = get_spotify_song_data(track_uri)
+    info = get_spotify_song_info(track_uri)
+    merged_json = features.copy()
+    merged_json.update(info)
+
+    return merged_json
+
+def get_acapella_data():
+    df_from = pd.read_csv('src/new_songs_uris.csv')
+    df_to = []
+
+    for index, row in df_from.iterrows():
+        if index % 75 == 0 and index != 0:
+            sleep(60)
+        data = get_relevant_track_data(row['uri'])
+        data['artist'] = ', '.join(data['artist'])
+        data['genre'] = row['genre']
+        data['uri'] = row['uri']
+        df_to.append(data)
+        print(index)
+    
+    df_to = pd.DataFrame(df_to)
+    df_to.to_csv('src/updated_acapellas.csv', index=False)
 
 
 # ––––– Model Loading Functions –––––
 
 
 def load_songs():
-    df = pd.read_csv('src/acapellas.csv')
+    df = pd.read_csv('src/updated_acapellas.csv')
 
     for index, row in df.iterrows():
         add_acapella({
             "uri": row['uri'],
-            "title": row['song'],
+            "title": row['title'],
             "artist": row['artist'],
             "key": row['key'],
             "mode": row['mode'],
             "decade": get_decade(row['year']),
-            "bpm": int(row['tempo']),
+            "bpm": int(row['bpm']),
             "popularity": int(row['popularity']),
             "genres": row['genre'].split(', '),
-            "adj_key": row['adj_key']
+            "adj_key": row['adj_key'],
+            "danceability": row['danceability'],
+            "energy": row['energy'],
+            "valence": row['valence']
         })
 
 def add_acapella(song_dict):
@@ -151,7 +206,10 @@ def add_acapella(song_dict):
         bpm=song_dict['bpm'],
         popularity=song_dict['popularity'],
         mode=song_dict['mode'],
-        adj_key=song_dict['adj_key']
+        adj_key=song_dict['adj_key'],
+        danceability=song_dict['danceability'],
+        energy=song_dict['energy'],
+        valence=song_dict['valence']
     )
     db.session.add(new_acapella)
 
@@ -184,7 +242,7 @@ def get_decade(year):
 
 if __name__ == '__main__':
     # get_access_token()
-    # create_pitchmap_keys()
+
     file_path = os.path.join('./instance', DB_FILE)
     if os.path.exists(file_path):
         os.remove(file_path)

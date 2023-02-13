@@ -7,12 +7,19 @@ function Song(props) {
     const link = props.link;
     const img = props.img;
 
+    function cutString(string, maxLength) {
+        if (string.length > maxLength) {
+            return string.substring(0, maxLength) + '...';
+        }
+        return string;
+    }
+
     return (
         <a href={link} target="_blank" rel="noopener noreferrer">
             <Card className="song-unit">
                 <div className = "artist-info">
-                    <div className="song-title">{songName}</div>
-                    <div className="artist-title">{artistName}</div>
+                    <div className="song-title">{cutString(songName, 30)}</div>
+                    <div className="artist-title">{cutString(artistName, 25)}</div>
                 </div>
                 <div className = "song-image-container">
                     <Card.Img src={img === 'none' ? require(`../images/${img}.png`) : img}></Card.Img>

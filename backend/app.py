@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, make_response
-from flask_restful import reqparse, abort
+from flask_restful import abort
 from flask_sqlalchemy import SQLAlchemy
-import os
 import requests
 from creds import CLIENT_ID, CLIENT_SECRET
 
@@ -21,7 +20,7 @@ from models import *
 # app.app_context().push()
 
 # setup key hashmap
-pitchmap = {
+harmonic_pitchmap = {
     0: [5, 7, 21],
     1: [6, 8, 22],
     2: [7, 9, 23],
@@ -46,6 +45,32 @@ pitchmap = {
     21: [14, 16, 0],
     22: [15, 17, 1],
     23: [16, 18, 2]
+}
+major_pitchmap = {
+    0: [5, 7],
+    1: [6, 8],
+    2: [7, 9],
+    3: [8, 10],
+    4: [9, 11],
+    5: [0, 10],
+    6: [1, 11],
+    7: [0, 2],
+    8: [1, 3],
+    9: [2, 4],
+    10: [3, 5],
+    11: [4, 6],
+    12: [17, 19],
+    13: [18, 20],
+    14: [19, 21],
+    15: [20, 22],
+    16: [21, 23],
+    17: [12, 22],
+    18: [13, 23],
+    19: [12, 14],
+    20: [13, 15],
+    21: [14, 16],
+    22: [15, 17],
+    23: [16, 18]
 }
 
 genre_map = {
@@ -98,7 +123,7 @@ def pitchmap_key(key, mode):
 
 def get_adjusted_key_range(key, diff):
     if not diff:
-        return [tuple([key, '+0']) for key in pitchmap[key]]
+        return [tuple([key, '+0']) for key in major_pitchmap[key]]
 
     lo = hi = key
     if 0 <= key < 12:
@@ -122,7 +147,7 @@ def get_adjusted_key_range(key, diff):
         else:
             lo = key - diff
     
-    return [tuple([key, "-{}".format(diff)]) for key in pitchmap[lo]] + [tuple([key, "+{}".format(diff)]) for key in pitchmap[hi]]
+    return [tuple([key, "-{}".format(diff)]) for key in major_pitchmap[lo]] + [tuple([key, "+{}".format(diff)]) for key in major_pitchmap[hi]]
 
 
 def get_key_range(key, input):
@@ -144,7 +169,7 @@ def get_bpm_range(bpm, input):
     elif input == 'Tight':
         return tuple([bpm - 5, bpm + 5])
     else:
-        return tuple([bpm - 15, bpm + 15])
+        return tuple([bpm - 20, bpm + 20])
 
 def get_spotify_song_data(track_uri):
     track_id = track_uri.split(':')[2]
@@ -152,7 +177,11 @@ def get_spotify_song_data(track_uri):
     return r.json()
 
 def get_match_uris(instr_data, req_data):
-    sel_genre, sel_decade, sel_key, sel_bpm, sel_limit = input_map[req_data['genre']], int(req_data['decade']), req_data['key'], req_data['bpm'], req_data['limit']
+    sel_genre = input_map[req_data['genre']]
+    sel_decade = int(req_data['decade'])
+    sel_key = req_data['key']
+    sel_bpm = req_data['bpm']
+    sel_limit = req_data['limit']
     lo_bpm, hi_bpm = get_bpm_range(int(instr_data['tempo']), sel_bpm)
     key = pitchmap_key(instr_data['key'], instr_data['mode'])
     keys = {key: value for key, value in get_key_range(key, sel_key)}
@@ -188,10 +217,13 @@ def get_acapellas():
     limit = request.args.get("limit")
 
     if uri is None or bpm is None or genre is None or decade is None or key is None or limit is None:
-        return "All parameters are required: uri, bpm, genre, decade, key, limit", 400
+        return jsonify({"message": "All parameters are required: uri, bpm, genre, decade, key, limit"}), 400
 
     # get spotify data for song
-    instr_data = get_spotify_song_data(uri)
+    try:
+        instr_data = get_spotify_song_data(uri)
+    except:
+        return jsonify({"message": "Invalid URI or search failed."}), 400
 
     # find matches
     data = {
@@ -206,15 +238,21 @@ def get_acapellas():
     res = []
     for acapella in acapellas:
         res.append(tuple([acapella.uri, key_dict[acapella.adj_key], acapella.bpm - instr_data['tempo']]))
+    
+    if not res:
+        return jsonify({"message": "No matches found."}), 404
 
-    return jsonify(res), 200
+    response = jsonify(res)
 
-# CORS Errors
+    return response, 200
+
+# CORS Errors (Fix on Deployment)
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
 if __name__ == '__main__':
