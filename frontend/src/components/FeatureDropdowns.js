@@ -38,7 +38,7 @@ function FeatureDropdowns({callback}) {
     items = DropdownList["Genre"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
     );
-    dropdowns.push(<Form.Select className="feature-dropdown arrow-color" onChange={handleGenreChange}>
+    dropdowns.push(<Form.Select className="feature-dropdown" key="Genre" onChange={handleGenreChange}>
         <option value="">Genre</option>
         {items}
     </Form.Select>);
@@ -47,7 +47,7 @@ function FeatureDropdowns({callback}) {
     items = DropdownList["Time"].options.map((item) => 
         <option key={item} value={item.slice(0, 4)}>{item}</option>
     );
-    dropdowns.push(<Form.Select className="feature-dropdown" onChange={handleTimeChange}>
+    dropdowns.push(<Form.Select className="feature-dropdown" key="Time" onChange={handleTimeChange}>
         <option value="">Time</option>
         {items}
     </Form.Select>);
@@ -56,7 +56,7 @@ function FeatureDropdowns({callback}) {
     items = DropdownList["Key"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
     );
-    dropdowns.push(<Form.Select className="feature-dropdown" onChange={handleKeyChange}>
+    dropdowns.push(<Form.Select className="feature-dropdown" key="Key" onChange={handleKeyChange}>
         <option value="">Key</option>
         {items}
     </Form.Select>);
@@ -65,7 +65,7 @@ function FeatureDropdowns({callback}) {
     items = DropdownList["BPM"].options.map((item) => 
         <option key={item} value={item}>{item}</option>
     );
-    dropdowns.push(<Form.Select className="feature-dropdown" onChange={handleBPMChange}>
+    dropdowns.push(<Form.Select className="feature-dropdown" key="BPM" onChange={handleBPMChange}>
         <option value="">BPM</option>
         {items}
     </Form.Select>);
