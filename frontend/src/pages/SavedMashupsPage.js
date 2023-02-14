@@ -10,7 +10,7 @@ const CLIENT_ID = ApiInfo['CLIENT_ID'];
 const CLIENT_SECRET = ApiInfo['CLIENT_SECRET'];
 
 function SavedMashupsPage() {
-    const api_url = 'http://127.0.0.1:5000/saved?';
+    const api_url = 'http://127.0.0.1:5000/mashups';
     const base_url = 'https://api.spotify.com/v1/'
 
     const [mashups, setMashups] = useState([]);
@@ -38,30 +38,22 @@ function SavedMashupsPage() {
 
     // useEffect to Load Saved Mashups
     useEffect(() => {
-        addMashup({
-            songName1: 'N/A',
-            artistName1: 'N/A',
-            img1: 'none',
-            link1: '',
-            songName2: 'N/A',
-            artistName2: 'N/A',
-            img2: 'none',
-            link2: ''
-        });
-        addMashup({
-            songName1: 'N/A',
-            artistName1: 'N/A',
-            img1: 'none',
-            link1: '',
-            songName2: 'N/A',
-            artistName2: 'N/A',
-            img2: 'none',
-            link2: ''
-        });
+        var mashups = fetch(api_url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(mashup => {
+              
+            })
+        })
     }, []);
 
     // getRelevant Mashup Data from URIs
-    async function getAcapellaDataFromURI(trackUri) {
+    async function getTrackDataFromURI(trackUri) {
         var trackId = trackUri.split(":")[2]
         var searchParameters = {
           method: 'GET',

@@ -340,9 +340,8 @@ a {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 640px;
+    height: 700px;
     width: 400px;
-    padding-top: 2em;
 }
 .spotify-auth-button {
     background-color: #1DB954;

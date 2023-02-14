@@ -51,6 +51,7 @@ function AcapellaMatchPage() {
   
     // Spotify URL Information
     const api_url = 'http://127.0.0.1:5000/get-acapellas?';
+    const api_mashups_url = 'http://127.0.0.1:5000/mashups'
     const base_url = 'https://api.spotify.com/v1/'
   
   
@@ -214,87 +215,117 @@ function AcapellaMatchPage() {
         console.log("Incomplete request.")
       }
     }
-  
+
+    // Add Mashup
+    function addMashup() {
+      if (selectedAcapella != undefined && selectedSong != undefined) {
+        var body = {
+          "acap_uri": selectedAcapella.uri,
+          "instr_uri": selectedSong.uri
+        }
+
+        var mashup = fetch(api_mashups_url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body),
+          credentials: 'include'
+        })
+          .then(res => {
+            if (!res.ok) {
+              throw Error(res.statusText);
+            }
+            return res.json()
+          })
+          .then(data => {
+            console.log("add success!")
+          })
+          .catch(error => {
+            console.log("add failure :(")
+          })
+      }
+    }
+
     return (
-      <div className="App">
         <div className="view-container">
-          <Header/>
-          {isSelectPage ?
+            <Header/>
+            {isSelectPage ?
             <div className="select-page-container">
-              <div className="page-title">[acapella match]</div>
-              <div className="song-select-container">
+                <div className="page-title">[acapella match]</div>
+                <div className="song-select-container">
                 <div className="section-title">1. choose instrumental...</div>
                 <div className="song-select">
-                  <div className="song-search-bar">
+                    <div className="song-search-bar">
                     <button className="search-button" onClick={() => {search()}}>
-                      <AiOutlineSearch/>	  
+                        <AiOutlineSearch/>	  
                     </button>
                     <input id="team-search" type="test" className="song-search-input" placeholder="Search by title" onChange={(evt) => {setSearchState(evt.target.value)}}/>
-                  </div>
-                  <DropdownButton id='dropdown-button' title="">
+                    </div>
+                    <DropdownButton id='dropdown-button' title="">
                     {isSongSelected() && songResults.map((song, idx) => (
-                      <Dropdown.Item onClick={() => {updateSelectedSong(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
+                        <Dropdown.Item onClick={() => {updateSelectedSong(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
                     ))}
-                  </DropdownButton>
+                    </DropdownButton>
                 </div>
                 
                 {!isSongSelected() ?
-                  <Song songName="N/A" artistName="N/A" img="none" link=""/>
+                    <Song songName="N/A" artistName="N/A" img="none" link=""/>
                 :
-                  <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
+                    <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
                 }
                 {searchWarning && <div className="warning">Your track has vocals which could clash with the acapella.</div>}
-              </div>
-              <div className='feature-select-container'>
+                </div>
+                <div className='feature-select-container'>
                 <FeatureDropdowns callback={updateDropdownData}/>
                 {dropdownWarning && <div className="warning">{errorMessage}</div>}
-              </div>
-              <div className="match">
+                </div>
+                <div className="match">
                 <div className="section-title">3. match...</div>
                 <button className="action-button" onClick={() => {getAcapellas()}}>match</button>
-              </div>
+                </div>
             </div>
-          :
+            :
             <div className="results-page-container">
-              <div className="section-title">instrumental</div>
-              <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
-              <div className="plus-container">
+                <div className="section-title">instrumental</div>
+                <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
+                <div className="plus-container">
                 <AiOutlinePlus color='white' size={40}/>
-              </div>
-              <div className="acapella-container">
+                </div>
+                <div className="acapella-container">
                 <div className="section-title">acapella</div>
                 <DropdownButton id='dropdown-button' title="">
-                  {isSongSelected() && acapellas.map((song, idx) => (
-                    <Dropdown.Item onClick={() => {updateSelectedAcapella(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
-                  ))}
+                    {isSongSelected() && acapellas.map((song, idx) => (
+                      <Dropdown.Item onClick={() => {updateSelectedAcapella(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
+                    ))}
                 </DropdownButton>
-              </div>
-              <Song songName={selectedAcapella.name} artistName={selectedAcapella.artists.join(', ')} link={selectedAcapella.link} img={selectedAcapella.image}/>
-              <div className="mix-instructions-container">
+                </div>
+                <Song songName={selectedAcapella.name} artistName={selectedAcapella.artists.join(', ')} link={selectedAcapella.link} img={selectedAcapella.image}/>
+                <div className="mix-instructions-container">
                 <div className="section-title">mix instructions:</div>
                 <div className="section-text">{`change bpm ${formatBPM(selectedAcapella.bpm_shift)} and key ${selectedAcapella.key_shift}`}</div>
-              </div>
-              <div className="playlist-add">add to playlist</div>
-              <button className="action-button" 
+                </div>
+                <div className="playlist-add" onClick={() => {addMashup()}}>add to playlist</div>
+                <button className="action-button" 
                 onClick={() => {
-                  setSearchState("");
-                  setSongResults([]);
-                  setSelectedSong({});
-                  setSelectedAcapella({});
-                  setDropdownData([]);
-                  setSearchWarning(false);
-                  setDropdownWarning(false);
-                  setAcapellas([]);
-                  setIsSelectPage(true);
+                    setSearchState("");
+                    setSongResults([]);
+                    setSelectedSong({});
+                    setSelectedAcapella({});
+                    setDropdownData([]);
+                    setSearchWarning(false);
+                    setDropdownWarning(false);
+                    setAcapellas([]);
+                    setIsSelectPage(true);
                 }}
-              >
+                >
                 reset
-              </button>
+                </button>
             </div>
-          }
-          {/* <ButtonGroup className="nav-button-group">
+            }
+            {/* <ButtonGroup className="nav-button-group">
             {radios.map((radio, idx) => (
-              <ToggleButton
+                <ToggleButton
                 key = {idx}
                 id={`radio${idx}`}
                 type="radio"
@@ -302,13 +333,12 @@ function AcapellaMatchPage() {
                 value={radio.value}
                 checked={radioValue === radio.value}
                 onChange={(e) => setRadioValue(e.currentTarget.value)}
-              >
+                >
                 {radio.icon}
-              </ToggleButton>
+                </ToggleButton>
             ))}
-          </ButtonGroup> */}
+            </ButtonGroup> */}
         </div>
-      </div>
     );
   }
 

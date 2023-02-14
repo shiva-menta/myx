@@ -56,3 +56,15 @@ class Genre(db.Model):
         return {
             'name': self.name
         }
+
+class Mashup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_uri = db.Column(db.Integer, nullable=False)
+    instr_uri = db.Column(db.String(50), nullable=False)
+    acap_uri = db.Column(db.String(50), nullable=False)
+
+    def serialize(self):
+        return {
+            'instr_uri': self.instr_uri,
+            'acap_uri': self.acap_uri
+        }

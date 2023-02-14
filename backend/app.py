@@ -1,20 +1,33 @@
-from flask import Flask, request, jsonify, make_response
-from flask_restful import abort
+from flask import Flask, request, jsonify, make_response, redirect, session
+from flask_restful import abort, reqparse
 from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session
+from flask_cors import CORS, cross_origin
+from datetime import timedelta
 import requests
-from creds import CLIENT_ID, CLIENT_SECRET
+import base64
+from creds import CLIENT_ID, CLIENT_SECRET, secret_key
+import logging
 
 # ––––– App Initialization / Setup –––––
 DB_FILE = "songs.db"
 AUTH_URL = 'https://accounts.spotify.com/api/token'
 BASE_URL = 'https://api.spotify.com/v1/'
+REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+FRONTEND_REDIRECT_URL = 'http://localhost:3000/match'
 
 access_token = None
 headers = None
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_FILE}"
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['CORS_HEADERS'] = 'Content-Type'
+app.secret_key = secret_key
+logging.basicConfig(level=logging.DEBUG)
+CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 db = SQLAlchemy()
+sess = Session()
 
 from models import *
 # app.app_context().push()
@@ -199,12 +212,48 @@ def get_match_uris(instr_data, req_data):
 
     return acapellas, keys
 
-# ––––– App Routes –––––
+# ––––– OAuth –––––
+@app.route('/callback')
+def callback():
+    code = request.args.get('code')
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + base64.b64encode(bytes(CLIENT_ID + ':' + CLIENT_SECRET, 'utf-8')).decode('utf-8')
+    }
+    data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': REDIRECT_URI
+    }
+    response = requests.post('https://accounts.spotify.com/api/token', data=data, headers=headers)
+    
+    access_token = response.json()['access_token']
+    
+    headers = {
+        'Authorization': 'Bearer ' + access_token
+    }
+    response = requests.get(
+        'https://api.spotify.com/v1/me',
+        headers=headers
+    )
+    user_info = response.json()
+    
+    session['user_info'] = user_info
+    app.logger.info(session.sid)
+
+    return redirect(FRONTEND_REDIRECT_URL)
+
+
+# ––––– General Endpoints –––––
+
 
 # Intro Endpoint
 @app.route('/', methods=['GET'])
 def main():
     return jsonify({"message": "Welcome to the Myx API!"}), 200
+
+
+# ––––– Acapella Endpoints –––––
 
 # Acapellas Endpoint
 @app.route('/get-acapellas', methods=['GET'])
@@ -246,16 +295,42 @@ def get_acapellas():
 
     return response, 200
 
-# CORS Errors (Fix on Deployment)
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response
+
+# ––––– Mashup Endpoints –––––
+
+# get all mashups
+@app.route('/mashups', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def get_mashups():
+    mashups = Mashup.query.filter_by(user_uri=session['user_info']['uri']).all()
+    mashups = list(map(lambda x: x.serialize(), mashups))
+    return jsonify(mashups), 200
+
+# post new mashup
+mashup_post_args = reqparse.RequestParser()
+mashup_post_args.add_argument("instr_uri", type=str, help="Instrumental URI is required", required=True)
+mashup_post_args.add_argument("acap_uri", type=str, help="Acapella URI is required", required=True)
+
+@app.route('/mashups', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def create_mashup():
+    data = request.get_json()
+
+    app.logger.info(request.cookies)
+
+    same_mashup = Mashup.query.filter_by(user_uri=session['user_info']['uri'], instr_uri=data['instr_uri'], acap_uri=data['acap_uri']).first()
+    if same_mashup:
+        return jsonify({"message": "Mashup already exists."}), 409
+
+    mashup = Mashup(user_uri=session['user_info']['uri'], instr_uri=data['instr_uri'], acap_uri=data['acap_uri'])
+    db.session.add(mashup)
+    db.session.commit()
+    return jsonify(mashup.serialize()), 200
+
+# ––––– MAIN –––––
 
 if __name__ == '__main__':
     get_access_token()
     db.init_app(app)
+    sess.init_app(app)
     app.run(debug=True)
