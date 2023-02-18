@@ -5,20 +5,20 @@ import '../components/component.css'
 import ApiInfo from '../config.json'
 import Mashup from '../components/Mashup.js'
 
+import { FaSpotify, FaPlus } from 'react-icons/fa';
+import { CgPlayListRemove } from 'react-icons/cg';
+
 // Spotify ID Imports
 const CLIENT_ID = ApiInfo['CLIENT_ID'];
 const CLIENT_SECRET = ApiInfo['CLIENT_SECRET'];
 
 function SavedMashupsPage() {
     const api_url = 'http://127.0.0.1:5000/mashups';
+    const api_spot_url = 'http://127.0.0.1:5000/add-spotify-mashup';
     const base_url = 'https://api.spotify.com/v1/'
 
     const [mashups, setMashups] = useState([]);
     const [accessToken, setAccessToken] = useState('');
-
-    const addMashup = (mashup) => {
-        setMashups(prevMashups => [...prevMashups, mashup]);
-    }
 
     // useEffects
     // Spotify useEffect
@@ -34,7 +34,7 @@ function SavedMashupsPage() {
         fetch('https://accounts.spotify.com/api/token', authParameters) 
           .then(result => result.json())
           .then(data => setAccessToken(data.access_token))
-      }, []);
+    }, []);
 
     // useEffect to Load Saved Mashups
     useEffect(() => {
@@ -42,15 +42,27 @@ function SavedMashupsPage() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            credentials: 'include'
         })
         .then(response => response.json())
         .then(data => {
-            data.forEach(mashup => {
-              
-            })
+            toMashupComponents(data);
+            console.log(data);
         })
     }, []);
+
+    useEffect(() => {
+        var div = document.getElementById('mashups-container');
+        var height = div.clientHeight;
+        var scrollHeight = div.scrollHeight;
+
+        if (scrollHeight > height) {
+            div.style.overflowY = 'scroll';
+        } else {
+            div.style.overflowY = 'hidden';
+        }
+    }, [mashups]);
 
     // getRelevant Mashup Data from URIs
     async function getTrackDataFromURI(trackUri) {
@@ -65,29 +77,126 @@ function SavedMashupsPage() {
     
         const response = await fetch(base_url + 'tracks/' + trackId, searchParameters)
         const data = await response.json();
-    
+        console.log(response)
+        
         return data;
-      }
+    }
+
+    function extractSongData(data) {
+        return {
+            artists: data.artists.map(artist => artist.name),
+            name: data.name,
+            link: data.external_urls.spotify,
+            image: data.album.images[1].url,
+            uri: data.uri
+        }
+    }
+
+    // map mashups to Mashup Components
+    async function toMashupComponents(mashupObjects) {
+        var res = [];
+
+        for (const mashup in mashupObjects) {
+            const mashupData = mashupObjects[mashup];
+            const acapData = await getTrackDataFromURI(mashupData.acap_uri);
+            const acapInfo = extractSongData(acapData);
+            const instrData = await getTrackDataFromURI(mashupData.instr_uri);
+            const instrInfo = extractSongData(instrData);
+
+            res.push({
+                acapSongName: acapInfo.name,
+                acapArtistNames: acapInfo.artists.join(', '),
+                acapImage: acapInfo.image,
+                acapLink: acapInfo.link,
+                acapUri: acapInfo.uri,
+
+                instrSongName: instrInfo.name,
+                instrArtistNames: instrInfo.artists.join(', '),
+                instrImage: instrInfo.image,
+                instrLink: instrInfo.link,
+                instrUri: instrInfo.uri
+            })
+        }
+        
+        console.log(res);
+        setMashups(res);
+    }
+
+    function addMashupToSpotify(idx) {
+        var mashup = mashups[idx];
+        var mashupData = {
+            acap_uri: mashup.acapUri,
+            acap_name: mashup.acapSongName,
+            instr_uri: mashup.instrUri,
+            instr_name: mashup.instrSongName
+        }
+        console.log(mashupData);
+        fetch(api_spot_url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(mashupData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+    }
+
+    function removeMashup(idx) {
+        var mashup = mashups[idx];
+        var mashupData = {
+            acap_uri: mashup.acapUri,
+            instr_uri: mashup.instrUri
+        }
+        console.log(mashupData);
+        fetch(api_url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(mashupData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            setMashups(prevMashups => prevMashups.filter((_, i) => i !== idx));
+        })
+    }
     
     // Render Function
     return (
         <div className='saved-mashups-page'>
             <Header/>
             <div className="page-title">[saved mashups]</div>
-            <div className="mashups-container">
-                {mashups.map((mashup, index) => 
-                    <Mashup key={index}
-                        songName1={mashup.songName1}
-                        artistName1={mashup.artistName1}
-                        img1={mashup.img1}
-                        link1={mashup.link1}
+            <div className="mashups-container" id="mashups-container">
+                {mashups.map((mashup, index) => (
+                    <div key={index} className="mashup-add-container">
+                        <Mashup
+                            acapSongName={mashup.acapSongName}
+                            acapArtistNames={mashup.acapArtistNames}
+                            acapImage={mashup.acapImage}
+                            acapLink={mashup.acapLink}
 
-                        songName2={mashup.songName2}
-                        artistName2={mashup.artistName2}
-                        img2={mashup.img2}
-                        link2={mashup.link2}
-                    />
-                )}
+                            instrSongName={mashup.instrSongName}
+                            instrArtistNames={mashup.instrArtistNames}
+                            instrImage={mashup.instrImage}
+                            instrLink={mashup.instrLink}
+                        />
+                        <div className="mashup-action-button-container">
+                            <button className="mashup-action-button" onClick={() => {addMashupToSpotify(index)}}>
+                                <FaSpotify className="add-mashup-spotify-icon" size={20}/>
+                                <FaPlus className="add-mashup-spotify-icon" size={10}/>
+                            </button>
+                            <button className="mashup-action-button" onClick={() => {removeMashup(index)}}>
+                                <CgPlayListRemove className="remove-mashup-spotify-icon" size={20}/>
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     )

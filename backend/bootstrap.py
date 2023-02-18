@@ -13,24 +13,10 @@ AUTH_URL = 'https://accounts.spotify.com/api/token'
 BASE_URL = 'https://api.spotify.com/v1/'
 SEARCH_URL = 'https://api.spotify.com/v1/search?q='
 
-genre_map = {
-    "Dance/Electronic": "edm",
-    "pop": "pop",
-    "jazz": "jazz",
-    "country": "country",
-    "R&B": "r&b",
-    "World/Traditional": "world",
-    "Folk/Acoustic": "folk",
-    "hip hop": "hip-hop",
-    "blues": "blues",
-    "latin": "latin",
-    "metal": "metal",
-    "rock": "rock"
-}
-
 access_token = None
 headers = None
 
+GENRES = set(["pop", "rock", "country", "latin", "metal", "edm", "r&b", "hip-hop"])
 
 # ––––– Setup Functions –––––
 
@@ -214,9 +200,9 @@ def add_acapella(song_dict):
     db.session.add(new_acapella)
 
     for genre_val in genres:
-        if genre_val not in genre_map:
+        if genre_val not in GENRES:
             continue
-        genre_name = genre_map[genre_val]
+        genre_name = genre_val
         genre = Genre.query.filter_by(name=genre_name).first()
         if not genre:
             genre = Genre(name=genre_name)

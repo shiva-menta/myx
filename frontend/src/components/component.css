@@ -317,20 +317,95 @@ a {
 }
 /* #endregion */
 
-
 /* #region Mashups Page */
+/* General */
 .saved-mashups-page {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     height: 640px;
     padding-top: 2em;
 }
-.mashups-container {
-    height: 300px;
+.mashups-container, #mashups-container {
+    height: 500px;
     width: 100%;
-    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    
+    gap: 0.5em;
+}
+#mashups-container::-webkit-scrollbar {
+    width: 5px;
+}
+#mashups-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+}
+#mashups-container::-webkit-scrollbar-thumb:hover {
+    background-color: white;
+}
+
+/* Mashup Text */
+.mashup-add-container {
+    display: flex;
+    gap: 0.5em;
+    width: 400px;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 0.25em;
+}
+.mashup-unit {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.0);
+    padding: 0.25em 0.5em;
+    width: 350px;
+    border: none;
+}
+.mashup-unit .song-info {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-x: hidden;
+}
+.mashup-unit .song-title {
+    font-family: var(--font-primary);
+    line-height: normal;
+    color: white;
+    white-space: nowrap;
+}
+.mashup-unit .artist-title {
+    font-family: var(--font-primary);
+    color: white;
+    line-height: normal;
+    font-size: 18px;
+    white-space: nowrap;
+}
+.mashup-unit hr {
+    margin: 0.25em 2em;
+    color: white;
+    height: 2px;
+}
+
+/* Mashup Buttons */
+.mashup-action-button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0.15em;
+}
+.mashup-action-button {
+    height: 30px;
+    width: 50px;
+    border: none;
+    border-radius: 0.65em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.15em;
+    cursor: pointer;
 }
 /* #endregion */
 
@@ -372,5 +447,63 @@ a {
 .spotify-icon {
     height: 2rem;
     width: 2rem;
+}
+/* #endregion */
+
+/* #region Home Page */
+.home-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 700px;
+    width: 400px;
+}
+.page-navigation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2em;
+    margin: 2em 0px;
+    width: 100%;
+}
+.page-navigation .nav-item {
+    font-family: var(--font-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 0.5em 1em;
+    border-radius: 0.5em;
+    border: 2px solid white;
+    transition: 0.15s;
+    cursor: pointer;
+    width: 275px;
+
+    position: relative;
+    border: none;
+    line-height: normal;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    color: var(--white-color);
+
+    border-radius: var(--button-radius);
+    -webkit-border-radius: var(--button-radius); 
+    -moz-border-radius: var(--button-radius); 
+    transition: 0.15s;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25em;
+}
+.page-navigation .nav-item:hover {
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.5);
+}
+.page-navigation .nav-icon {
+    height: 1.75rem;
+    width: 1.75rem;
 }
 /* #endregion */

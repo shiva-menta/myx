@@ -10,8 +10,10 @@ flask-restful = "*"
 flask-sqlalchemy = "*"
 lxml = "*"
 pandas = "*"
-flask-session = "*"
 flask-cors = "*"
+flask-session = "*"
+redis = "*"
+pyjwt = "*"
 
 [dev-packages]
 

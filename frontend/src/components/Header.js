@@ -1,11 +1,14 @@
 import React from 'react';
 import MyxDisc from '../images/Disc.png'
+import { Link } from 'react-router-dom'
 
 function Header() {
 
     return (
         <div className="header">
-            <img src={MyxDisc}/>
+            <Link to="/home">
+                <img src={MyxDisc}/>
+            </Link>
         </div>
     );
 }

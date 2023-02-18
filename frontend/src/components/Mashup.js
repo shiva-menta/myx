@@ -2,32 +2,27 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 
 function Mashup(props) {
-    const songName1 = props.songName1;
-    const artistName1 = props.artistName1;
-    const link1 = props.link1;
-    const img1 = props.img1;
+    const acapSongName = props.acapSongName;
+    const acapArtistNames = props.acapArtistNames;
+    const acapLink = props.acapLink;
+    const acapImage = props.acapImage;
 
-    const songName2 = props.songName2;
-    const artistName2 = props.artistName2;
-    const link2 = props.link2;
-    const img2 = props.img2;
+    const instrSongName = props.instrSongName;
+    const instrArtistNames = props.instrArtistNames;
+    const instrLink = props.instrLink;
+    const instrImage = props.instrImage;
 
-    function cutString(string, maxLength) {
-        if (string.length > maxLength) {
-            return string.substring(0, maxLength) + '...';
-        }
-        return string;
-    }
-
+    // Render Function
     return (
         <Card className="mashup-unit">
-            <div className = "artist-info">
-                <div className="song-title">{cutString(songName1, 30)}</div>
-                <div className="artist-title">{cutString(artistName1, 25)}</div>
+            <div className="song-info">
+                <div className="song-title">{acapSongName + " –" + '\u00a0'}</div>
+                <div className="artist-title">{acapArtistNames}</div>
             </div>
-            <div className = "artist-info">
-                <div className="song-title">{cutString(songName2, 30)}</div>
-                <div className="artist-title">{cutString(artistName2, 25)}</div>
+            <hr/>
+            <div className="song-info">
+                <div className="song-title">{instrSongName + " –" + '\u00a0'}</div>
+                <div className="artist-title">{instrArtistNames}</div>
             </div>
         </Card>
     );

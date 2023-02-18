@@ -13,7 +13,7 @@ function LoginPage() {
     const handleLogin = () => {
         const clientId = CLIENT_ID;
         const redirectUri = "http://127.0.0.1:5000/callback";
-        const scopes = "app-remote-control user-read-private user-read-email";
+        const scopes = "user-read-private user-read-email playlist-modify-private playlist-modify-public";
         
         const authorizationUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scopes}`;
         

@@ -6,11 +6,9 @@ import FeatureDropdowns from '../components/FeatureDropdowns';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../components/component.css'
 
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import ToggleButton from 'react-bootstrap/ToggleButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-import { BsMusicNoteList } from 'react-icons/bs';
+import { BsCheck, BsMusicNoteList } from 'react-icons/bs';
 import { FaRecordVinyl } from 'react-icons/fa';
 import { AiOutlineSearch, AiOutlinePlus } from 'react-icons/ai';
 import ApiInfo from '../config.json'
@@ -22,7 +20,6 @@ const CLIENT_SECRET = ApiInfo['CLIENT_SECRET'];
 function AcapellaMatchPage() {
     // useStates
     // Page State
-    // const [radioValue, setRadioValue] = useState('match');
     const [isSelectPage, setIsSelectPage] = useState(true);
     
     // Search State
@@ -34,6 +31,7 @@ function AcapellaMatchPage() {
     const [errorMessage, setErrorMessage] = useState('Select all parameters.');
     const [searchWarning, setSearchWarning] = useState(false);
     const [dropdownWarning, setDropdownWarning] = useState(false);
+    const [mashupAdded, setMashupAdded] = useState(false);
   
     // Acapella State
     const [acapellas, setAcapellas] = useState([]);
@@ -240,6 +238,7 @@ function AcapellaMatchPage() {
           })
           .then(data => {
             console.log("add success!")
+            console.log(data)
           })
           .catch(error => {
             console.log("add failure :(")
@@ -260,11 +259,14 @@ function AcapellaMatchPage() {
                     <button className="search-button" onClick={() => {search()}}>
                         <AiOutlineSearch/>	  
                     </button>
-                    <input id="team-search" type="test" className="song-search-input" placeholder="Search by title" onChange={(evt) => {setSearchState(evt.target.value)}}/>
+                    <input id="team-search" type="test" className="song-search-input" placeholder="Search by title" 
+                      onChange={(evt) => {setSearchState(evt.target.value)}}
+                      onKeyDown={(evt) => {if (evt.key === 'Enter') {search()}}}
+                    />
                     </div>
                     <DropdownButton id='dropdown-button' title="">
                     {isSongSelected() && songResults.map((song, idx) => (
-                        <Dropdown.Item onClick={() => {updateSelectedSong(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
+                        <Dropdown.Item onClick={() => {updateSelectedSong(idx)}} key={idx}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
                     ))}
                     </DropdownButton>
                 </div>
@@ -296,48 +298,37 @@ function AcapellaMatchPage() {
                 <div className="section-title">acapella</div>
                 <DropdownButton id='dropdown-button' title="">
                     {isSongSelected() && acapellas.map((song, idx) => (
-                      <Dropdown.Item onClick={() => {updateSelectedAcapella(idx)}}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
+                      <Dropdown.Item onClick={() => {updateSelectedAcapella(idx)}} key={idx}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
                     ))}
                 </DropdownButton>
                 </div>
                 <Song songName={selectedAcapella.name} artistName={selectedAcapella.artists.join(', ')} link={selectedAcapella.link} img={selectedAcapella.image}/>
                 <div className="mix-instructions-container">
-                <div className="section-title">mix instructions:</div>
-                <div className="section-text">{`change bpm ${formatBPM(selectedAcapella.bpm_shift)} and key ${selectedAcapella.key_shift}`}</div>
+                  <div className="section-title">mix instructions:</div>
+                  <div className="section-text">{`change bpm ${formatBPM(selectedAcapella.bpm_shift)} and key ${selectedAcapella.key_shift}`}</div>
                 </div>
-                <div className="playlist-add" onClick={() => {addMashup()}}>add to playlist</div>
+                <div className="playlist-add" onClick={() => {addMashup(); setMashupAdded(true)}}>
+                  {mashupAdded ? "added" : "add to saved"}
+                  {mashupAdded && <BsCheck color='white' size={15}/>}
+                </div>
                 <button className="action-button" 
-                onClick={() => {
-                    setSearchState("");
-                    setSongResults([]);
-                    setSelectedSong({});
-                    setSelectedAcapella({});
-                    setDropdownData([]);
-                    setSearchWarning(false);
-                    setDropdownWarning(false);
-                    setAcapellas([]);
-                    setIsSelectPage(true);
-                }}
-                >
-                reset
+                  onClick={() => {
+                      setSearchState("");
+                      setSongResults([]);
+                      setSelectedSong({});
+                      setSelectedAcapella({});
+                      setDropdownData([]);
+                      setSearchWarning(false);
+                      setDropdownWarning(false);
+                      setAcapellas([]);
+                      setIsSelectPage(true);
+                      setMashupAdded(false)
+                  }}
+                  >
+                  reset
                 </button>
             </div>
             }
-            {/* <ButtonGroup className="nav-button-group">
-            {radios.map((radio, idx) => (
-                <ToggleButton
-                key = {idx}
-                id={`radio${idx}`}
-                type="radio"
-                name="radio"
-                value={radio.value}
-                checked={radioValue === radio.value}
-                onChange={(e) => setRadioValue(e.currentTarget.value)}
-                >
-                {radio.icon}
-                </ToggleButton>
-            ))}
-            </ButtonGroup> */}
         </div>
     );
   }
