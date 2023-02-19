@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../components/component.css'
 import ApiInfo from '../config.json'
 import Mashup from '../components/Mashup.js'
+import ScaleLoader from "react-spinners/ScaleLoader";
 
 import { FaSpotify, FaPlus } from 'react-icons/fa';
 import { CgPlayListRemove } from 'react-icons/cg';
@@ -18,24 +19,9 @@ function SavedMashupsPage() {
     const base_url = 'https://api.spotify.com/v1/'
 
     const [mashups, setMashups] = useState([]);
-    const [accessToken, setAccessToken] = useState('');
+    const [loading, setLoading] = useState(true);
 
     // useEffects
-    // Spotify useEffect
-    useEffect(() => {
-        var authParameters = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'grant_type=client_credentials&client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET
-        }
-        
-        fetch('https://accounts.spotify.com/api/token/' + '?t=' + Date.now(), authParameters) 
-          .then(result => result.json())
-          .then(data => setAccessToken(data.access_token))
-    }, []);
-
     // useEffect to Load Saved Mashups
     useEffect(() => {
         var mashups = fetch(api_url, {
@@ -47,72 +33,46 @@ function SavedMashupsPage() {
         })
         .then(response => response.json())
         .then(data => {
-            toMashupComponents(data);
+            updateMashups(data);
+            setLoading(false);
         })
     }, []);
 
     useEffect(() => {
         var div = document.getElementById('mashups-container');
-        var height = div.clientHeight;
-        var scrollHeight = div.scrollHeight;
+        if (div != null) {
+            var height = div.clientHeight;
+            var scrollHeight = div.scrollHeight;
 
-        if (scrollHeight > height) {
-            div.style.overflowY = 'scroll';
-        } else {
-            div.style.overflowY = 'hidden';
+            if (scrollHeight > height) {
+                div.style.overflowY = 'scroll';
+            } else {
+                div.style.overflowY = 'hidden';
+            }
         }
     }, [mashups]);
 
-    // getRelevant Mashup Data from URIs
-    async function getTrackDataFromURI(trackUri) {
-        var trackId = trackUri.split(":")[2]
-        var searchParameters = {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + accessToken
-          }
-        }
-    
-        const response = await fetch(base_url + 'tracks/' + trackId, searchParameters)
-        const data = await response.json();
-
-        return data;
-    }
-
-    function extractSongData(data) {
-        return {
-            artists: data.artists.map(artist => artist.name),
-            name: data.name,
-            link: data.external_urls.spotify,
-            image: data.album.images[1].url,
-            uri: data.uri
-        }
-    }
-
     // map mashups to Mashup Components
-    async function toMashupComponents(mashupObjects) {
+    async function updateMashups(mashupObjects) {
         var res = [];
 
         for (const mashup in mashupObjects) {
             const mashupData = mashupObjects[mashup];
-            const acapData = await getTrackDataFromURI(mashupData.acap_uri);
-            const acapInfo = extractSongData(acapData);
-            const instrData = await getTrackDataFromURI(mashupData.instr_uri);
-            const instrInfo = extractSongData(instrData);
+            const acapData = mashupData.acap_data
+            const instrData = mashupData.instr_data
 
             res.push({
-                acapSongName: acapInfo.name,
-                acapArtistNames: acapInfo.artists.join(', '),
-                acapImage: acapInfo.image,
-                acapLink: acapInfo.link,
-                acapUri: acapInfo.uri,
+                acapSongName: acapData.name,
+                acapArtistNames: acapData.artists.join(', '),
+                acapImage: acapData.image,
+                acapLink: acapData.link,
+                acapUri: acapData.uri,
 
-                instrSongName: instrInfo.name,
-                instrArtistNames: instrInfo.artists.join(', '),
-                instrImage: instrInfo.image,
-                instrLink: instrInfo.link,
-                instrUri: instrInfo.uri
+                instrSongName: instrData.name,
+                instrArtistNames: instrData.artists.join(', '),
+                instrImage: instrData.image,
+                instrLink: instrData.link,
+                instrUri: instrData.uri
             })
         }
         
@@ -169,6 +129,11 @@ function SavedMashupsPage() {
         <div className='saved-mashups-page'>
             <Header/>
             <div className="page-title">[saved mashups]</div>
+            {loading ? 
+            <div className="loader-container">
+                <ScaleLoader color={'#ffffff'} loading={loading} size={150}/>
+            </div>
+                :
             <div className="mashups-container" id="mashups-container">
                 {mashups.map((mashup, index) => (
                     <div key={index} className="mashup-add-container">
@@ -194,7 +159,7 @@ function SavedMashupsPage() {
                         </div>
                     </div>
                 ))}
-            </div>
+            </div>}  
         </div>
     )
 }

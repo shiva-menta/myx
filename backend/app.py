@@ -193,6 +193,20 @@ def get_spotify_song_data(track_uri):
     r = requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
     return r.json()
 
+def get_spotify_song_info(track_uri):
+    track_id = track_uri.split(':')[2]
+    r = requests.get(BASE_URL + 'tracks/' + track_id, headers=headers)
+    return r.json()
+
+def extract_song_data(song_data):
+    return {
+        'uri': song_data['uri'],
+        'name': song_data['name'],
+        'artists': [artist['name'] for artist in song_data['artists']],
+        'link': song_data['external_urls']['spotify'],
+        'image': song_data['album']['images'][1]['url']
+    }
+
 def get_match_uris(instr_data, req_data):
     sel_genre = input_map[req_data['genre']]
     sel_decade = int(req_data['decade'])
@@ -331,8 +345,19 @@ def get_acapellas():
 @app.route('/mashups', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def get_mashups():
+    res = []
+
     mashups = Mashup.query.filter_by(user_uri=session['user_info']['uri']).all()
-    return jsonify([e.serialize() for e in mashups]), 200
+    for mashup in mashups:
+        mashup.instr_data = extract_song_data(get_spotify_song_info(mashup.instr_uri))
+        mashup.acap_data = extract_song_data(get_spotify_song_info(mashup.acap_uri))
+
+        res.append({
+            "instr_data": mashup.instr_data,
+            "acap_data": mashup.acap_data
+        })
+
+    return jsonify([e for e in res]), 200
 
 # post new mashup
 mashup_args = reqparse.RequestParser()
