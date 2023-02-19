@@ -11,6 +11,7 @@ import base64
 import jwt
 from creds import CLIENT_ID, CLIENT_SECRET, secret_key
 import logging
+from functools import wraps
 
 # ––––– App Initialization / Setup –––––
 DB_FILE = "songs.db"
@@ -286,12 +287,26 @@ def refresh_user_token(refresh_token):
     else:
         return jsonify({"message": "Token refresh failed"}), 400
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if request.method == 'OPTIONS':
+            return jsonify({"message": "Preflight request"}), 200
+        if 'user_info' not in session:
+            return jsonify({"message": "User is not logged in"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/api/authenticate')
+@login_required
+def authenticated():
+    return jsonify({'authenticated': True}), 200
 
 # ––––– General Endpoints –––––
 
-
 # Intro Endpoint
 @app.route('/', methods=['GET'])
+@login_required
 def main():
     return jsonify({"message": "Welcome to the Myx API!"}), 200
 
@@ -300,6 +315,7 @@ def main():
 
 # Acapellas Endpoint
 @app.route('/get-acapellas', methods=['GET'])
+@login_required
 def get_acapellas():
     uri = request.args.get("uri")
     bpm = request.args.get("bpm")
@@ -343,6 +359,7 @@ def get_acapellas():
 
 # get all mashups
 @app.route('/mashups', methods=['GET'])
+@login_required
 @cross_origin(supports_credentials=True)
 def get_mashups():
     res = []
@@ -365,6 +382,7 @@ mashup_args.add_argument("instr_uri", type=str, help="Instrumental URI is requir
 mashup_args.add_argument("acap_uri", type=str, help="Acapella URI is required", required=True)
 
 @app.route('/mashups', methods=['POST'])
+@login_required
 @cross_origin(supports_credentials=True)
 def create_mashup():
     data = mashup_args.parse_args()
@@ -381,6 +399,7 @@ def create_mashup():
 
 # delete mashup
 @app.route('/mashups', methods=['DELETE'])
+@login_required
 @cross_origin(supports_credentials=True)
 def delete_mashup():
     data = mashup_args.parse_args()
@@ -402,6 +421,7 @@ spotify_mashup_args.add_argument("acap_uri", type=str, help="Acapella URI is req
 spotify_mashup_args.add_argument("acap_name", type=str, help="Instrumental URI is required", required=True)
 
 @app.route('/add-spotify-mashup', methods=['POST'])
+@login_required
 @cross_origin(supports_credentials=True)
 def add_spotify_mashup():
     response = refresh_user_token(session['user_refresh_token'])

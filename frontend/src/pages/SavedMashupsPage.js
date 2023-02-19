@@ -2,23 +2,18 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header.js'
 import 'bootstrap/dist/css/bootstrap.css';
 import '../components/component.css'
-import ApiInfo from '../config.json'
 import Mashup from '../components/Mashup.js'
 import ScaleLoader from "react-spinners/ScaleLoader";
 
-import { FaSpotify, FaPlus } from 'react-icons/fa';
+import { FaSpotify, FaPlus, FaCheck } from 'react-icons/fa';
 import { CgPlayListRemove } from 'react-icons/cg';
-
-// Spotify ID Imports
-const CLIENT_ID = ApiInfo['CLIENT_ID'];
-const CLIENT_SECRET = ApiInfo['CLIENT_SECRET'];
 
 function SavedMashupsPage() {
     const api_url = 'http://127.0.0.1:5000/mashups';
     const api_spot_url = 'http://127.0.0.1:5000/add-spotify-mashup';
-    const base_url = 'https://api.spotify.com/v1/'
 
     const [mashups, setMashups] = useState([]);
+    const [addMarkers, setAddMarkers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // useEffects
@@ -55,6 +50,7 @@ function SavedMashupsPage() {
     // map mashups to Mashup Components
     async function updateMashups(mashupObjects) {
         var res = [];
+        var markersArray = [];
 
         for (const mashup in mashupObjects) {
             const mashupData = mashupObjects[mashup];
@@ -74,9 +70,11 @@ function SavedMashupsPage() {
                 instrLink: instrData.link,
                 instrUri: instrData.uri
             })
+            markersArray.push(false);
         }
         
         setMashups(res);
+        setAddMarkers(markersArray);
     }
 
     function addMashupToSpotify(idx) {
@@ -99,6 +97,11 @@ function SavedMashupsPage() {
         .then(response => response.json())
         .then(data => {
             console.log(data);
+            setAddMarkers(prevMarkers => {
+                var newMarkers = [...prevMarkers];
+                newMarkers[idx] = true;
+                return newMarkers;
+            })
         })
     }
 
@@ -121,6 +124,7 @@ function SavedMashupsPage() {
         .then(data => {
             console.log(data);
             setMashups(prevMashups => prevMashups.filter((_, i) => i !== idx));
+            setAddMarkers(prevMarkers => prevMarkers.filter((_, i) => i !== idx));
         })
     }
     
@@ -149,9 +153,9 @@ function SavedMashupsPage() {
                             instrLink={mashup.instrLink}
                         />
                         <div className="mashup-action-button-container">
-                            <button className="mashup-action-button" onClick={() => {addMashupToSpotify(index)}}>
+                            <button className="mashup-action-button" onClick={() => {if (!addMarkers[index]) {addMashupToSpotify(index)}}}>
                                 <FaSpotify className="add-mashup-spotify-icon" size={20}/>
-                                <FaPlus className="add-mashup-spotify-icon" size={10}/>
+                                {addMarkers[index] ? <FaCheck className="add-mashup-spotify-icon" size={10}/> : <FaPlus className="add-mashup-spotify-icon" size={10}/>}
                             </button>
                             <button className="mashup-action-button" onClick={() => {removeMashup(index)}}>
                                 <CgPlayListRemove className="remove-mashup-spotify-icon" size={20}/>

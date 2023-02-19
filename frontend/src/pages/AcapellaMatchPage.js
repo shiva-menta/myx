@@ -174,7 +174,8 @@ function AcapellaMatchPage() {
           let trackFeatures = await fetch(`https://api.spotify.com/v1/audio-features/?ids=${trackURIs.join(',')}`, searchParameters)
             .then(response => response.json())
             .then(data => {
-              let instrumentalValues = data.audio_features.map(feature => feature.instrumentalness);
+              // why is this here?
+              let instrumentalValues = data.audio_features.map(feature => feature === null ? 1 : feature.instrumentalness);
               extractedSongListData.forEach((track, index) => {
                 track.instrumentalness = instrumentalValues[index];
               });
@@ -192,7 +193,8 @@ function AcapellaMatchPage() {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json'
-          }
+          },
+          credentials: 'include'
         })
           .then(res => {
             if (!res.ok) {
