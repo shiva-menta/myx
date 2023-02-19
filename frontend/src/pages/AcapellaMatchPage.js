@@ -238,7 +238,6 @@ function AcapellaMatchPage() {
           })
           .then(data => {
             console.log("add success!")
-            console.log(data)
           })
           .catch(error => {
             console.log("add failure :(")

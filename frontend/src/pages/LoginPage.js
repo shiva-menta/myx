@@ -29,7 +29,7 @@ function LoginPage() {
             <br></br>
             <div className="section-text"><b>Myx V2: Shortest Mix Path</b> will use graph algorithms to find the shortest path between two songs in a playlist. This will come in the next few weeks!</div>
             <button className="spotify-auth-button" onClick={() => {handleLogin()}}>
-                <div className="spotify-button-text">Spotify OAuth</div>
+                <div className="spotify-button-text">Spotify Log-In</div>
                 <FaSpotify className="spotify-icon"/>
             </button>
         </div>

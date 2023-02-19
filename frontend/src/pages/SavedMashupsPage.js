@@ -30,8 +30,8 @@ function SavedMashupsPage() {
           },
           body: 'grant_type=client_credentials&client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET
         }
-    
-        fetch('https://accounts.spotify.com/api/token', authParameters) 
+        
+        fetch('https://accounts.spotify.com/api/token/' + '?t=' + Date.now(), authParameters) 
           .then(result => result.json())
           .then(data => setAccessToken(data.access_token))
     }, []);
@@ -48,7 +48,6 @@ function SavedMashupsPage() {
         .then(response => response.json())
         .then(data => {
             toMashupComponents(data);
-            console.log(data);
         })
     }, []);
 
@@ -77,8 +76,7 @@ function SavedMashupsPage() {
     
         const response = await fetch(base_url + 'tracks/' + trackId, searchParameters)
         const data = await response.json();
-        console.log(response)
-        
+
         return data;
     }
 
@@ -118,7 +116,6 @@ function SavedMashupsPage() {
             })
         }
         
-        console.log(res);
         setMashups(res);
     }
 
