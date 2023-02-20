@@ -335,6 +335,16 @@ a {
     
     gap: 0.5em;
 }
+.no-mashups-found-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 350px;
+    width: 100%;
+}
+.no-mashups-found-container .section-text {
+    width: 300px;
+}
 #mashups-container::-webkit-scrollbar {
     width: 5px;
 }

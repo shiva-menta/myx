@@ -61,10 +61,26 @@ class Mashup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_uri = db.Column(db.Integer, nullable=False)
     instr_uri = db.Column(db.String(50), nullable=False)
+    instr_song_name = db.Column(db.String(100), nullable=False)
+    instr_artist_name = db.Column(db.String(200), nullable=False)
+    instr_image = db.Column(db.String(100), nullable=False)
+    instr_link = db.Column(db.String(100), nullable=False)
     acap_uri = db.Column(db.String(50), nullable=False)
+    acap_song_name = db.Column(db.String(100), nullable=False)
+    acap_artist_name = db.Column(db.String(200), nullable=False)
+    acap_image = db.Column(db.String(100), nullable=False)
+    acap_link = db.Column(db.String(100), nullable=False)
 
     def serialize(self):
         return {
+            'acap_uri': self.acap_uri,
+            'acap_song_name': self.acap_song_name,
+            'acap_artist_name': self.acap_artist_name,
+            'acap_image': self.acap_image,
+            'acap_link': self.acap_link,
             'instr_uri': self.instr_uri,
-            'acap_uri': self.acap_uri
+            'instr_song_name': self.instr_song_name,
+            'instr_artist_name': self.instr_artist_name,
+            'instr_image': self.instr_image,
+            'instr_link': self.instr_link
         }

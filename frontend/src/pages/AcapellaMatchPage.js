@@ -221,7 +221,15 @@ function AcapellaMatchPage() {
       if (selectedAcapella != undefined && selectedSong != undefined) {
         var body = {
           "acap_uri": selectedAcapella.uri,
-          "instr_uri": selectedSong.uri
+          "acap_song_name": selectedAcapella.name,
+          "acap_artist_name": selectedAcapella.artists.join(", "),
+          "acap_image": selectedAcapella.image,
+          "acap_link": selectedAcapella.link,
+          "instr_uri": selectedSong.uri,
+          "instr_song_name": selectedSong.name,
+          "instr_artist_name": selectedSong.artists.join(", "),
+          "instr_image": selectedSong.image,
+          "instr_link": selectedSong.link
         }
 
         var mashup = fetch(api_mashups_url, {
@@ -239,10 +247,10 @@ function AcapellaMatchPage() {
             return res.json()
           })
           .then(data => {
-            console.log("add success!")
+            console.log("Success!")
           })
           .catch(error => {
-            console.log("add failure :(")
+            console.log("Failure.")
           })
       }
     }
@@ -284,8 +292,8 @@ function AcapellaMatchPage() {
                 {dropdownWarning && <div className="warning">{errorMessage}</div>}
                 </div>
                 <div className="match">
-                <div className="section-title">3. match...</div>
-                <button className="action-button" onClick={() => {getAcapellas()}}>match</button>
+                  <div className="section-title">3. match...</div>
+                  <button className="action-button" onClick={() => {getAcapellas()}}>match</button>
                 </div>
             </div>
             :

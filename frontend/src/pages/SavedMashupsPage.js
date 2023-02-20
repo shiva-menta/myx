@@ -85,7 +85,7 @@ function SavedMashupsPage() {
             instr_uri: mashup.instrUri,
             instr_name: mashup.instrSongName
         }
-        console.log(mashupData);
+        // console.log(mashupData);
         fetch(api_spot_url, {
             method: 'POST',
             headers: {
@@ -96,7 +96,7 @@ function SavedMashupsPage() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            // console.log(data);
             setAddMarkers(prevMarkers => {
                 var newMarkers = [...prevMarkers];
                 newMarkers[idx] = true;
@@ -111,7 +111,7 @@ function SavedMashupsPage() {
             acap_uri: mashup.acapUri,
             instr_uri: mashup.instrUri
         }
-        console.log(mashupData);
+        // console.log(mashupData);
         fetch(api_url, {
             method: 'DELETE',
             headers: {
@@ -122,7 +122,7 @@ function SavedMashupsPage() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            // console.log(data);
             setMashups(prevMashups => prevMashups.filter((_, i) => i !== idx));
             setAddMarkers(prevMarkers => prevMarkers.filter((_, i) => i !== idx));
         })
@@ -139,7 +139,12 @@ function SavedMashupsPage() {
             </div>
                 :
             <div className="mashups-container" id="mashups-container">
-                {mashups.map((mashup, index) => (
+                {mashups.length === 0 ? 
+                <div className="no-mashups-found-container">
+                    <div className="section-text">No mashups found! Add some through <b>acapella match</b>.</div>
+                </div>
+                    :
+                mashups.map((mashup, index) => (
                     <div key={index} className="mashup-add-container">
                         <Mashup
                             acapSongName={mashup.acapSongName}
