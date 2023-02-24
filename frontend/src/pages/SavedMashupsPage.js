@@ -54,21 +54,19 @@ function SavedMashupsPage() {
 
         for (const mashup in mashupObjects) {
             const mashupData = mashupObjects[mashup];
-            const acapData = mashupData.acap_data
-            const instrData = mashupData.instr_data
 
             res.push({
-                acapSongName: acapData.name,
-                acapArtistNames: acapData.artists.join(', '),
-                acapImage: acapData.image,
-                acapLink: acapData.link,
-                acapUri: acapData.uri,
+                acapSongName: mashupData.acap_song_name,
+                acapArtistNames: mashupData.acap_artist_name,
+                acapImage: mashupData.acap_image,
+                acapLink: mashupData.acap_link,
+                acapUri: mashupData.acap_uri,
 
-                instrSongName: instrData.name,
-                instrArtistNames: instrData.artists.join(', '),
-                instrImage: instrData.image,
-                instrLink: instrData.link,
-                instrUri: instrData.uri
+                instrSongName: mashupData.instr_song_name,
+                instrArtistNames: mashupData.instr_artist_name,
+                instrImage: mashupData.instr_image,
+                instrLink: mashupData.instr_link,
+                instrUri: mashupData.instr_uri
             })
             markersArray.push(false);
         }

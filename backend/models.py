@@ -21,7 +21,7 @@ class Acapella(db.Model):
     title = db.Column(db.String(100), nullable=False)
     artist = db.Column(db.String(100), nullable=False)
     key = db.Column(db.String(5), nullable=False)
-    decade = db.Column(db.String(5), nullable=False)
+    decade = db.Column(db.Integer, nullable=False)
     bpm = db.Column(db.Integer, nullable=False)
     genres = db.relationship('Genre', secondary=genres, lazy='subquery', backref=db.backref('genres', lazy=True))
     popularity = db.Column(db.Integer, nullable=False)
@@ -59,7 +59,7 @@ class Genre(db.Model):
 
 class Mashup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_uri = db.Column(db.Integer, nullable=False)
+    user_uri = db.Column(db.String(50), nullable=False)
     instr_uri = db.Column(db.String(50), nullable=False)
     instr_song_name = db.Column(db.String(100), nullable=False)
     instr_artist_name = db.Column(db.String(200), nullable=False)

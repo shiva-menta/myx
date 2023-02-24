@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-spotipy = "*"
 flask = "*"
 flask-restful = "*"
 flask-sqlalchemy = "*"
@@ -14,6 +13,8 @@ flask-cors = "*"
 flask-session = "*"
 redis = "*"
 pyjwt = "*"
+psycopg2 = "*"
+flask-migrate = "*"
 
 [dev-packages]
 

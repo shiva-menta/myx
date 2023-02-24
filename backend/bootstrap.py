@@ -1,5 +1,5 @@
 import os
-from app import app, db, DB_FILE
+from app import app, db
 import requests
 import pandas as pd
 from time import sleep
@@ -229,9 +229,9 @@ def get_decade(year):
 if __name__ == '__main__':
     # get_access_token()
 
-    file_path = os.path.join('./instance', DB_FILE)
-    if os.path.exists(file_path):
-        os.remove(file_path)
+    # file_path = os.path.join('./instance', DB_FILE)
+    # if os.path.exists(file_path):
+    #     os.remove(file_path)
 
     with app.app_context():
         db.create_all()

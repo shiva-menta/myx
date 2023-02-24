@@ -10,11 +10,11 @@ import requests
 import base64
 import jwt
 from creds import CLIENT_ID, CLIENT_SECRET, secret_key
+from config import DEV_DB, PROD_DB
 import logging
 from functools import wraps
 
 # ––––– App Initialization / Setup –––––
-DB_FILE = "songs.db"
 AUTH_URL = 'https://accounts.spotify.com/api/token'
 BASE_URL = 'https://api.spotify.com/v1/'
 REDIRECT_URI = 'http://127.0.0.1:5000/callback'
@@ -25,16 +25,16 @@ headers = None
 expires_at = None
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_FILE}"
+app.config['SQLALCHEMY_DATABASE_URI'] = PROD_DB
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.secret_key = secret_key
 logging.basicConfig(level=logging.DEBUG)
 CORS(app, origins=['http://127.0.0.1:3000'], supports_credentials=True)
-db = SQLAlchemy()
-sess = Session()
-# db.init_app(app)
+db = SQLAlchemy(app)
+sess = Session(app)
 
 from models import *
 
@@ -384,12 +384,18 @@ def get_mashups():
 
     mashups = Mashup.query.filter_by(user_uri=session['user_info']['uri']).all()
     for mashup in mashups:
-        mashup.instr_data = extract_song_data(get_spotify_song_info(mashup.instr_uri))
-        mashup.acap_data = extract_song_data(get_spotify_song_info(mashup.acap_uri))
-
         res.append({
-            "instr_data": mashup.instr_data,
-            "acap_data": mashup.acap_data
+            "acap_song_name": mashup.acap_song_name,
+            "acap_artist_name": mashup.acap_artist_name,
+            "acap_image": mashup.acap_image,
+            "acap_link": mashup.acap_link,
+            "acap_uri": mashup.acap_uri,
+            
+            "instr_song_name": mashup.instr_song_name,
+            "instr_artist_name": mashup.instr_artist_name,
+            "instr_image": mashup.instr_image,
+            "instr_link": mashup.instr_link,
+            "instr_uri": mashup.instr_uri,
         })
 
     return jsonify([e for e in res]), 200
@@ -505,7 +511,7 @@ def add_spotify_mashup():
 # ––––– MAIN –––––
 
 if __name__ == '__main__':
-    get_access_token()
-    db.init_app(app)
-    sess.init_app(app)
+    # get_access_token()
+    # db.init_app(app)
+    # sess.init_app(app)
     app.run(debug=True)
