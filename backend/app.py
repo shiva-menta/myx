@@ -1,4 +1,4 @@
-from redis import Redis
+import redis
 from flask import Flask, request, jsonify, make_response, redirect, session
 from flask_restful import abort, reqparse
 from flask_sqlalchemy import SQLAlchemy
@@ -10,14 +10,15 @@ import requests
 import base64
 import jwt
 from creds import CLIENT_ID, CLIENT_SECRET, secret_key
-from config import DEV_DB, PROD_DB
+from config import DEV_DB, PROD_DB, redis_url
 import logging
 from functools import wraps
 
 # ––––– App Initialization / Setup –––––
+BACKEND_URL = 'http://127.0.0.1:8000'
 AUTH_URL = 'https://accounts.spotify.com/api/token'
 BASE_URL = 'https://api.spotify.com/v1/'
-REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+REDIRECT_URI = BACKEND_URL + '/callback'
 FRONTEND_REDIRECT_URL = 'http://127.0.0.1:3000/home'
 
 access_token = None
@@ -25,10 +26,10 @@ headers = None
 expires_at = None
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = PROD_DB
+app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379)
+app.config['SESSION_REDIS'] = redis.from_url(redis_url)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.secret_key = secret_key
 logging.basicConfig(level=logging.DEBUG)
@@ -261,6 +262,7 @@ def callback():
         'redirect_uri': REDIRECT_URI
     }
     response = requests.post(AUTH_URL, data=data, headers=headers)
+    app.logger.info(response.json())
     
     user_access_token = response.json()['access_token']
     user_refresh_token = response.json()['refresh_token']
@@ -309,6 +311,7 @@ def login_required(f):
         if request.method == 'OPTIONS':
             return jsonify({"message": "Preflight request"}), 200
         if 'user_info' not in session:
+            app.logger.info(session)
             return jsonify({"message": "User is not logged in"}), 401
         return f(*args, **kwargs)
     return decorated_function

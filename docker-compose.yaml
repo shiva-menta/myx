@@ -1,0 +1,41 @@
+version: "3"
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    command: npm start
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./frontend:/app
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: pipenv run gunicorn --bind 127.0.0.1:8000 -w 3 run:app
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - redis
+      - db
+    environment:
+      REDIS_URL: "redis://redis/"
+
+  redis:
+    image: redis:latest
+    command: "redis-server"
+
+  db:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=shivamenta
+      - POSTGRES_PASSWORD=myxd3V$tar
+      - POSTGRES_DB=myx
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

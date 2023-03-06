@@ -6,10 +6,12 @@ RUN mkdir /code
 
 WORKDIR /code
 
-COPY requirements.txt /code/
-RUN pip3 install -r requirements.txt
+RUN pip install pipenv
+# COPY requirements.txt /code/
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install
 
-COPY . /code/
+COPY . .
 
 # CMD python run.py
-CMD gunicorn --bind 0.0.0.0:5000 -w 3 run:app
+CMD pipenv run gunicorn --bind 127.0.0.1:8000 -w 3 run:app

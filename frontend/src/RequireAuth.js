@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import ScaleLoader from 'react-spinners/ScaleLoader';
+import ApiInfo from './config.json';
+
+const BACKEND_URL = ApiInfo['BACKEND_URL'];
 
 function RequireAuth({children}) {
     const [authenticated, setAuthenticated] = useState(false);
     const [authCheckFinished, setAuthCheckFinished] = useState(false);
-    const api_url = 'http://127.0.0.1:5000/api/authenticate';
+    const api_url = BACKEND_URL + '/api/authenticate';
 
     useEffect(() => {
         const checkAuth = async () => {

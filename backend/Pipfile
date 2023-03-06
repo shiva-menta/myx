@@ -13,8 +13,10 @@ flask-cors = "*"
 flask-session = "*"
 redis = "*"
 pyjwt = "*"
-psycopg2 = "*"
 flask-migrate = "*"
+gunicorn = "*"
+psycopg2-binary = "*"
+requests = "*"
 
 [dev-packages]
 

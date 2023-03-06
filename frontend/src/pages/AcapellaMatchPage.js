@@ -13,6 +13,8 @@ import { FaRecordVinyl } from 'react-icons/fa';
 import { AiOutlineSearch, AiOutlinePlus } from 'react-icons/ai';
 import ApiInfo from '../config.json'
 
+const BACKEND_URL = ApiInfo['BACKEND_URL']
+
 // Spotify ID Imports
 const CLIENT_ID = ApiInfo['CLIENT_ID'];
 const CLIENT_SECRET = ApiInfo['CLIENT_SECRET'];
@@ -48,8 +50,8 @@ function AcapellaMatchPage() {
     }
   
     // Spotify URL Information
-    const api_url = 'http://127.0.0.1:5000/get-acapellas?';
-    const api_mashups_url = 'http://127.0.0.1:5000/mashups'
+    const api_url = BACKEND_URL + '/get-acapellas?';
+    const api_mashups_url = BACKEND_URL + '/mashups'
     const base_url = 'https://api.spotify.com/v1/'
   
   

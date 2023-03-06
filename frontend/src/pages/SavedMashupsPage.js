@@ -4,13 +4,16 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../components/component.css'
 import Mashup from '../components/Mashup.js'
 import ScaleLoader from "react-spinners/ScaleLoader";
+import ApiInfo from '../config.json';
 
 import { FaSpotify, FaPlus, FaCheck } from 'react-icons/fa';
 import { CgPlayListRemove } from 'react-icons/cg';
 
+const BACKEND_URL = ApiInfo['BACKEND_URL']
+
 function SavedMashupsPage() {
-    const api_url = 'http://127.0.0.1:5000/mashups';
-    const api_spot_url = 'http://127.0.0.1:5000/add-spotify-mashup';
+    const api_url = BACKEND_URL + '/mashups';
+    const api_spot_url = BACKEND_URL + '/add-spotify-mashup';
 
     const [mashups, setMashups] = useState([]);
     const [addMarkers, setAddMarkers] = useState([]);
