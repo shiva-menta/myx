@@ -1,41 +1,71 @@
 version: "3"
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    command: npm start
-    ports:
-      - "127.0.0.1:3000:3000"
-    volumes:
-      - ./frontend:/app
-  web:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    command: pipenv run gunicorn --bind 127.0.0.1:8000 -w 3 run:app
-    ports:
-      - "127.0.0.1:8000:8000"
-    depends_on:
-      - redis
-      - db
-    environment:
-      REDIS_URL: "redis://redis/"
-
   redis:
     image: redis:latest
     command: "redis-server"
-
+    networks:
+      - myx-network
   db:
     image: postgres
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_USER=shivamenta
-      - POSTGRES_PASSWORD=myxd3V$tar
-      - POSTGRES_DB=myx
+      POSTGRES_USER: shivamenta
+      POSTGRES_PASSWORD: myxd3V$tar
+      POSTGRES_DB: myx
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - myx-network
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    expose:
+      - 3000
+    volumes:
+      - ./frontend:/app
+    networks:
+      - myx-network
+    environment:
+      REACT_APP_API_URL: http://myx.localhost/api
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: pipenv run gunicorn --bind 0.0.0.0:8000 -w 3 run:app
+    expose:
+      - 8000
+    depends_on:
+      - redis
+      - db
+    environment:
+      REDIS_URL: redis://redis/
+      BACKEND_URL: http://myx.localhost/api
+      FRONTEND_URL: http://myx.localhost
+      POSTGRES_USER: shivamenta
+      POSTGRES_PASSWORD: myxd3V$tar
+      POSTGRES_DB: myx
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+    networks:
+      - myx-network
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 8080:80
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - myx-network
 
 volumes:
   postgres_data:
+networks:
+  myx-network:
+    driver: bridge

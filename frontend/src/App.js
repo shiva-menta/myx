@@ -5,6 +5,7 @@ import SavedMashupsPage from './pages/SavedMashupsPage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import RequireAuth from './RequireAuth';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (

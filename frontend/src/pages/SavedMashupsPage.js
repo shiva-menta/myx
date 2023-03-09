@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header.js'
-import 'bootstrap/dist/css/bootstrap.css';
 import '../components/component.css'
 import Mashup from '../components/Mashup.js'
 import ScaleLoader from "react-spinners/ScaleLoader";

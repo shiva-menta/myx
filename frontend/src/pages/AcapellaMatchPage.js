@@ -3,7 +3,6 @@ import '../App.css';
 import Header from '../components/Header.js'
 import Song from '../components/Song.js'
 import FeatureDropdowns from '../components/FeatureDropdowns';
-import 'bootstrap/dist/css/bootstrap.css';
 import '../components/component.css'
 
 import Dropdown from 'react-bootstrap/Dropdown';

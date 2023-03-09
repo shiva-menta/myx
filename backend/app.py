@@ -10,16 +10,15 @@ import requests
 import base64
 import jwt
 from creds import CLIENT_ID, CLIENT_SECRET, secret_key
-from config import DEV_DB, PROD_DB, redis_url
+from config import DEV_DB, PROD_DB, redis_url, backend_url, frontend_url
 import logging
 from functools import wraps
 
 # ––––– App Initialization / Setup –––––
-BACKEND_URL = 'http://127.0.0.1:8000'
 AUTH_URL = 'https://accounts.spotify.com/api/token'
 BASE_URL = 'https://api.spotify.com/v1/'
-REDIRECT_URI = BACKEND_URL + '/callback'
-FRONTEND_REDIRECT_URL = 'http://127.0.0.1:3000/home'
+REDIRECT_URI = backend_url + '/callback'
+FRONTEND_REDIRECT_URL = frontend_url + '/home'
 
 access_token = None
 headers = None
@@ -33,7 +32,7 @@ app.config['SESSION_REDIS'] = redis.from_url(redis_url)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.secret_key = secret_key
 logging.basicConfig(level=logging.DEBUG)
-CORS(app, origins=['http://127.0.0.1:3000'], supports_credentials=True)
+CORS(app, origins=[frontend_url], supports_credentials=True)
 db = SQLAlchemy(app)
 sess = Session(app)
 

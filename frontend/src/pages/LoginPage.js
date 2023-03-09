@@ -3,7 +3,7 @@ import { FaSpotify } from 'react-icons/fa';
 import Header from '../components/Header.js'
 import ApiInfo from '../config.json';
 
-const BACKEND_URL = ApiInfo['BACKEND_URL']
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 // Spotify ID Imports
 const CLIENT_ID = ApiInfo['CLIENT_ID'];

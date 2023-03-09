@@ -14,4 +14,4 @@ RUN pipenv install
 COPY . .
 
 # CMD python run.py
-CMD pipenv run gunicorn --bind 127.0.0.1:8000 -w 3 run:app
+CMD pipenv run gunicorn --bind 0.0.0.0:8000 -w 3 run:app
