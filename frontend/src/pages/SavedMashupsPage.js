@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header.js'
-import '../components/component.css'
 import Mashup from '../components/Mashup.js'
 import ScaleLoader from "react-spinners/ScaleLoader";
 import ApiInfo from '../config.json';
@@ -8,7 +7,7 @@ import ApiInfo from '../config.json';
 import { FaSpotify, FaPlus, FaCheck } from 'react-icons/fa';
 import { CgPlayListRemove } from 'react-icons/cg';
 
-const BACKEND_URL = ApiInfo['BACKEND_URL']
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 function SavedMashupsPage() {
     const api_url = BACKEND_URL + '/mashups';

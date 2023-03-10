@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import ApiInfo from './config.json';
 
-const BACKEND_URL = ApiInfo['BACKEND_URL'];
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 function RequireAuth({children}) {
     const [authenticated, setAuthenticated] = useState(false);

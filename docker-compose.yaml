@@ -5,8 +5,9 @@ services:
     command: "redis-server"
     networks:
       - myx-network
+  
   db:
-    image: postgres
+    image: postgres:latest
     ports:
       - 5432:5432
     environment:
@@ -17,6 +18,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - myx-network
+    restart: always
+  
   frontend:
     build:
       context: ./frontend
@@ -28,7 +31,8 @@ services:
     networks:
       - myx-network
     environment:
-      REACT_APP_API_URL: http://myx.localhost/api
+      REACT_APP_API_URL: http://myx.localhost:8080/api
+  
   backend:
     build:
       context: ./backend
@@ -41,15 +45,16 @@ services:
       - db
     environment:
       REDIS_URL: redis://redis/
-      BACKEND_URL: http://myx.localhost/api
-      FRONTEND_URL: http://myx.localhost
+      BACKEND_URL: http://myx.localhost:8080/api
+      FRONTEND_URL: http://myx.localhost:8080
       POSTGRES_USER: shivamenta
       POSTGRES_PASSWORD: myxd3V$tar
       POSTGRES_DB: myx
-      POSTGRES_HOST: localhost
+      POSTGRES_HOST: db
       POSTGRES_PORT: 5432
     networks:
       - myx-network
+  
   nginx:
     build:
       context: ./nginx
@@ -58,6 +63,7 @@ services:
       - 8080:80
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+    restart: always
     depends_on:
       - frontend
       - backend

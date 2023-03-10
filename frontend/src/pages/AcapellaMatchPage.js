@@ -3,7 +3,6 @@ import '../App.css';
 import Header from '../components/Header.js'
 import Song from '../components/Song.js'
 import FeatureDropdowns from '../components/FeatureDropdowns';
-import '../components/component.css'
 
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
@@ -12,7 +11,7 @@ import { FaRecordVinyl } from 'react-icons/fa';
 import { AiOutlineSearch, AiOutlinePlus } from 'react-icons/ai';
 import ApiInfo from '../config.json'
 
-const BACKEND_URL = ApiInfo['BACKEND_URL']
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 // Spotify ID Imports
 const CLIENT_ID = ApiInfo['CLIENT_ID'];
