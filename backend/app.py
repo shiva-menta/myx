@@ -18,7 +18,7 @@ from functools import wraps
 AUTH_URL = 'https://accounts.spotify.com/api/token'
 BASE_URL = 'https://api.spotify.com/v1/'
 REDIRECT_URI = backend_url + '/callback'
-FRONTEND_REDIRECT_URL = frontend_url + '/home'
+FRONTEND_REDIRECT_URL = frontend_url + '/#/home'
 
 access_token = None
 headers = None
