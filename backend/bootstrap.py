@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 from time import sleep
 from creds import CLIENT_ID, CLIENT_SECRET
+from sqlalchemy import inspect
 
 
 # ––––– Environment Setup –––––
@@ -222,6 +223,16 @@ def get_decade(year):
     else:
         return 1990
 
+def create_and_load_tables():
+    with app.app_context():
+        meta = db.metadata
+        inspector = inspect(db.engine)
+        existing_tables = inspector.get_table_names()
+
+        if not existing_tables:
+            db.create_all()
+            load_songs()
+
 
 # ––––– Runtime –––––
 
@@ -233,6 +244,4 @@ if __name__ == '__main__':
     # if os.path.exists(file_path):
     #     os.remove(file_path)
 
-    with app.app_context():
-        db.create_all()
-        load_songs()
+    create_and_load_tables()

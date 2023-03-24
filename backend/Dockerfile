@@ -13,8 +13,5 @@ RUN pipenv install
 
 COPY . .
 
-# curl download for debugging
-RUN apt-get update && apt-get install -y curl
-
 # CMD python run.py
-CMD pipenv run gunicorn --bind 0.0.0.0:8000 -w 3 run:app
+CMD pipenv run gunicorn --bind 0.0.0.0:8080 -w 3 run:app

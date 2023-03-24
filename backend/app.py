@@ -233,16 +233,19 @@ def get_match_uris(instr_data, req_data):
     key = pitchmap_key(instr_data['key'], instr_data['mode'])
     keys = {key: value for key, value in get_key_range(key, sel_key)}
 
-    acapellas = Acapella.query \
-        .join(Acapella.genres) \
-        .filter(Genre.name == sel_genre) \
-        .filter(Acapella.decade == sel_decade) \
-        .filter(Acapella.bpm >= lo_bpm) \
-        .filter(Acapella.bpm <= hi_bpm) \
-        .filter(Acapella.adj_key.in_(keys)) \
-        .order_by(Acapella.popularity.desc()) \
-        .limit(sel_limit) \
-        .all()
+    try:
+        acapellas = Acapella.query \
+            .join(Acapella.genres) \
+            .filter(Genre.name == sel_genre) \
+            .filter(Acapella.decade == sel_decade) \
+            .filter(Acapella.bpm >= lo_bpm) \
+            .filter(Acapella.bpm <= hi_bpm) \
+            .filter(Acapella.adj_key.in_(keys)) \
+            .order_by(Acapella.popularity.desc()) \
+            .limit(sel_limit) \
+            .all()
+    except:
+        acapellas = []
 
     return acapellas, keys
 
@@ -361,7 +364,9 @@ def get_acapellas():
         "key": key,
         "limit": limit
     }
+
     acapellas, key_dict = get_match_uris(instr_data, data)
+
     res = []
     for acapella in acapellas:
         res.append(tuple([acapella.uri, key_dict[acapella.adj_key], acapella.bpm - instr_data['tempo']]))

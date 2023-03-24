@@ -15,8 +15,8 @@ redis = "*"
 pyjwt = "*"
 flask-migrate = "*"
 gunicorn = "*"
-psycopg2-binary = "*"
 requests = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
