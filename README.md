@@ -1,18 +1,15 @@
-# myx
+# myx dj suite
 
 ## Purpose
----
 Myx is a suite of tools to help DJs build mixes &amp; sets. I built this to help me and other beginner DJs create smoother and smarter mixes, all while putting the creative power in the hands of the DJ. Current version allows for mashup searching and shortest transition path searching.
 
 ## Tech Stack
-----
 * Frontend: React
 * Backend: Flask & PostgreSQL
 * State: Redis
 * Deployment: Fly.io & Nginx
 
 ## Starting Instructions
----
 ### Development Mode
 _This mode is meant for developing new features, allowing quick code changes and immediate DOM updates._
 Backend
