@@ -7,7 +7,6 @@ RUN mkdir /code
 WORKDIR /code
 
 RUN pip install pipenv
-# COPY requirements.txt /code/
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install
 

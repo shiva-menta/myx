@@ -25,6 +25,7 @@ headers = None
 expires_at = None
 
 app = Flask(__name__)
+# change this to PROD_DB when testing / deploying
 app.config['SQLALCHEMY_DATABASE_URI'] = PROD_DB
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_TYPE'] = 'redis'

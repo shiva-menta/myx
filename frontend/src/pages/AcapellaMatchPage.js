@@ -156,8 +156,7 @@ function AcapellaMatchPage() {
   
     // Search
     async function search() {
-      console.log("Search for " + searchState);
-  
+      // console.log("Search for " + searchState);
       var searchParameters = {
         method: 'GET',
         headers: {
@@ -189,7 +188,7 @@ function AcapellaMatchPage() {
     // Request Match
     function getAcapellas() {
       if (isSongSelected() && dropdownData.every(item => item !== "")) {
-        var acapellas = fetch(api_url + 'uri=' + selectedSong.uri + '&bpm=' + dropdownData[3] + '&genre=' + dropdownData[0] + '&decade=' + dropdownData[1] + '&key=' + dropdownData[2] + '&limit=10', {
+        var acapellas = fetch(api_url + 'uri=' + encodeURIComponent(selectedSong.uri) + '&bpm=' + dropdownData[3] + '&genre=' + encodeURIComponent(dropdownData[0]) + '&decade=' + dropdownData[1] + '&key=' + dropdownData[2] + '&limit=10', {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json'
