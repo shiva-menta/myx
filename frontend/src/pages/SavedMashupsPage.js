@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header.js'
-import Mashup from '../components/Mashup.js'
+import Header from '../components/Header.js';
+import Mashup from '../components/Mashup.js';
 import ScaleLoader from "react-spinners/ScaleLoader";
-import ApiInfo from '../config.json';
-
 import { FaSpotify, FaPlus, FaCheck } from 'react-icons/fa';
 import { CgPlayListRemove } from 'react-icons/cg';
-
-const BACKEND_URL = process.env.REACT_APP_API_URL;
+import { getMashups, addMashupToSpotify, removeSavedMashup } from '../api/backendApiCalls.js';
 
 function SavedMashupsPage() {
-    const api_url = BACKEND_URL + '/mashups';
-    const api_spot_url = BACKEND_URL + '/add-spotify-mashup';
-
     const [mashups, setMashups] = useState([]);
     const [addMarkers, setAddMarkers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -20,20 +14,14 @@ function SavedMashupsPage() {
     // useEffects
     // useEffect to Load Saved Mashups
     useEffect(() => {
-        var mashups = fetch(api_url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            updateMashups(data);
-            setLoading(false);
-        })
+        getMashups()
+            .then(data => {
+                updateMashups(data);
+                setLoading(false);
+            })
     }, []);
 
+    // Adjust Mashups Container for Scroll
     useEffect(() => {
         var div = document.getElementById('mashups-container');
         if (div != null) {
@@ -56,75 +44,44 @@ function SavedMashupsPage() {
         for (const mashup in mashupObjects) {
             const mashupData = mashupObjects[mashup];
 
-            res.push({
-                acapSongName: mashupData.acap_song_name,
-                acapArtistNames: mashupData.acap_artist_name,
-                acapImage: mashupData.acap_image,
-                acapLink: mashupData.acap_link,
-                acapUri: mashupData.acap_uri,
-
-                instrSongName: mashupData.instr_song_name,
-                instrArtistNames: mashupData.instr_artist_name,
-                instrImage: mashupData.instr_image,
-                instrLink: mashupData.instr_link,
-                instrUri: mashupData.instr_uri
-            })
+            res.push(mashupData)
             markersArray.push(false);
         }
         
         setMashups(res);
         setAddMarkers(markersArray);
-    }
+    };
 
-    function addMashupToSpotify(idx) {
+    function addToSpotify(idx) {
         var mashup = mashups[idx];
         var mashupData = {
-            acap_uri: mashup.acapUri,
-            acap_name: mashup.acapSongName,
-            instr_uri: mashup.instrUri,
-            instr_name: mashup.instrSongName
+            acap_uri: mashup.acap_uri,
+            acap_name: mashup.acap_song_name,
+            instr_uri: mashup.instr_uri,
+            instr_name: mashup.instr_song_name
         }
-        // console.log(mashupData);
-        fetch(api_spot_url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify(mashupData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // console.log(data);
-            setAddMarkers(prevMarkers => {
-                var newMarkers = [...prevMarkers];
-                newMarkers[idx] = true;
-                return newMarkers;
-            })
-        })
+        addMashupToSpotify(mashupData)
+            .then(
+                setAddMarkers(prevMarkers => {
+                    var newMarkers = [...prevMarkers];
+                    newMarkers[idx] = true;
+                    return newMarkers;
+                })
+            )
     }
 
     function removeMashup(idx) {
         var mashup = mashups[idx];
         var mashupData = {
-            acap_uri: mashup.acapUri,
-            instr_uri: mashup.instrUri
+            acap_uri: mashup.acap_uri,
+            instr_uri: mashup.instr_uri
         }
-        // console.log(mashupData);
-        fetch(api_url, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify(mashupData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // console.log(data);
-            setMashups(prevMashups => prevMashups.filter((_, i) => i !== idx));
-            setAddMarkers(prevMarkers => prevMarkers.filter((_, i) => i !== idx));
-        })
+
+        removeSavedMashup(mashupData)
+            .then(() => {
+                setMashups(prevMashups => prevMashups.filter((_, i) => i !== idx));
+                setAddMarkers(prevMarkers => prevMarkers.filter((_, i) => i !== idx));
+            })
     }
     
     // Render Function
@@ -145,19 +102,9 @@ function SavedMashupsPage() {
                     :
                 mashups.map((mashup, index) => (
                     <div key={index} className="mashup-add-container">
-                        <Mashup
-                            acapSongName={mashup.acapSongName}
-                            acapArtistNames={mashup.acapArtistNames}
-                            acapImage={mashup.acapImage}
-                            acapLink={mashup.acapLink}
-
-                            instrSongName={mashup.instrSongName}
-                            instrArtistNames={mashup.instrArtistNames}
-                            instrImage={mashup.instrImage}
-                            instrLink={mashup.instrLink}
-                        />
+                        <Mashup songData={mashup} />
                         <div className="mashup-action-button-container">
-                            <button className="mashup-action-button" onClick={() => {if (!addMarkers[index]) {addMashupToSpotify(index)}}}>
+                            <button className="mashup-action-button" onClick={() => {if (!addMarkers[index]) {addToSpotify(index)}}}>
                                 <FaSpotify className="add-mashup-spotify-icon" size={20}/>
                                 {addMarkers[index] ? <FaCheck className="add-mashup-spotify-icon" size={10}/> : <FaPlus className="add-mashup-spotify-icon" size={10}/>}
                             </button>

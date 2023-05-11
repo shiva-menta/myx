@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AcapellaMatchPage from './pages/AcapellaMatchPage';
 import SavedMashupsPage from './pages/SavedMashupsPage';
 import LoginPage from './pages/LoginPage';

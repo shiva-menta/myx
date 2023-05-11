@@ -1,16 +1,11 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
 
-function Mashup(props) {
-    const acapSongName = props.acapSongName;
-    const acapArtistNames = props.acapArtistNames;
-    const acapLink = props.acapLink;
-    const acapImage = props.acapImage;
-
-    const instrSongName = props.instrSongName;
-    const instrArtistNames = props.instrArtistNames;
-    const instrLink = props.instrLink;
-    const instrImage = props.instrImage;
+function Mashup({ songData }) {
+    const acapSongName = songData.acap_song_name;
+    const acapArtistNames = songData.acap_artist_name;
+    const instrSongName = songData.instr_song_name;
+    const instrArtistNames = songData.instr_artist_name;
 
     // Render Function
     return (

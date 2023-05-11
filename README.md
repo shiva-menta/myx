@@ -10,23 +10,25 @@ Myx is a suite of tools to help DJs build mixes &amp; sets. I built this to help
 * Deployment: Fly.io & Nginx
 
 ## Starting Instructions
-### Development Mode
+### Development Mode (127.0.0.1)
 _This mode is meant for developing new features, allowing quick code changes and immediate DOM updates._
+
 Backend
-* `.env`: uncomment only development mode lines
 * switch to DEV_DB in `app.py`
 * `cd backend`
 * `pipenv shell`
 * `python run.py`
+
 Database / State
 * comment out everything below line 8 in `docker-compose.yaml`
-* run `docker-compose up`
+* run `docker-compose up --build`
+
 Frontend
 * `cd frontend`
 * `npm install`
 * `npm start`
 
-### Testing Mode
+### Testing Mode (myx.localhost)
 _This mode is meant for verifying new features work in a containerized environment._
 * open up Docker Desktop
 * `.env`: uncomment only testing mode lines
@@ -37,7 +39,7 @@ _This mode is meant for verifying new features work in a containerized environme
 * run `docker-compose up --build` or `docker-compose up` as needed
 * access the app at myx.localhost!
 
-### Deployment Mode
+### Deployment Mode (myxdj.live)
 _This mode is meant for deploying actual code to Fly.io._
 * `config.py`: comment out appropriate database url
 * frontend `Dockerfile`: comment out myx.localhost and uncomment myxdj.live
