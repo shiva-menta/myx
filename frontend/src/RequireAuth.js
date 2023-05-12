@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import ScaleLoader from 'react-spinners/ScaleLoader';
-import ApiInfo from './config.json';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
