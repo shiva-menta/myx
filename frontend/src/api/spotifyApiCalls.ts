@@ -16,7 +16,7 @@ const authParameters = {
     },
     body: 'grant_type=client_credentials&client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET
 }
-const searchParameters = (accessToken) => {
+const searchParameters = (accessToken: string) => {
     return {
         method: 'GET',
         headers: {
@@ -38,20 +38,20 @@ const getAccessToken = async () => {
     const token = await fetch(BASE_URL + 'api/token', authParameters)
     return token.json();
 }
-const searchSongs = async (searchInput, accessToken) => {
+const searchSongs = async (searchInput: string, accessToken: string) => {
     const params = searchParameters(accessToken);
     const trackIDs = await fetch(BASE_API_URL + 'search?q=' + searchInput + '&type=track&limit=10', params)
     
     return trackIDs.json();
 };
-const getAcapellaDataFromURI = async (trackUri, accessToken) => {
+const getAcapellaDataFromURI = async (trackUri: string, accessToken: string) => {
     var trackId = trackUri.split(":")[2]
     const params = searchParameters(accessToken)
     const response = await fetch(BASE_API_URL + 'tracks/' + trackId, params)
   
     return response.json();
 };
-const getTrackFeaturesFromURIs = async (trackURIs, accessToken) => {
+const getTrackFeaturesFromURIs = async (trackURIs: string[], accessToken: string) => {
     const params = searchParameters(accessToken);
     const response = await fetch(BASE_API_URL + `audio-features/?ids=${trackURIs.join(',')}`, params)
 

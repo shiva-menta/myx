@@ -1,21 +1,36 @@
+// Imports
 import { useState, useEffect } from 'react';
+import Song from './Song';
 import { addMashupToDB } from '../api/backendApiCalls';
-import { formatBPM } from '../helpers';
+import { formatBPM } from '../utils/helpers';
+import { SongResultData, AcapellaData, AcapellaURI } from '../utils/types';
 
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import { BsCheck } from 'react-icons/bs';
 import { AiOutlinePlus } from 'react-icons/ai';
 
-import Song from '../components/Song.js';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
+// Type Declarations
+type DisplayMatchResultsProps = {
+  selectedSong: SongResultData;
+  resetFlag: boolean;
+  acapellas: AcapellaData[];
+  selectedAcapella: AcapellaData;
+  setSelectedAcapella: (value: AcapellaData) => void;
+  reset: () => void;
+};
 
-function DisplayMatchResults({ selectedSong, resetFlag, acapellas, selectedAcapella, setSelectedAcapella, reset }) {
+// Main Component
+function DisplayMatchResults({ selectedSong, resetFlag, acapellas, selectedAcapella, setSelectedAcapella, reset }: DisplayMatchResultsProps) {
+  // State Hooks
   const [mashupAdded, setMashupAdded] = useState(false);
 
+  // Effect Hooks
   useEffect(() => {
     setMashupAdded(false)
   }, [resetFlag])
 
+  // Functions
   function addMashup() {
     if (selectedAcapella != undefined && selectedSong != undefined) {
       var body = {
@@ -40,11 +55,11 @@ function DisplayMatchResults({ selectedSong, resetFlag, acapellas, selectedAcape
         });
     }
   }
-
-  function updateSelectedAcapella(idx) {
+  function updateSelectedAcapella(idx: number) {
     setSelectedAcapella(acapellas[idx]);
   }
   
+  // Render Function
   return (
     <div className="results-page-container">
       <div className="section-title">instrumental</div>
@@ -55,7 +70,7 @@ function DisplayMatchResults({ selectedSong, resetFlag, acapellas, selectedAcape
       <div className="acapella-container">
         <div className="section-title">acapella</div>
         <DropdownButton id='dropdown-button' title="">
-          {acapellas.map((song, idx) => (
+          {acapellas.map((song, idx: number) => (
             <Dropdown.Item onClick={() => {updateSelectedAcapella(idx)}} key={idx}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
           ))}
         </DropdownButton>

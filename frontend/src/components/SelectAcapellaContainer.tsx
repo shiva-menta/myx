@@ -1,24 +1,37 @@
+// Imports
 import { useState, useEffect } from 'react';
-import Song from '../components/Song.js';
-import FeatureDropdowns from '../components/FeatureDropdowns';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-
-import { AiOutlineSearch } from 'react-icons/ai';
+import Song from './Song';
+import FeatureDropdowns from './FeatureDropdowns';
 
 import { searchSongs, getTrackFeaturesFromURIs } from '../api/spotifyApiCalls';
-import { extractSongListData } from '../helpers';
+import { SongData, SongResultData, AcapellaURI } from '../utils/types';
+import { extractSongListData } from '../utils/helpers';
 import { getMatchingAcapellas } from '../api/backendApiCalls';
 
-function SelectAcapellaContainer({ updateAcapellaState, setSong, selectedSong, accessToken, resetFlag }) {
-  const [searchState, setSearchState] = useState('');
-  const [songResults, setSongResults] = useState([]);
-  const [searchWarning, setSearchWarning] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('Select all parameters.');
-  const [dropdownWarning, setDropdownWarning] = useState(false);
-  const [dropdownData, setDropdownData] = useState([]);
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import { AiOutlineSearch } from 'react-icons/ai';
 
-  // Search
+// Type Declarations
+type SelectAcapellaContainerProps = {
+  updateAcapellaState: (acapellaURIs: AcapellaURI[]) => void;
+  setSong: (value: SongResultData) => void;
+  selectedSong: SongResultData;
+  accessToken: string;
+  resetFlag: boolean;
+};
+
+// Main Component
+function SelectAcapellaContainer({ updateAcapellaState, setSong, selectedSong, accessToken, resetFlag }: SelectAcapellaContainerProps) {
+  // State Hooks
+  const [searchState, setSearchState] = useState<string>('');
+  const [songResults, setSongResults] = useState<SongResultData[]>([]);
+  const [searchWarning, setSearchWarning] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('Select all parameters.');
+  const [dropdownWarning, setDropdownWarning] = useState<boolean>(false);
+  const [dropdownData, setDropdownData] = useState<string[]>([]);
+
+  // Effect Hooks
   useEffect(() => {
     updateSelectedSong(0);
   }, [songResults]);
@@ -30,12 +43,8 @@ function SelectAcapellaContainer({ updateAcapellaState, setSong, selectedSong, a
     setDropdownWarning(false);
   }, [resetFlag]);
 
-  const updateDropdownData = (data) => {
-    setDropdownData(data);
-  }
-
   // Functions
-  function updateSelectedSong(idx) {
+  const updateSelectedSong = (idx: number) => {
     setSong(songResults[idx]);
     if (songResults.length > 0) {
       if (songResults[idx].instrumentalness < 0.3) {
@@ -44,9 +53,8 @@ function SelectAcapellaContainer({ updateAcapellaState, setSong, selectedSong, a
         setSearchWarning(false);
       }
     }
-  }
-
-  function getAcapellas() {
+  };
+  const getAcapellas = () => {
     if (isSongSelected() && dropdownData.every(item => item !== "")) {
       getMatchingAcapellas(selectedSong.uri, dropdownData[3], dropdownData[0], dropdownData[1], dropdownData[2])
         .then(data => {
@@ -60,31 +68,30 @@ function SelectAcapellaContainer({ updateAcapellaState, setSong, selectedSong, a
       setDropdownWarning(true);
       setErrorMessage("Select all parameters.");
     }
-  }
-
-  
-
-  function isSongSelected() {
+  };
+  const isSongSelected = () => {
     return selectedSong != undefined && Object.keys(selectedSong).length != 0;
-  }
-
-  async function search() {
+  };
+  const search = async () => {
     if (searchState.length > 0) {
       searchSongs(searchState, accessToken)
         .then(async data => {
           let extractedSongListData = extractSongListData(data.tracks.items);
-          let trackURIs = extractedSongListData.map(track => track.uri.split(":")[2]);
+          let trackURIs = extractedSongListData.map((track: SongData) => track.uri.split(":")[2]);
           
           getTrackFeaturesFromURIs(trackURIs, accessToken)
             .then(data => {
-              let instrumentalValues = data.audio_features.map(feature => feature === null ? 1 : feature.instrumentalness);
-              extractedSongListData.forEach((track, index) => {
+              let instrumentalValues = data.audio_features.map((feature: any) => feature === null ? 1 : feature.instrumentalness);
+              extractedSongListData.forEach((track: SongResultData, index: number) => {
                 track.instrumentalness = instrumentalValues[index];
               });
               setSongResults(extractedSongListData);
             })
         })
     }
+  };
+  const updateDropdownData = (data: string[]) => {
+    setDropdownData(data);
   }
   
   // Render Function
@@ -104,15 +111,15 @@ function SelectAcapellaContainer({ updateAcapellaState, setSong, selectedSong, a
             />
           </div>
           <DropdownButton id='dropdown-button' title="">
-            {isSongSelected() && songResults.map((song, idx) => (
-                <Dropdown.Item onClick={() => {updateSelectedSong(idx)}} key={idx}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
+            {isSongSelected() && songResults.map((song, idx: number) => (
+              <Dropdown.Item onClick={() => {updateSelectedSong(idx)}} key={idx}>{song.name + ' - ' + song.artists.join(', ')}</Dropdown.Item>
             ))}
           </DropdownButton>
         </div>
         {!isSongSelected() ?
-            <Song songName="N/A" artistName="N/A" img="none" link=""/>
+          <Song songName="N/A" artistName="N/A" img="none" link=""/>
         :
-            <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
+          <Song songName={selectedSong.name} artistName={selectedSong.artists.join(', ')} link={selectedSong.link} img={selectedSong.image}/>
         }
         {searchWarning && <div className="warning">Your track has vocals which could clash with the acapella.</div>}
       </div>

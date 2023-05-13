@@ -1,3 +1,6 @@
+// Imports
+import { MashupData, MashupDataAdd, MashupDataRemove } from '../utils/types';
+
 // Constants
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 const MASHUPS_URL = BACKEND_URL + '/mashups';
@@ -16,7 +19,7 @@ const getMashups = async () => {
 
     return mashups.json();
 }
-const addMashupToSpotify = async (data) => {
+const addMashupToSpotify = async (data: MashupDataAdd) => {
     const mashups = await fetch(SPOT_MASHUPS_URL, {
         method: 'POST',
         headers: {
@@ -28,7 +31,7 @@ const addMashupToSpotify = async (data) => {
 
     return mashups.json();
 };
-const removeSavedMashup = async (data) => {
+const removeSavedMashup = async (data: MashupDataRemove) => {
     const mashups = await fetch(MASHUPS_URL, {
         method: 'DELETE',
         headers: {
@@ -40,7 +43,7 @@ const removeSavedMashup = async (data) => {
 
     return mashups.json();
 };
-const getMatchingAcapellas = async (uri, bpm, genre, decade, key) => {
+const getMatchingAcapellas = async (uri: string, bpm: string, genre: string, decade: string, key: string) => {
     const acapellas = await fetch(ACAPELLAS_URL + 'uri=' + encodeURIComponent(uri) + '&bpm=' + bpm + '&genre=' + encodeURIComponent(genre) + '&decade=' + decade + '&key=' + key + '&limit=10', {
         method: 'GET',
         headers: {
@@ -54,7 +57,7 @@ const getMatchingAcapellas = async (uri, bpm, genre, decade, key) => {
     }
     return acapellas.json();
 }
-const addMashupToDB = async (data) => {
+const addMashupToDB = async (data: MashupData) => {
     const res = await fetch(MASHUPS_URL, {
         method: 'POST',
         headers: {
