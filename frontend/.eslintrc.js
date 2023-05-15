@@ -1,4 +1,11 @@
 module.exports = {
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb",
+    "plugin:@typescript-eslint/recommended"
+  ],
   env: {
     browser: true,
     es2021: true,

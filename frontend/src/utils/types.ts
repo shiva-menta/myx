@@ -47,4 +47,12 @@ type MashupDataRemove = {
 };
 type AcapellaURI = [string, string, number];
 
-export type { SongData, SongResultData, AcapellaData, AcapellaURI, MashupData, MashupDataAdd, MashupDataRemove };
+export type {
+  SongData,
+  SongResultData,
+  AcapellaData,
+  AcapellaURI,
+  MashupData,
+  MashupDataAdd,
+  MashupDataRemove,
+};
