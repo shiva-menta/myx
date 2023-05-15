@@ -19,6 +19,8 @@ from utils.helpers import pitchmap_key, get_key_range, get_bpm_range
 
 # ––––– App Initialization / Setup –––––
 FRONTEND_REDIRECT_URL = frontend_url + '/#/home'
+FRONTEND_ACCESS_DENIED_URL = frontend_url + '/#/access'
+ENERGY_THRESHOLD = 0.25
 
 access_token = None
 headers = None
@@ -67,22 +69,28 @@ def requires_access_token(f):
   return token_wrapper
 
 def get_match_uris(instr_data, req_data):
-  sel_genre = input_map[req_data['genre']]
-  sel_decade = int(req_data['decade'])
+  sel_genre = input_map[req_data['genre']] if req_data['genre'] != 'Any' else None
+  sel_decade = int(req_data['decade'][0:4]) if req_data['decade'] != 'Any' else None
   sel_key = req_data['key']
   sel_bpm = req_data['bpm']
+  sel_energy = float(req_data['energy'])
   sel_limit = req_data['limit']
   lo_bpm, hi_bpm = get_bpm_range(int(instr_data['tempo']), sel_bpm)
   key = pitchmap_key(instr_data['key'], instr_data['mode'])
   keys = {key: value for key, value in get_key_range(key, sel_key)}
 
   try:
-    acapellas = Acapella.query \
-      .join(Acapella.genres) \
-      .filter(Genre.name == sel_genre) \
-      .filter(Acapella.decade == sel_decade) \
-      .filter(Acapella.bpm >= lo_bpm) \
+    acapellas = Acapella.query.join(Acapella.genres)
+
+    if sel_genre is not None:
+      acapellas = acapellas.filter(Genre.name == sel_genre)
+    if sel_decade is not None:
+      acapellas = acapellas.filter(Acapella.decade == sel_decade)
+
+    acapellas = acapellas.filter(Acapella.bpm >= lo_bpm) \
       .filter(Acapella.bpm <= hi_bpm) \
+      .filter(Acapella.energy >= max(sel_energy - ENERGY_THRESHOLD, 0)) \
+      .filter(Acapella.energy <= min(sel_energy + ENERGY_THRESHOLD, 1)) \
       .filter(Acapella.adj_key.in_(keys)) \
       .order_by(Acapella.popularity.desc()) \
       .limit(sel_limit) \
@@ -104,6 +112,10 @@ def callback():
   expires_in = response.json()['expires_in']
   
   response = get_user_info(user_access_token)
+
+  if response.status_code == 403:
+    return redirect(FRONTEND_ACCESS_DENIED_URL)
+
   user_info = response.json()
   
   session['user_info'] = user_info
@@ -154,11 +166,11 @@ def main():
 @login_required
 @requires_access_token
 def get_acapellas():
-  arg_keys = ["uri", "bpm", "genre", "decade", "key", "limit"]
+  arg_keys = ["uri", "bpm", "genre", "decade", "key", "energy", "limit"]
   args = {key: request.args.get(key) for key in arg_keys}
 
   if not all(args.values()):
-    return jsonify({"message": "All parameters are required: uri, bpm, genre, decade, key, limit"}), 400
+    return jsonify({"message": "All parameters are required: uri, bpm, genre, decade, key, energy, limit"}), 400
 
   try:
     instr_data = get_spotify_song_audio_features(args["uri"], headers)
@@ -171,6 +183,7 @@ def get_acapellas():
     "genre": args["genre"],
     "decade": args["decade"],
     "key": args["key"],
+    "energy": args["energy"],
     "limit": args["limit"]
   }
 

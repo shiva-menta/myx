@@ -1,9 +1,9 @@
 {
     "Genre" : {
-        "options" : ["Pop", "Hip-Hop / Rap", "Rock", "Country", "EDM", "R&B", "Latin", "Metal"]
+        "options" : ["Any", "Pop", "Hip-Hop / Rap", "Rock", "Country", "EDM", "R&B", "Latin", "Metal"]
     },
     "Time" : {
-        "options" : ["2000s", "2010s", "2020s"]
+        "options" : ["Any", "2000s", "2010s", "2020s"]
     },
     "Key" : {
         "options" : ["Exact", "Tight", "Flexible"]

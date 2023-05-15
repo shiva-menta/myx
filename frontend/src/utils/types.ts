@@ -12,6 +12,7 @@ type SongResultData = {
   image: string;
   uri: string;
   instrumentalness: number;
+  energy: number;
 };
 type AcapellaData = {
   artists: string[];

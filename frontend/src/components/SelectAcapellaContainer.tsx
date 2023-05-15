@@ -56,7 +56,7 @@ function SelectAcapellaContainer({ updateAcapellaState, setSong, selectedSong, a
   };
   const getAcapellas = () => {
     if (isSongSelected() && dropdownData.every(item => item !== "")) {
-      getMatchingAcapellas(selectedSong.uri, dropdownData[3], dropdownData[0], dropdownData[1], dropdownData[2])
+      getMatchingAcapellas(selectedSong.uri, dropdownData[3], dropdownData[0], dropdownData[1], dropdownData[2], selectedSong.energy)
         .then(data => {
           updateAcapellaState(data)
         })
@@ -82,8 +82,10 @@ function SelectAcapellaContainer({ updateAcapellaState, setSong, selectedSong, a
           getTrackFeaturesFromURIs(trackURIs, accessToken)
             .then(data => {
               let instrumentalValues = data.audio_features.map((feature: any) => feature === null ? 1 : feature.instrumentalness);
+              let energyValues = data.audio_features.map((feature: any) => feature === null ? 1 : feature.energy);
               extractedSongListData.forEach((track: SongResultData, index: number) => {
                 track.instrumentalness = instrumentalValues[index];
+                track.energy = energyValues[index];
               });
               setSongResults(extractedSongListData);
             })

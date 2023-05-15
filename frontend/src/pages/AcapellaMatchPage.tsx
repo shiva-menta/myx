@@ -17,7 +17,8 @@ const noSong = {
   link: '',
   image: '',
   uri: '',
-  instrumentalness: 0
+  instrumentalness: 0,
+  energy: 0
 };
 const noAcapella = {
   artists: [],

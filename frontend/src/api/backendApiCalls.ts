@@ -43,8 +43,8 @@ const removeSavedMashup = async (data: MashupDataRemove) => {
 
     return mashups.json();
 };
-const getMatchingAcapellas = async (uri: string, bpm: string, genre: string, decade: string, key: string) => {
-    const acapellas = await fetch(ACAPELLAS_URL + 'uri=' + encodeURIComponent(uri) + '&bpm=' + bpm + '&genre=' + encodeURIComponent(genre) + '&decade=' + decade + '&key=' + key + '&limit=10', {
+const getMatchingAcapellas = async (uri: string, bpm: string, genre: string, decade: string, key: string, energy: number) => {
+    const acapellas = await fetch(ACAPELLAS_URL + 'uri=' + encodeURIComponent(uri) + '&bpm=' + bpm + '&genre=' + encodeURIComponent(genre) + '&decade=' + decade + '&key=' + key + '&energy=' + energy + '&limit=10', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

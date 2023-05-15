@@ -15,7 +15,7 @@ function Dropdown({ name, options, handleDropdownChange }: DropdownProps) {
     <Form.Select className="feature-dropdown" onChange={handleDropdownChange}>
       <option value="">{name}</option>
       {options.map((option) => (
-        <option key={option} value={name !== 'Time' ? option : option.slice(0, 4)}>{option}</option>
+        <option key={option} value={option}>{option}</option>
       ))}
     </Form.Select>
   );
