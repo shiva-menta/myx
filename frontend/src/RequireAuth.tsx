@@ -1,6 +1,6 @@
 // Imports
 import React, { useEffect, useState, ReactElement } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
@@ -14,16 +14,16 @@ type RequireAuthProps = {
 function RequireAuth({ children }: RequireAuthProps): ReactElement | null {
   const [authenticated, setAuthenticated] = useState(false);
   const [authCheckFinished, setAuthCheckFinished] = useState(false);
-  const api_url = BACKEND_URL + '/api/authenticate';
+  const apiUrl = `${BACKEND_URL}/api/authenticate`;
 
   useEffect(() => {
     const checkAuth = async () => {
-      const response = await fetch(api_url, {
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include'
+        credentials: 'include',
       });
       const data = await response.json();
       setAuthenticated(data.authenticated);
@@ -31,15 +31,15 @@ function RequireAuth({ children }: RequireAuthProps): ReactElement | null {
     };
     checkAuth();
   }, []);
-  
+
   // Render Function
   if (!authCheckFinished) {
-      return <ScaleLoader color={'#ffffff'} height={50} width={5} />;
+    return <ScaleLoader color="#ffffff" height={50} width={5} />;
   } else if (!authenticated) {
-      return <Navigate to="/" />;
+    return <Navigate to="/" />;
   } else {
-      return children;
+    return children;
   }
-};
+}
 
 export default RequireAuth;

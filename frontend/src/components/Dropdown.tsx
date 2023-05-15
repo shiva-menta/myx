@@ -1,4 +1,5 @@
 // Imports
+import React from 'react';
 import Form from 'react-bootstrap/Form';
 
 // Props Type
@@ -19,6 +20,6 @@ function Dropdown({ name, options, handleDropdownChange }: DropdownProps) {
       ))}
     </Form.Select>
   );
-};
+}
 
 export default Dropdown;

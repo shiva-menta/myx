@@ -18,7 +18,7 @@ const noSong = {
   image: '',
   uri: '',
   instrumentalness: 0,
-  energy: 0
+  energy: 0,
 };
 const noAcapella = {
   artists: [],
@@ -27,7 +27,7 @@ const noAcapella = {
   image: '',
   uri: '',
   key_shift: '',
-  bpm_shift: 0
+  bpm_shift: 0,
 };
 
 // Main Component
@@ -43,7 +43,7 @@ function AcapellaMatchPage() {
   // Effect Hooks
   useEffect(() => {
     getAccessToken()
-      .then(data => setAccessToken(data.access_token))
+      .then((data) => setAccessToken(data.access_token));
   }, []);
   useEffect(() => {
     if (acapellas.length > 0 && selectedAcapella.uri.length > 0) {
@@ -53,7 +53,7 @@ function AcapellaMatchPage() {
 
   // Functions
   const updateAllAcapellaData = async (acapellaURIs: AcapellaURI[]) => {
-    var res: AcapellaData[] = [];
+    const res: AcapellaData[] = [];
 
     for (const data of acapellaURIs) {
       const songData = await getAcapellaDataFromURI(data[0], accessToken);
@@ -65,7 +65,7 @@ function AcapellaMatchPage() {
         image: songInfo.image,
         uri: data[0],
         key_shift: data[1],
-        bpm_shift: data[2]
+        bpm_shift: data[2],
       });
     }
 
@@ -74,36 +74,38 @@ function AcapellaMatchPage() {
   };
   const resetData = () => {
     setSelectedSong(noSong);
-    setSelectedAcapella(noAcapella);    
+    setSelectedAcapella(noAcapella);
     setAcapellas([]);
     setResetFlag(!resetFlag);
     setAcapellasLoaded(false);
-  }
-  
+  };
+
   // Render Function
   return (
     <div className="view-container">
-      <Header/>
-      {!acapellasLoaded || acapellas.length === 0 || selectedAcapella.uri.length === 0 ?
-        (<SelectAcapellaContainer
-          updateAcapellaState={updateAllAcapellaData}
-          setSong={setSelectedSong}
-          selectedSong={selectedSong}
-          accessToken={accessToken}
-          resetFlag={resetFlag}
-        />)
-      :
-        (<DisplayMatchResults
-          selectedSong={selectedSong}
-          resetFlag={resetFlag}
-          acapellas={acapellas}
-          selectedAcapella={selectedAcapella}
-          setSelectedAcapella={setSelectedAcapella}
-          reset={resetData}
-        />)
-      }
+      <Header />
+      {!acapellasLoaded || acapellas.length === 0 || selectedAcapella.uri.length === 0
+        ? (
+          <SelectAcapellaContainer
+            updateAcapellaState={updateAllAcapellaData}
+            setSong={setSelectedSong}
+            selectedSong={selectedSong}
+            accessToken={accessToken}
+            resetFlag={resetFlag}
+          />
+        )
+        : (
+          <DisplayMatchResults
+            selectedSong={selectedSong}
+            resetFlag={resetFlag}
+            acapellas={acapellas}
+            selectedAcapella={selectedAcapella}
+            setSelectedAcapella={setSelectedAcapella}
+            reset={resetData}
+          />
+        )}
     </div>
   );
-};
+}
 
 export default AcapellaMatchPage;

@@ -18,17 +18,17 @@ type FeatureDropdownsProps = {
 // Main Component
 function FeatureDropdowns({ callback }: FeatureDropdownsProps) {
   // State Hooks
-  const [genreValue, setGenreValue] = useState<string>("");
-  const [timeValue, setTimeValue] = useState<string>("");
-  const [keyValue, setKeyValue] = useState<string>("");
-  const [bpmValue, setBPMValue] = useState<string>("");
+  const [genreValue, setGenreValue] = useState<string>('');
+  const [timeValue, setTimeValue] = useState<string>('');
+  const [keyValue, setKeyValue] = useState<string>('');
+  const [bpmValue, setBPMValue] = useState<string>('');
 
   // Dropdowns
   const dropdowns = [
-    { name: "Genre", value: genreValue, handler: setGenreValue },
-    { name: "Time", value: timeValue, handler: setTimeValue },
-    { name: "Key", value: keyValue, handler: setKeyValue },
-    { name: "BPM", value: bpmValue, handler: setBPMValue },
+    { name: 'Genre', value: genreValue, handler: setGenreValue },
+    { name: 'Time', value: timeValue, handler: setTimeValue },
+    { name: 'Key', value: keyValue, handler: setKeyValue },
+    { name: 'BPM', value: bpmValue, handler: setBPMValue },
   ];
 
   // Effect Hooks

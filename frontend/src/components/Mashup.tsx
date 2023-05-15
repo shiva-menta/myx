@@ -24,12 +24,12 @@ function Mashup({ songData }: MashupProps) {
   return (
     <Card className="mashup-unit">
       <div className="song-info">
-        <div className="song-title">{acapSongName + " –" + '\u00a0'}</div>
+        <div className="song-title">{`${acapSongName} –\u00a0`}</div>
         <div className="artist-title">{acapArtistNames}</div>
       </div>
-      <hr/>
+      <hr />
       <div className="song-info">
-        <div className="song-title">{instrSongName + " –" + '\u00a0'}</div>
+        <div className="song-title">{`${instrSongName} –\u00a0`}</div>
         <div className="artist-title">{instrArtistNames}</div>
       </div>
     </Card>
