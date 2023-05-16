@@ -15,7 +15,7 @@ jobs:
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_FRONTEND_API_TOKEN }}
-      - name: Frontend Deployment
+      - name: Backend Deployment
         working-directory: ./backend
         run: flyctl deploy --remote-only
         env:
