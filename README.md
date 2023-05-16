@@ -31,7 +31,7 @@ Frontend
 ### Testing Mode (myx.localhost)
 _This mode is meant for verifying new features work in a containerized environment._
 * open up Docker Desktop
-* `.env`: uncomment only testing mode lines
+* backend `.env`: uncomment only testing mode lines
 * `config.py`: comment out appropriate database url
 * frontend `Dockerfile`: comment out myxdj.live and uncomment myx.localhost
 * frontend `nginx.conf`: comment out myxdj.live and uncomment myx.localhost
