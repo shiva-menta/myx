@@ -11,8 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from flask_cors import CORS, cross_origin
 
-from creds import secret_key
-from config import DEV_DB, PROD_DB, redis_url, frontend_url
+from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY
 from utils.maps import input_map
 from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup
 from utils.helpers import pitchmap_key, get_key_range, get_bpm_range
@@ -34,7 +33,7 @@ app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = redis.from_url(redis_url)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-app.secret_key = secret_key
+app.secret_key = SECRET_KEY
 logging.basicConfig(level=logging.DEBUG)
 CORS(app, origins=[frontend_url], supports_credentials=True)
 db = SQLAlchemy(app)

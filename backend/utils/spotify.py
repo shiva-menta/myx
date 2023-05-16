@@ -1,8 +1,7 @@
 # Imports
 import requests
 import base64
-from config import backend_url
-from creds import CLIENT_ID, CLIENT_SECRET
+from config import backend_url, CLIENT_ID, CLIENT_SECRET
 
 # URLs
 AUTH_URL = 'https://accounts.spotify.com/api/token'

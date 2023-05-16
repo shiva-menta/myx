@@ -1,7 +1,7 @@
 from lxml import html
 import requests
 import json
-from creds import CLIENT_ID, CLIENT_SECRET
+from config import CLIENT_ID, CLIENT_SECRET
 import csv
 
 AUTH_URL = 'https://accounts.spotify.com/api/token'
