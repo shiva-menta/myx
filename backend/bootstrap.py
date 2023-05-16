@@ -3,7 +3,7 @@ from app import app, db
 import requests
 import pandas as pd
 from time import sleep
-from creds import CLIENT_ID, CLIENT_SECRET
+from config import CLIENT_ID, CLIENT_SECRET
 from sqlalchemy import inspect
 
 

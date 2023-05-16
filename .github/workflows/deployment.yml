@@ -9,12 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Frontend Deployment
         working-directory: ./frontend
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_FRONTEND_API_TOKEN }}
-      - name: Frontend Deployment
+      - name: Backend Deployment
         working-directory: ./backend
         run: flyctl deploy --remote-only
         env:
