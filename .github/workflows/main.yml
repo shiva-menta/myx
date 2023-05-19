@@ -32,4 +32,8 @@ jobs:
         working-directory: ./backend
         run: |
           pipenv install
-          pipenv run IS_TESTING=True pytest
+          pipenv run pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          IS_TESTING: True
+
