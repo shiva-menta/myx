@@ -4,6 +4,7 @@ import datetime
 import time
 import logging
 from functools import wraps
+from fakeredis import FakeStrictRedis
 
 from flask import Flask, request, jsonify, redirect, session
 from flask_restful import reqparse
@@ -11,7 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from flask_cors import CORS, cross_origin
 
-from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY
+from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING
 from utils.maps import input_map
 from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup
 from utils.helpers import pitchmap_key, get_key_range, get_bpm_range
@@ -27,12 +28,18 @@ expires_at = None
 
 app = Flask(__name__)
 # change this to PROD_DB when testing / deploying
-app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_REDIS'] = redis.from_url(redis_url)
-app.config['CORS_HEADERS'] = 'Content-Type'
+if IS_TESTING != 'True':
+  app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB
+  app.config['SESSION_TYPE'] = 'redis'
+  app.config['SESSION_REDIS'] = redis.from_url(redis_url)
+  app.config['CORS_HEADERS'] = 'Content-Type'
+else:
+  app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+  app.config['SESSION_TYPE'] = 'redis'
+  app.config['SESSION_REDIS'] = FakeStrictRedis()
+  app.config['TESTING'] = True
 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = SECRET_KEY
 logging.basicConfig(level=logging.DEBUG)
 CORS(app, origins=[frontend_url], supports_credentials=True)

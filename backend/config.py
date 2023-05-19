@@ -21,6 +21,7 @@ database_url = get_env_variable('DATABASE_URL')
 CLIENT_ID = get_env_variable('CLIENT_ID')
 CLIENT_SECRET = get_env_variable('CLIENT_SECRET')
 SECRET_KEY = get_env_variable('SECRET_KEY')
+IS_TESTING = get_env_variable('IS_TESTING') or 'False'
 
 DEV_DB = f'sqlite:///{DB_FILE}'
 

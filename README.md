@@ -45,6 +45,9 @@ _This mode is meant for deploying actual code to Fly.io._
 * frontend `Dockerfile`: comment out myx.localhost and uncomment myxdj.live
 * frontend `nginx.conf`: comment out myx.localhost and uncomment myxdj.live
 
+## Testing Instructions
+For `backend` testing, run `IS_TESTING=True pytest` within your pipenv shell.
+
 ## Common Errors
 _This section is meant to address any commonly reached problems when interacting with Myx locally._
 * Development – (`CORS Errors`): CORS errors might pop up in the browser console when interacting with the application. Frequently, there is no actual CORS error, but instead a backend error (e.g. key error), that you'll be able to observe in the backend logs.

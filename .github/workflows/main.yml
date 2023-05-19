@@ -21,3 +21,15 @@ jobs:
         run: |
           npm install
           npm run lint
+
+      - name: Use Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install pipenv
+        run: pip install pipenv
+      - name: Install backend dependencies and run tests
+        working-directory: ./backend
+        run: |
+          pipenv install
+          pipenv run IS_TESTING=True pytest
