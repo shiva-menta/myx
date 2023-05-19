@@ -34,6 +34,7 @@ def logout(client):
 # ––––– Tests –––––
 def test_logged_out(client):
   res = client.get('/')
+  assert res.status_code == 401
   assert b'User is not logged in' in res.data
 
 def test_logged_in(client):
@@ -42,8 +43,60 @@ def test_logged_in(client):
   assert b'Welcome to the Myx API!' in res.data
   logout(client)
 
+def test_get_acapellas_incomplete_params(client):
+  login(client)
+  data = {'bpm': 200, 'genre': 'edm'}
+  res = client.get('/get-acapellas', json=data)
+  assert res.status_code == 400
+  assert b'All parameters are required' in res.data
+  logout(client)
 
+def test_get_mashups_empty(client):
+  login(client)
+  res = client.get('/mashups')
+  assert res.status_code == 200
+  assert res.get_json() == []
+  logout(client)
 
-# testing get acapellas successful
+def test_post_get_delete_mashup(client):
+  login(client)
+  data = {
+    'acap_uri': 'test',
+    'acap_song_name': '',
+    'acap_artist_name': '',
+    'acap_image': '',
+    'acap_link': '',
+    'instr_uri': 'test',
+    'instr_song_name': '',
+    'instr_artist_name': '',
+    'instr_image': '',
+    'instr_link': ''
+  }
+  res = client.post('/mashups', json=data)
+  assert res.status_code == 200
 
-# testing get acapellas unsuccessful
+  res = client.get('/mashups')
+  assert res.status_code == 200
+  assert len(res.get_json()) != 0
+
+  data = {
+    'acap_uri': 'test',
+    'instr_uri': 'test'
+  }
+  res = client.delete('/mashups', json=data)
+  assert res.status_code == 200
+
+  res = client.get('/mashups')
+  assert res.status_code == 200
+  assert res.get_json() == []
+  logout(client)
+
+def test_delete_mashup_unsuccessful(client):
+  login(client)
+  data = {
+    'acap_uri': 'none',
+    'instr_uri': 'none'
+  }
+  res = client.delete('/mashups', json=data)
+  assert res.status_code == 404
+  logout(client)
