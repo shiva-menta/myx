@@ -35,7 +35,7 @@ jobs:
           pipenv run pytest
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
-          IS_TESTING: True
+          IS_TESTING: 'True'
           BACKEND_URL: ''
           FRONTEND_URL: ''
           CLIENT_ID: ''
