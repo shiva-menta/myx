@@ -45,7 +45,7 @@ def get_user_info(user_access_token):
     }
   )
 
-def refresh_user_token(refresh_token):
+def refresh_spot_user_token(refresh_token):
   return requests.post(AUTH_URL,
     data={
       'grant_type': 'refresh_token',
@@ -58,6 +58,27 @@ def get_spotify_song_audio_features(track_uri, headers):
   track_id = track_uri.split(':')[2]
   r = requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
   return r.json()
+
+def get_spotify_songs_audio_features(track_uris, headers):
+  length = len(track_uris)
+  iterations = length // 100 + 1
+  all_tracks = []
+
+  for i in range(iterations):
+    curr_uris = ','.join(track_uris[i * 100 : min(length, (i + 1) * 100)])
+    r = requests.get(BASE_URL + 'audio-features?ids=' + curr_uris, headers=headers)
+    all_tracks += [{
+      'acousticness': e['acousticness'],
+      'danceability': e['danceability'],
+      'energy': e['energy'],
+      'key': e['key'],
+      'loudness': e['loudness'],
+      'mode': e['mode'],
+      'tempo': e['tempo'],
+      'valence': e['valence']
+    } for e in r.json()['audio_features']]
+  
+  return all_tracks
 
 def get_spotify_song_info(track_uri, headers):
   track_id = track_uri.split(':')[2]
@@ -82,4 +103,20 @@ def add_songs_to_mashup(playlist_id, instr_uri, acap_uri, access_token):
       "uris": [instr_uri, acap_uri]
     },
     headers=get_user_headers(access_token)
+  )
+
+def get_user_playlists(user_access_token):
+  return requests.get(
+    'https://api.spotify.com/v1/me/playlists?limit=50',
+    headers={
+      'Authorization': 'Bearer ' + user_access_token
+    }
+  )
+
+def get_playlist_items(playlist_id, user_access_token):
+  return requests.get(
+    f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks',
+    headers={
+      'Authorization': 'Bearer ' + user_access_token
+    }
   )

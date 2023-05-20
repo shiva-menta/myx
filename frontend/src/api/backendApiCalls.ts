@@ -6,6 +6,7 @@ const BACKEND_URL = process.env.REACT_APP_API_URL;
 const MASHUPS_URL = `${BACKEND_URL}/mashups`;
 const ACAPELLAS_URL = `${BACKEND_URL}/get-acapellas?`;
 const SPOT_MASHUPS_URL = `${BACKEND_URL}/add-spotify-mashup`;
+const PLAYLISTS_URL = `${BACKEND_URL}/get-user-playlists`;
 
 // Functions
 const getMashups = async () => {
@@ -79,6 +80,16 @@ const addMashupToDB = async (data: MashupData) => {
   }
   return res.json();
 };
+const getUserPlaylists = async () => {
+  const playlists = await fetch(PLAYLISTS_URL, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  return playlists.json();
+};
 
 export {
   getMashups,
@@ -86,4 +97,5 @@ export {
   removeSavedMashup,
   getMatchingAcapellas,
   addMashupToDB,
+  getUserPlaylists,
 };

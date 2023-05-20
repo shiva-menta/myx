@@ -46,6 +46,11 @@ type MashupDataRemove = {
   instr_uri: string;
 };
 type AcapellaURI = [string, string, number];
+type PlaylistData = {
+  name: string;
+  image: string;
+  playlist_id: string;
+}
 
 export type {
   SongData,
@@ -55,4 +60,5 @@ export type {
   MashupData,
   MashupDataAdd,
   MashupDataRemove,
+  PlaylistData,
 };

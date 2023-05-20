@@ -1,5 +1,6 @@
 // Imports
 import React from 'react';
+import { AiOutlineNodeIndex } from 'react-icons/ai';
 import { RxMixerHorizontal } from 'react-icons/rx';
 import { RiPlayListLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ import Header from '../components/Header';
 function HomePage() {
   // Constants
   const pages = [
+    { title: 'mix path', link: '/mixpath', component: AiOutlineNodeIndex },
     { title: 'acapella match', link: '/match', component: RxMixerHorizontal },
     { title: 'saved mashups', link: '/saved', component: RiPlayListLine },
   ];

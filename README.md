@@ -20,6 +20,7 @@ Backend
 * `python run.py`
 
 Database / State
+* open up Docker Desktop
 * comment out everything below line 8 in `docker-compose.yaml`
 * run `docker-compose up --build`
 
