@@ -340,6 +340,7 @@ def get_playlists():
   return [{
     'name': e['name'],
     'image': e['images'][0]['url'],
+    'link': e['external_urls']['spotify'],
     'playlist_id': e['id']
   } for e in res.json()['items']]
 
@@ -358,7 +359,7 @@ def get_playlist_weights():
     'name': e['track']['name'],
     'id': e['track']['id'],
     'artists': [artist['name'] for artist in e['track']['artists']]
-  } for e in response.json()['items']]
+  } for e in response if e['track']['id']]
   playlist_data = get_spotify_songs_audio_features(track_descriptions, headers)
 
   # create weights of given playlist
@@ -366,8 +367,8 @@ def get_playlist_weights():
 
   # return weights of given playlist
   return jsonify({
-    'names': track_names,
-    'data': track_data,
+    'tracks': track_names,
+    'tracks_data': track_data,
     'weights': weight_matrix
   })
 

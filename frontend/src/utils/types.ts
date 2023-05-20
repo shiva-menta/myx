@@ -49,6 +49,7 @@ type AcapellaURI = [string, string, number];
 type PlaylistData = {
   name: string;
   image: string;
+  link: string;
   playlist_id: string;
 }
 type SongAudioFeatures = {

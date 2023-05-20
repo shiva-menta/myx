@@ -62,7 +62,7 @@ def get_spotify_song_audio_features(track_uri, headers):
 def get_spotify_songs_audio_features(track_descriptions, headers):
   track_uris = [e['id'] for e in track_descriptions]
   length = len(track_uris)
-  iterations = length // 100 + 1
+  iterations = (length + 99) // 100
   all_tracks = []
 
   for i in range(iterations):
@@ -115,9 +115,18 @@ def get_user_playlists(user_access_token):
   )
 
 def get_playlist_items(playlist_id, user_access_token):
-  return requests.get(
-    f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks',
-    headers={
-      'Authorization': 'Bearer ' + user_access_token
-    }
-  )
+  all_items, limit = [], 3
+  playlist_url = f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks'
+
+  while (limit and playlist_url):
+    response = requests.get(
+      playlist_url,
+      headers={
+        'Authorization': 'Bearer ' + user_access_token
+      }
+    )
+    all_items.extend(response.json()['items'])
+    limit -= 1
+    playlist_url = response.json()['next']
+  print(len(all_items))
+  return all_items

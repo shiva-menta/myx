@@ -92,7 +92,7 @@ const getUserPlaylists = async () => {
   return playlists.json();
 };
 const getPlaylistWeights = async (playlist_id: string) => {
-  const playlistData = await fetch(PLAYLISTS_WEIGHTS_URL, {
+  const playlistData = await fetch(`${PLAYLISTS_WEIGHTS_URL}?playlist_id=${playlist_id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ const getPlaylistWeights = async (playlist_id: string) => {
     credentials: 'include',
   });
   return playlistData.json();
-}
+};
 
 export {
   getMashups,

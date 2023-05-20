@@ -429,6 +429,14 @@ a {
 }
 /* #endregion */
 
+/* #region MyxPath Page */
+.select-playlist-container {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+/* #endregion */
+
 /* #region Login Page */
 .login-page {
     display: flex;
