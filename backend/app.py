@@ -363,12 +363,11 @@ def get_playlist_weights():
   playlist_data = get_spotify_songs_audio_features(track_descriptions, headers)
 
   # create weights of given playlist
-  track_names, track_data, weight_matrix = create_weight_matrix(track_descriptions, playlist_data)
+  tracks, weight_matrix = create_weight_matrix(track_descriptions, playlist_data)
 
   # return weights of given playlist
   return jsonify({
-    'tracks': track_names,
-    'tracks_data': track_data,
+    'tracks': tracks,
     'weights': weight_matrix
   })
 

@@ -94,32 +94,38 @@ def adjust_track_key(song_data, pitch_shift):
   return song_data
 
 def get_pitch_adjusted_track_data(track_descriptions, track_data, pitch_tolerance):
-  all_track_names, all_track_data = [], []
+  all_tracks = []
   for i in range(len(track_descriptions)):
-    all_track_names.append(track_descriptions[i])
-    all_track_data.append(track_data[i])
+    all_tracks.append({
+      'name': track_descriptions[i]['name'],
+      'artists': track_descriptions[i]['artists'],
+      'id': track_descriptions[i]['id'],
+      'audio_features': track_data[i]
+    })
   for i in range(1, pitch_tolerance + 1):
     for track_ind, track_description in enumerate(track_descriptions):
-      all_track_names.extend([{
+      all_tracks.extend([{
+        'name': track_description['name'] + f'| +{i}',
         'artists': track_description['artists'],
         'id': track_description['id'],
-        'name': track_description['name'] + f'| +{i}'
+        'audio_features': adjust_track_key(track_data[track_ind], i)
       }, {
+        'name': track_description['name'] + f'| -{i}',
         'artists': track_description['artists'],
         'id': track_description['id'],
-        'name': track_description['name'] + f'| -{i}'
+        'audio_features': adjust_track_key(track_data[track_ind], -1 * i)
       }])
-      all_track_data.extend([adjust_track_key(track_data[track_ind], i), adjust_track_key(track_data[track_ind], -1 * i)])
-  return all_track_names, all_track_data
+
+  return all_tracks
 
 def create_weight_matrix(track_descriptions, track_data):
   pitch_shift_tolerance = 2
-  adj_track_descriptions, adj_track_data = get_pitch_adjusted_track_data(track_descriptions, track_data, pitch_shift_tolerance)
-  pitch_adj_num_tracks = len(adj_track_descriptions)
+  adj_tracks = get_pitch_adjusted_track_data(track_descriptions, track_data, pitch_shift_tolerance)
+  pitch_adj_num_tracks = len(adj_tracks)
   matrix = [[0] * pitch_adj_num_tracks for _ in range(pitch_adj_num_tracks)]
 
   for i in range(pitch_adj_num_tracks):
     for j in range(i + 1, pitch_adj_num_tracks):
-      matrix[i][j] = calc_mix_distance(adj_track_data[i], adj_track_data[j])
+      matrix[i][j] = calc_mix_distance(adj_tracks[i]['audio_features'], adj_tracks[j]['audio_features'])
 
-  return adj_track_descriptions, adj_track_data, matrix
+  return adj_tracks, matrix

@@ -62,6 +62,12 @@ type SongAudioFeatures = {
   tempo: number;
   valence: number;
 }
+type PlaylistTrackData = {
+  name: string;
+  artists: string[];
+  id: string;
+  audio_features: SongAudioFeatures;
+}
 
 export type {
   SongData,
@@ -73,4 +79,5 @@ export type {
   MashupDataRemove,
   PlaylistData,
   SongAudioFeatures,
+  PlaylistTrackData,
 };

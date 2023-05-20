@@ -39,6 +39,12 @@
 a {
     text-decoration: none;
 }
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
 /* #endregion */
 
 /* #region Header */
@@ -226,6 +232,12 @@ a {
 }
 .feature-select-container .warning {
     width: 200px;
+}
+/* #endregion */
+
+/* #region TypeInDropdown */
+.z-10 {
+    z-index: 10;
 }
 /* #endregion */
 

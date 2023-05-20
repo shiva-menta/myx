@@ -3,7 +3,8 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Header from '../components/Header';
 import Song from '../components/Song';
-import { PlaylistData, SongData, SongAudioFeatures } from '../utils/types';
+import TypeInDropdown from '../components/TypeInDropdown';
+import { PlaylistData, SongData, PlaylistTrackData } from '../utils/types';
 import { getUserPlaylists, getPlaylistWeights } from '../api/backendApiCalls';
 
 // State Defaults
@@ -13,14 +14,30 @@ const noPlaylist = {
   link: '',
   playlist_id: '',
 };
+const noPlaylistTrack = {
+  name: '',
+  artists: [],
+  id: '',
+  audio_features: {
+    acousticness: 0,
+    danceability: 0,
+    energy: 0,
+    key: 0,
+    loudness: 0,
+    mode: 0,
+    tempo: 0,
+    valence: 0,
+  },
+};
 
 function MixPathPage() {
   // State Hooks
   const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<PlaylistData>(noPlaylist);
+  const [firstSong, setFirstSong] = useState<PlaylistTrackData>(noPlaylistTrack);
+  const [secondSong, setSecondSong] = useState<PlaylistTrackData>(noPlaylistTrack);
   const [playlistCache, setPlaylistCache] = useState<Map<string, any>>(new Map());
-  const [playlistTracks, setPlaylistTracks] = useState<SongData[]>([]);
-  const [playlistTracksFeatures, setPlaylistsTracksFeatures] = useState<SongAudioFeatures[]>([]);
+  const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackData[]>([]);
   const [playlistWeightMatrix, setPlaylistWeightMatrix] = useState<number[][]>([]);
 
   // Effect Hooks
@@ -33,15 +50,12 @@ function MixPathPage() {
     if (playlistCache.has(playlist_id)) {
       const data = playlistCache.get(playlist_id);
       setPlaylistTracks(data.tracks);
-      setPlaylistsTracksFeatures(data.tracks_data);
       setPlaylistWeightMatrix(data.weights);
     } else {
       getPlaylistWeights(playlist_id)
         .then((data) => {
           setPlaylistTracks(data.tracks);
-          setPlaylistsTracksFeatures(data.tracks_data);
           setPlaylistWeightMatrix(data.weights);
-          console.log(data.weights);
           setPlaylistCache((prevCache) => new Map(prevCache).set(
             playlist_id,
             data,
@@ -70,18 +84,22 @@ function MixPathPage() {
           ? <Song songName="N/A" artistName="N/A" img="none" link="" />
           : <Song songName={selectedPlaylist.name} artistName="" link={selectedPlaylist.link} img={selectedPlaylist.image} />}
         <DropdownButton id="dropdown-button" title="">
-          {playlists.map((playlist, idx: number) => (
-            <Dropdown.Item
-              onClick={() => { updateSelectedPlaylist(idx); }}
-              key={playlist.name}
-            >
-              {playlist.name}
-            </Dropdown.Item>
-          ))}
+          <div className="scrollable-menu">
+            {playlists.map((playlist, idx: number) => (
+              <Dropdown.Item
+                onClick={() => { updateSelectedPlaylist(idx); }}
+                key={playlist.name}
+              >
+                {playlist.name}
+              </Dropdown.Item>
+            ))}
+          </div>
         </DropdownButton>
       </div>
       <div className="section-title">2. choose first song...</div>
+      <TypeInDropdown onChangeFunc={setFirstSong} results={playlistTracks} defaultText="Set first song..." />
       <div className="section-title">3. choose second song...</div>
+      <TypeInDropdown onChangeFunc={setSecondSong} results={playlistTracks} defaultText="Set second song..." />
     </div>
   );
 }
