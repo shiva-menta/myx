@@ -51,6 +51,16 @@ type PlaylistData = {
   image: string;
   playlist_id: string;
 }
+type SongAudioFeatures = {
+  acousticness: number;
+  danceability: number;
+  energy: number;
+  key: number;
+  loudness: number;
+  mode: number;
+  tempo: number;
+  valence: number;
+}
 
 export type {
   SongData,
@@ -61,4 +71,5 @@ export type {
   MashupDataAdd,
   MashupDataRemove,
   PlaylistData,
+  SongAudioFeatures,
 };

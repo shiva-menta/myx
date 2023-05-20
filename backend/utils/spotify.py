@@ -59,7 +59,8 @@ def get_spotify_song_audio_features(track_uri, headers):
   r = requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
   return r.json()
 
-def get_spotify_songs_audio_features(track_uris, headers):
+def get_spotify_songs_audio_features(track_descriptions, headers):
+  track_uris = [e['id'] for e in track_descriptions]
   length = len(track_uris)
   iterations = length // 100 + 1
   all_tracks = []
@@ -67,7 +68,7 @@ def get_spotify_songs_audio_features(track_uris, headers):
   for i in range(iterations):
     curr_uris = ','.join(track_uris[i * 100 : min(length, (i + 1) * 100)])
     r = requests.get(BASE_URL + 'audio-features?ids=' + curr_uris, headers=headers)
-    all_tracks += [{
+    all_tracks.extend([{
       'acousticness': e['acousticness'],
       'danceability': e['danceability'],
       'energy': e['energy'],
@@ -76,7 +77,7 @@ def get_spotify_songs_audio_features(track_uris, headers):
       'mode': e['mode'],
       'tempo': e['tempo'],
       'valence': e['valence']
-    } for e in r.json()['audio_features']]
+    } for e in r.json()['audio_features']])
   
   return all_tracks
 

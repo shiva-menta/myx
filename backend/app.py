@@ -354,11 +354,15 @@ def get_playlist_weights():
 
   # get songs of given playlist
   response = get_playlist_items(playlist_id, session['user_access_token'])
-  track_ids = [e['track']['id'] for e in response.json()['items']]
-  playlist_data = get_spotify_songs_audio_features(track_ids, headers)
+  track_descriptions = [{
+    'name': e['track']['name'],
+    'id': e['track']['id'],
+    'artists': [artist['name'] for artist in e['track']['artists']]
+  } for e in response.json()['items']]
+  playlist_data = get_spotify_songs_audio_features(track_descriptions, headers)
 
   # create weights of given playlist
-  track_names, track_data, weight_matrix = create_weight_matrix(track_ids, playlist_data)
+  track_names, track_data, weight_matrix = create_weight_matrix(track_descriptions, playlist_data)
 
   # return weights of given playlist
   return jsonify({
