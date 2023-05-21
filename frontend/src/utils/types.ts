@@ -68,6 +68,11 @@ type PlaylistTrackData = {
   id: string;
   audio_features: SongAudioFeatures;
 }
+type MixInstructionData = {
+  song_name: string;
+  artists: string[];
+  instruction: string;
+};
 
 export type {
   SongData,
@@ -80,4 +85,5 @@ export type {
   PlaylistData,
   SongAudioFeatures,
   PlaylistTrackData,
+  MixInstructionData,
 };

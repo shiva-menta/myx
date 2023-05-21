@@ -4,7 +4,9 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Header from '../components/Header';
 import Song from '../components/Song';
 import TypeInDropdown from '../components/TypeInDropdown';
-import { PlaylistData, SongData, PlaylistTrackData } from '../utils/types';
+import MixPathTable from '../components/MixPathTable';
+import { PlaylistData, MixInstructionData, PlaylistTrackData } from '../utils/types';
+import { calculateMixList } from '../utils/helpers';
 import { getUserPlaylists, getPlaylistWeights } from '../api/backendApiCalls';
 
 // State Defaults
@@ -39,12 +41,20 @@ function MixPathPage() {
   const [playlistCache, setPlaylistCache] = useState<Map<string, any>>(new Map());
   const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackData[]>([]);
   const [playlistWeightMatrix, setPlaylistWeightMatrix] = useState<number[][]>([]);
+  const [mixingInstructions, setMixingInstructions] = useState<MixInstructionData[]>([]);
 
   // Effect Hooks
   useEffect(() => {
     getUserPlaylists()
       .then((data) => setPlaylists(data));
   }, []);
+
+  // Constants
+  const tableDefaults = [
+    { name: "Title", value: "title" },
+    { name: "Artists", value: "artists" },
+    { name: "Instructions", value: "instruction" },
+  ];
 
   const getSelectedPlaylistWeights = async (playlist_id: string) => {
     if (playlistCache.has(playlist_id)) {
@@ -71,6 +81,10 @@ function MixPathPage() {
   const updateSelectedPlaylist = async (idx: number) => {
     setSelectedPlaylist(playlists[idx]);
     getSelectedPlaylistWeights(playlists[idx].playlist_id);
+  };
+
+  const getMixPath = () => {
+    setMixingInstructions(calculateMixList(firstSong, secondSong, playlistTracks, playlistWeightMatrix));
   };
 
   // Render Function
@@ -100,6 +114,8 @@ function MixPathPage() {
       <TypeInDropdown onChangeFunc={setFirstSong} results={playlistTracks} defaultText="Set first song..." />
       <div className="section-title">3. choose second song...</div>
       <TypeInDropdown onChangeFunc={setSecondSong} results={playlistTracks} defaultText="Set second song..." />
+      <button className="action-button" onClick={() => {}}>blend</button>
+      <MixPathTable tableDefaults={tableDefaults} instructionList={mixingInstructions} />
     </div>
   );
 }
