@@ -41,6 +41,8 @@ module.exports = {
     'no-restricted-syntax': 'off',
     'no-await-in-loop': 'off',
     'guard-for-in': 'off',
-    'react/jsx-props-no-spreading': 'off'
+    'react/jsx-props-no-spreading': 'off',
+    'prefer-destructuring': 'off',
+    'class-methods-use-this': 'off'
   },
 };

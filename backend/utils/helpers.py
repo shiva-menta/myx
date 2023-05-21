@@ -67,16 +67,17 @@ def calc_key_distance(song1_mode, song1_key, song2_mode, song2_key):
     elif song1_adj_key in harmonic_pitchmap[song2_adj_key]:
       return 2
   
-  return 10
+  return 20
 
 def calc_mix_distance(song1_data, song2_data):
+  # maybe log scale tempo difference for scoring?
   return calc_key_distance(
       song1_mode=song1_data['mode'],
       song1_key=song1_data['key'],
       song2_mode=song2_data['mode'],
       song2_key=song2_data['key']
     ) \
-    + abs(song1_data['tempo'] - song2_data['tempo']) * 0.2 \
+    + abs(song1_data['tempo'] - song2_data['tempo']) * 0.5 \
     + abs(song1_data['valence'] - song2_data['valence']) * 5 \
     + abs(song1_data['energy'] - song2_data['energy']) * 5 \
     + abs(song1_data['danceability'] - song2_data['danceability']) * 5 \
@@ -105,12 +106,12 @@ def get_pitch_adjusted_track_data(track_descriptions, track_data, pitch_toleranc
   for i in range(1, pitch_tolerance + 1):
     for track_ind, track_description in enumerate(track_descriptions):
       all_tracks.extend([{
-        'name': track_description['name'] + f'| +{i}',
+        'name': track_description['name'] + f' | +{i}',
         'artists': track_description['artists'],
         'id': track_description['id'],
         'audio_features': adjust_track_key(track_data[track_ind], i)
       }, {
-        'name': track_description['name'] + f'| -{i}',
+        'name': track_description['name'] + f' | -{i}',
         'artists': track_description['artists'],
         'id': track_description['id'],
         'audio_features': adjust_track_key(track_data[track_ind], -1 * i)

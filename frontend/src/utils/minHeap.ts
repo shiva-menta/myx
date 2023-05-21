@@ -1,32 +1,38 @@
 class MinHeap {
-  // will currently implement just keys themselves, but will need to implement based on kv pairs
-  heap: number[];
+  heap: number[][];
+
   heapsize: number;
 
-  constructor () {
+  vertexMap: Map<number, number>;
+
+  constructor() {
     this.heap = [];
+    this.vertexMap = new Map();
     this.heapsize = 0;
   }
 
   // Helper Functions
   getParent(idx: number) {
-    return Math.floor(idx / 2)
+    return Math.floor(idx / 2);
   }
+
   getLeftChild(idx: number) {
     return 2 * idx;
   }
+
   getRightChild(idx: number) {
     return 2 * idx + 1;
   }
+
   minHeapify(idx: number) {
     const l = this.getLeftChild(idx);
     const r = this.getRightChild(idx);
     let smallest = idx;
 
-    if (l <= this.heapsize - 1 && this.heap[l] < this.heap[idx]) {
+    if (l <= this.heapsize - 1 && this.heap[l][0] < this.heap[idx][0]) {
       smallest = l;
     }
-    if (r <= this.heapsize - 1 && this.heap[r] > this.heap[smallest]) {
+    if (r <= this.heapsize - 1 && this.heap[r][0] > this.heap[smallest][0]) {
       smallest = r;
     }
 
@@ -38,34 +44,49 @@ class MinHeap {
 
   // User Functions
   getMin() {
-    return this.heap[1];
+    return this.heap[0];
   }
-  insert(num: number) {
-    this.heapsize++;
-    this.heap[this.heapsize - 1] = Number.MAX_VALUE;
-    this.decreaseKey(this.heapsize - 1, num);
+
+  getSize() {
+    return this.heapsize;
   }
+
+  insert(dist: number, vertIdx: number) {
+    this.heapsize += 1;
+    this.heap[this.heapsize - 1] = [Number.MAX_VALUE, vertIdx];
+    this.vertexMap.set(vertIdx, this.heapsize - 1);
+    this.decreaseKey(this.heapsize - 1, dist);
+  }
+
   extractMin() {
     if (this.heapsize < 1) {
-      throw new Error;
+      throw new Error();
     }
     const min = this.getMin();
     this.heap[0] = this.heap[this.heapsize - 1];
-    this.heapsize--;
+    this.heapsize -= 1;
     this.minHeapify(1);
 
     return min;
   }
-  decreaseKey(idx: number, key: number) {
-    if (key > this.heap[idx]) {
-      throw new Error;
+
+  decreaseKey(vertIdx: number, key: number) {
+    let heapIdx = this.vertexMap.get(vertIdx);
+    if (heapIdx === undefined) {
+      throw new Error();
     }
-    this.heap[idx] = key;
-    let parent = this.getParent(idx);
-    while (idx > 0 && this.heap[parent] > this.heap[idx]) {
-      [this.heap[idx], this.heap[parent]] = [this.heap[parent], this.heap[idx]];
-      idx = parent;
-      parent = this.getParent(idx);
-    } 
+    if (key > this.heap[heapIdx][0]) {
+      return;
+    }
+
+    this.heap[heapIdx][0] = key;
+    let parentIdx = this.getParent(heapIdx);
+    while (heapIdx > 0 && this.heap[parentIdx][0] > this.heap[heapIdx][0]) {
+      [this.heap[heapIdx], this.heap[parentIdx]] = [this.heap[parentIdx], this.heap[heapIdx]];
+      heapIdx = parentIdx;
+      parentIdx = this.getParent(heapIdx);
+    }
   }
 }
+
+export default MinHeap;

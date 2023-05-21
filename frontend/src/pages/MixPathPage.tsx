@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { RiseLoader } from 'react-spinners';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Header from '../components/Header';
@@ -16,28 +17,15 @@ const noPlaylist = {
   link: '',
   playlist_id: '',
 };
-const noPlaylistTrack = {
-  name: '',
-  artists: [],
-  id: '',
-  audio_features: {
-    acousticness: 0,
-    danceability: 0,
-    energy: 0,
-    key: 0,
-    loudness: 0,
-    mode: 0,
-    tempo: 0,
-    valence: 0,
-  },
-};
 
+// Main Component
 function MixPathPage() {
   // State Hooks
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<PlaylistData>(noPlaylist);
-  const [firstSong, setFirstSong] = useState<PlaylistTrackData>(noPlaylistTrack);
-  const [secondSong, setSecondSong] = useState<PlaylistTrackData>(noPlaylistTrack);
+  const [firstSongIdx, setFirstSongIdx] = useState<number | null>(null);
+  const [secondSongIdx, setSecondSongIdx] = useState<number | null>(null);
   const [playlistCache, setPlaylistCache] = useState<Map<string, any>>(new Map());
   const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackData[]>([]);
   const [playlistWeightMatrix, setPlaylistWeightMatrix] = useState<number[][]>([]);
@@ -51,9 +39,9 @@ function MixPathPage() {
 
   // Constants
   const tableDefaults = [
-    { name: "Title", value: "title" },
-    { name: "Artists", value: "artists" },
-    { name: "Instructions", value: "instruction" },
+    { name: 'Title', value: 'song_name' },
+    { name: 'Artists', value: 'artists' },
+    { name: 'Instructions', value: 'instruction' },
   ];
 
   const getSelectedPlaylistWeights = async (playlist_id: string) => {
@@ -62,6 +50,7 @@ function MixPathPage() {
       setPlaylistTracks(data.tracks);
       setPlaylistWeightMatrix(data.weights);
     } else {
+      setIsLoading(true);
       getPlaylistWeights(playlist_id)
         .then((data) => {
           setPlaylistTracks(data.tracks);
@@ -70,6 +59,9 @@ function MixPathPage() {
             playlist_id,
             data,
           ));
+        })
+        .then(() => {
+          setIsLoading(false);
         });
     }
   };
@@ -84,7 +76,16 @@ function MixPathPage() {
   };
 
   const getMixPath = () => {
-    setMixingInstructions(calculateMixList(firstSong, secondSong, playlistTracks, playlistWeightMatrix));
+    if (firstSongIdx === null || secondSongIdx === null || firstSongIdx === secondSongIdx) {
+      alert('Invalid inputs. Please try again.');
+      return;
+    }
+    setMixingInstructions(calculateMixList(
+      firstSongIdx,
+      secondSongIdx,
+      playlistTracks,
+      playlistWeightMatrix,
+    ));
   };
 
   // Render Function
@@ -92,30 +93,47 @@ function MixPathPage() {
     <div className="mix-path-page">
       <Header />
       <div className="page-title">[myx path]</div>
-      <div className="section-title">1. choose playlist...</div>
-      <div className="select-playlist-container">
-        {!isPlaylistSelected()
-          ? <Song songName="N/A" artistName="N/A" img="none" link="" />
-          : <Song songName={selectedPlaylist.name} artistName="" link={selectedPlaylist.link} img={selectedPlaylist.image} />}
-        <DropdownButton id="dropdown-button" title="">
-          <div className="scrollable-menu">
-            {playlists.map((playlist, idx: number) => (
-              <Dropdown.Item
-                onClick={() => { updateSelectedPlaylist(idx); }}
-                key={playlist.name}
-              >
-                {playlist.name}
-              </Dropdown.Item>
-            ))}
+      <div className="mix-path-page-content">
+        <div className="mix-path-menu">
+          <div>
+            <div className="section-title">1. choose playlist...</div>
+            <div className="select-playlist-container">
+              {!isPlaylistSelected()
+                ? <Song songName="N/A" artistName="N/A" img="none" link="" />
+                : <Song songName={selectedPlaylist.name} artistName="" link={selectedPlaylist.link} img={selectedPlaylist.image} />}
+              <DropdownButton id="dropdown-button" title="">
+                <div className="scrollable-menu">
+                  {playlists.map((playlist, idx: number) => (
+                    <Dropdown.Item
+                      onClick={() => { updateSelectedPlaylist(idx); }}
+                      key={playlist.name}
+                    >
+                      {playlist.name}
+                    </Dropdown.Item>
+                  ))}
+                </div>
+              </DropdownButton>
+            </div>
           </div>
-        </DropdownButton>
+          {isLoading
+            ? <div className="h-300 mix-path-loading"><RiseLoader color="#ffffff" size={15} /></div>
+            : (
+              <div className="mix-path-menu h-300">
+                <div className="mix-path-song-select">
+                  <div className="section-title">2. choose first song...</div>
+                  <TypeInDropdown onChangeFunc={setFirstSongIdx} results={playlistTracks} defaultText="Set first song..." />
+                </div>
+                <div className="mix-path-song-select">
+                  <div className="section-title">3. choose second song...</div>
+                  <TypeInDropdown onChangeFunc={setSecondSongIdx} results={playlistTracks} defaultText="Set second song..." />
+                </div>
+                <button className="action-button" onClick={() => { getMixPath(); }}>blend</button>
+              </div>
+            )}
+        </div>
+        {mixingInstructions.length > 0
+          && <MixPathTable tableDefaults={tableDefaults} instructionList={mixingInstructions} />}
       </div>
-      <div className="section-title">2. choose first song...</div>
-      <TypeInDropdown onChangeFunc={setFirstSong} results={playlistTracks} defaultText="Set first song..." />
-      <div className="section-title">3. choose second song...</div>
-      <TypeInDropdown onChangeFunc={setSecondSong} results={playlistTracks} defaultText="Set second song..." />
-      <button className="action-button" onClick={() => {}}>blend</button>
-      <MixPathTable tableDefaults={tableDefaults} instructionList={mixingInstructions} />
     </div>
   );
 }

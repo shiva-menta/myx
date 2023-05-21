@@ -15,30 +15,32 @@ type MixPathTableProps = {
 // Main Component
 function MixPathTable({ tableDefaults, instructionList }: MixPathTableProps) {
   return (
-    <table>
-      <thead>
-        <tr>
-          {tableDefaults.map((item, idx) => (
-            <th key={idx}>
-              {item.name}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {instructionList.map((instruction, index) => (
-          <tr key={index}>
+    <div className="table-container">
+      <table>
+        <thead>
+          <tr>
             {tableDefaults.map((item, idx) => (
-              <td key={idx}>
-                {item.value === 'artists'
-                  ? instruction[item.value as keyof MixInstructionData]
-                  : (instruction[item.value as keyof MixInstructionData] as string[]).join(', ')}
-              </td>
+              <th key={item.name}>
+                {item.name}
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {instructionList.map((instruction, index) => (
+            <tr key={instruction.song_name}>
+              {tableDefaults.map((item, idx) => (
+                <td key={item.value}>
+                  {item.value !== 'artists'
+                    ? instruction[item.value as keyof MixInstructionData]
+                    : (instruction[item.value as keyof MixInstructionData] as string[]).join(', ')}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

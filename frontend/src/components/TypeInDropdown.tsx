@@ -12,10 +12,14 @@ type TypeInDropdownProps = {
 // Main Component
 function TypeInDropdown({ onChangeFunc, results, defaultText }: TypeInDropdownProps) {
   return (
-    <div className="z-10">
+    <div className="typeindropdown">
       <Downshift
-        itemToString={(item) => (item ? item.name : '')}
-        onChange={onChangeFunc}
+        itemToString={(item) => (item ? item.result.name : '')}
+        onChange={(item) => {
+          if (item) {
+            onChangeFunc(item.originalIndex);
+          }
+        }}
       >
         {({
           getInputProps,
@@ -25,31 +29,37 @@ function TypeInDropdown({ onChangeFunc, results, defaultText }: TypeInDropdownPr
           inputValue,
           highlightedIndex,
         }) => {
-          const filteredResults = results.filter((result) => (result.name).toLowerCase().startsWith(inputValue ? inputValue.toLowerCase() : '')).slice(0, 10);
+          const filteredResults = results
+            .map((result, index) => ({ result, originalIndex: index }))
+            .filter(({ result }) => result.name.toLowerCase().startsWith(inputValue ? inputValue.toLowerCase() : ''))
+            .slice(0, 10);
 
           return (
-            <div className="relative">
+            <div className="dropdown-container">
               <input
                 {...getInputProps({
                   placeholder: defaultText || 'Enter a song...',
-                  className: 'block w-full p-2 text-lg text-white appearance-none focus:outline-none bg-transparent',
+                  className: 'dropdown-text-container',
                 })}
               />
-              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-900 animate-pulse" />
+              <div className="dropdown-line" />
               <ul
                 {...getMenuProps({
                   className: `${
                     isOpen ? 'block' : 'hidden'
-                  } absolute bg-white border border-gray-300 w-full mt-2 text-left z-10`,
+                  } dropdown-text-box`,
+                  style: {
+                    listStyleType: 'none',
+                  },
                 })}
               >
                 {isOpen
-                  && filteredResults.map((result: any, index: number) => (
+                  && filteredResults.map((item: any, index: number) => (
                     <li
                       {...getItemProps({
                         key: index,
                         index,
-                        item: result,
+                        item,
                         style: {
                           backgroundColor:
                             highlightedIndex === index
@@ -64,7 +74,7 @@ function TypeInDropdown({ onChangeFunc, results, defaultText }: TypeInDropdownPr
                         },
                       })}
                     >
-                      {result.name}
+                      {item.result.name}
                     </li>
                   ))}
               </ul>
