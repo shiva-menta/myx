@@ -1,5 +1,6 @@
 import React from 'react';
 import { MixInstructionData } from '../utils/types';
+import { cutString } from '../utils/helpers';
 
 // Type Declarations
 type ColumnDefault = {
@@ -15,7 +16,7 @@ type MixPathTableProps = {
 // Main Component
 function MixPathTable({ tableDefaults, instructionList }: MixPathTableProps) {
   return (
-    <div className="table-container">
+    <div className="table-container" id="table-container">
       <table>
         <thead>
           <tr>
@@ -33,7 +34,7 @@ function MixPathTable({ tableDefaults, instructionList }: MixPathTableProps) {
                 <td key={item.value}>
                   {item.value !== 'artists'
                     ? instruction[item.value as keyof MixInstructionData]
-                    : (instruction[item.value as keyof MixInstructionData] as string[]).join(', ')}
+                    : cutString((instruction[item.value as keyof MixInstructionData] as string[]).join(', '), 25)}
                 </td>
               ))}
             </tr>

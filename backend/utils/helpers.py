@@ -120,6 +120,7 @@ def calc_mix_distance(song1_data, song2_data):
     + abs(song1_data['acousticness'] - song2_data['acousticness']) * 5
 
 def adjust_track_key(song_data, pitch_shift):
+  song_data = song_data.copy()
   key = song_data['key']
   new_key = key + pitch_shift
   if new_key > 11:

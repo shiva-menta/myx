@@ -414,14 +414,14 @@ a {
 .no-mashups-found-container .section-text {
     width: 300px;
 }
-#mashups-container::-webkit-scrollbar {
+#table-container::-webkit-scrollbar, #mashups-container::-webkit-scrollbar {
     width: 5px;
 }
-#mashups-container::-webkit-scrollbar-thumb {
+#table-container::-webkit-scrollbar-thumb, #mashups-container::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 5px;
 }
-#mashups-container::-webkit-scrollbar-thumb:hover {
+#table-container::-webkit-scrollbar-thumb:hover, #mashups-container::-webkit-scrollbar-thumb:hover {
     background-color: white;
 }
 
@@ -534,9 +534,10 @@ a {
 
 /* #region MixPathTable */
 .table-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
+    margin-top: 10px;
+    max-height: 450px;
+    overflow-y: auto;
 }
 table {
     height: auto;
