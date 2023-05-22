@@ -18,13 +18,43 @@ const noPlaylistTrack = {
   },
 };
 
+// Other Constants
+const pattern = /^\|\s*\+\d+$/;
+const harmonicPitchmap = new Map(Object.entries({
+  0: [5, 7, 21],
+  1: [6, 8, 22],
+  2: [7, 9, 23],
+  3: [8, 10, 12],
+  4: [9, 11, 13],
+  5: [0, 10, 14],
+  6: [1, 11, 15],
+  7: [0, 2, 16],
+  8: [1, 3, 17],
+  9: [2, 4, 18],
+  10: [3, 5, 19],
+  11: [4, 6, 20],
+  12: [17, 19, 3],
+  13: [18, 20, 4],
+  14: [19, 21, 5],
+  15: [20, 22, 6],
+  16: [21, 23, 7],
+  17: [12, 22, 8],
+  18: [13, 23, 9],
+  19: [12, 14, 10],
+  20: [13, 15, 11],
+  21: [14, 16, 0],
+  22: [15, 17, 1],
+  23: [16, 18, 2],
+}));
+
 const formatBPM = (bpm: number) => {
   if (bpm > 0) {
-    return `+${Math.round(bpm).toString()}`;
+    return `+${bpm.toFixed(1)}`;
   } else {
-    return Math.round(bpm).toString();
+    return bpm.toFixed(1);
   }
 };
+const formatKey = (key: number, mode: number) => (12 * (1 - mode) + key);
 const extractSongData = (data: any) => ({
   artists: data.artists.map((artist: any) => artist.name),
   name: data.name,
@@ -37,8 +67,7 @@ const extractSongListData = (data: any) => (
 );
 
 // Mix Path Helpers
-
-const modified_dijkstras = (
+const dijkstras = (
   firstSongIdx: number,
   secondSongIdx: number,
   numSongs: number,
@@ -77,6 +106,7 @@ const modified_dijkstras = (
 
   // Return Song Number Path
   const path = [];
+  console.log(dist[secondSongIdx]);
   let current = secondSongIdx;
   while (current !== firstSongIdx) {
     path.push(current);
@@ -86,6 +116,60 @@ const modified_dijkstras = (
   return path.reverse();
 };
 
+const isMixableKey = (
+  firstSongMode: number,
+  firstSongKey: number,
+  secondSongMode: number,
+  secondSongKey: number,
+) => {
+  const firstKey = formatKey(firstSongKey, firstSongMode);
+  const keys = harmonicPitchmap.get(firstKey.toString());
+  if (keys !== undefined) {
+    const secondKey = formatKey(secondSongKey, secondSongMode);
+    return keys.includes(secondKey) || firstKey === secondKey;
+  } else {
+    throw new Error();
+  }
+};
+
+const createMixInstruction = (
+  firstSong: PlaylistTrackData,
+  secondSong: PlaylistTrackData,
+  mixWeight: number,
+) => {
+  let currInstructions = '';
+  if (mixWeight > 100) {
+    currInstructions = 'hard stop and fade out';
+  } else {
+    if (pattern.test(firstSong.name)) {
+      currInstructions += `key shift ${firstSong.name.slice(firstSong.name.length - 2, firstSong.name.length)} |`;
+    }
+    const tempoDifferences = [
+      secondSong.audio_features.tempo - firstSong.audio_features.tempo,
+      secondSong.audio_features.tempo / 2 - firstSong.audio_features.tempo,
+      secondSong.audio_features.tempo - firstSong.audio_features.tempo / 2,
+    ];
+    const absValTempoDifferences = tempoDifferences.map((item) => Math.abs(item));
+    currInstructions += `change bpm ${formatBPM(tempoDifferences[absValTempoDifferences.indexOf(Math.min(...absValTempoDifferences))])}`;
+    if (!isMixableKey(
+      firstSong.audio_features.mode,
+      firstSong.audio_features.key,
+      secondSong.audio_features.mode,
+      secondSong.audio_features.key,
+    )) {
+      currInstructions += ' (non-harmonic)';
+    }
+  }
+
+  return {
+    song_name: firstSong.name,
+    artists: firstSong.artists,
+    tempo: Math.round(firstSong.audio_features.tempo),
+    key: formatKey(firstSong.audio_features.key, firstSong.audio_features.mode),
+    instruction: currInstructions,
+  };
+};
+
 const calculateMixList = (
   firstSongIdx: number,
   secondSongIdx: number,
@@ -93,7 +177,7 @@ const calculateMixList = (
   playlistWeightMatrix: number[][],
 ) => {
   // Call Modified Dijkstra's
-  const mixPath = modified_dijkstras(
+  const mixPath = dijkstras(
     firstSongIdx,
     secondSongIdx,
     allSongs.length,
@@ -102,41 +186,31 @@ const calculateMixList = (
 
   // Create Mixing Instruction List
   const instructionList = [];
-  const pattern = /^\|\s*\+\d+$/;
-  let currInstructions = '';
-  let songIdx = 0;
+  let songIdx = mixPath[0];
   let nextSongIdx = 0;
-  let currSong: PlaylistTrackData = noPlaylistTrack;
+  let currSong: PlaylistTrackData = allSongs[songIdx];
   let nextSong: PlaylistTrackData = noPlaylistTrack;
-  for (let i = 0; i < mixPath.length - 1; i += 1) {
-    songIdx = mixPath[i];
-    nextSongIdx = mixPath[i + 1];
-    currSong = allSongs[songIdx];
-    nextSong = allSongs[songIdx + 1];
-    if (pattern.test(currSong.name)) {
-      currInstructions += `key shift ${currSong.name.slice(currSong.name.length - 2, currSong.name.length)} |`;
-    }
-    currInstructions += `change bpm ${formatBPM(nextSong.audio_features.tempo - currSong.audio_features.tempo)}`;
-    if (playlistWeightMatrix[Math.min(songIdx, nextSongIdx)][Math.max(songIdx, nextSongIdx)] > 10) {
-      currInstructions += ' | hard stop and fade out';
-    }
-    instructionList.push({
-      song_name: currSong.name,
-      artists: currSong.artists,
-      instruction: currInstructions,
-    });
-    currInstructions = '';
+
+  for (let i = 1; i < mixPath.length; i += 1) {
+    nextSongIdx = mixPath[i];
+    nextSong = allSongs[nextSongIdx];
+    instructionList.push(createMixInstruction(
+      currSong,
+      nextSong,
+      playlistWeightMatrix[Math.min(songIdx, nextSongIdx)][Math.max(songIdx, nextSongIdx)],
+    ));
+    songIdx = nextSongIdx;
+    currSong = nextSong;
   }
 
   songIdx = mixPath[mixPath.length - 1];
   currSong = allSongs[songIdx];
-  if (pattern.test(currSong.name)) {
-    currInstructions += `key shift ${currSong.name.slice(currSong.name.length - 2, currSong.name.length)} |`;
-  }
   instructionList.push({
     song_name: currSong.name,
     artists: currSong.artists,
-    instruction: currInstructions,
+    tempo: Math.round(currSong.audio_features.tempo),
+    key: formatKey(currSong.audio_features.key, currSong.audio_features.mode),
+    instruction: (pattern.test(currSong.name) ? `key shift ${currSong.name.slice(currSong.name.length - 2, currSong.name.length)}` : ''),
   });
 
   return instructionList;

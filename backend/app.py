@@ -15,7 +15,7 @@ from flask_cors import CORS, cross_origin
 from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING
 from utils.maps import input_map
 from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_spot_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup, get_user_playlists, get_playlist_items, get_spotify_songs_audio_features
-from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix
+from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix, combine_track_info_features
 
 # ––––– App Initialization / Setup –––––
 FRONTEND_REDIRECT_URL = frontend_url + '/#/home'
@@ -361,9 +361,10 @@ def get_playlist_weights():
     'artists': [artist['name'] for artist in e['track']['artists']]
   } for e in response if e['track']['id']]
   playlist_data = get_spotify_songs_audio_features(track_descriptions, headers)
+  full_track_data = combine_track_info_features(track_descriptions, playlist_data)
 
   # create weights of given playlist
-  tracks, weight_matrix = create_weight_matrix(track_descriptions, playlist_data)
+  tracks, weight_matrix = create_weight_matrix(full_track_data)
 
   # return weights of given playlist
   return jsonify({

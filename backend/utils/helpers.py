@@ -1,5 +1,6 @@
 # Imports
 from .maps import major_pitchmap, harmonic_pitchmap
+import re
 
 # Functions
 def pitchmap_key(key, mode):
@@ -57,6 +58,32 @@ def extract_song_data(song_data):
     'image': song_data['album']['images'][1]['url']
   }
 
+def shorten_song_name(song_name):
+  return re.sub(r'\s*\((feat|with)\. [^)]*\)', '', song_name)
+
+def combine_track_info_features(track_descriptions, track_features):
+  all_tracks = []
+  for i in range(len(track_descriptions)):
+    audio_features = track_features[i]
+    if audio_features is not None:
+      all_tracks.append({
+        'name': shorten_song_name(track_descriptions[i]['name']),
+        'artists': track_descriptions[i]['artists'],
+        'id': track_descriptions[i]['id'],
+        'audio_features': {
+          'acousticness': audio_features['acousticness'],
+          'danceability': audio_features['danceability'],
+          'energy': audio_features['energy'],
+          'key': audio_features['key'],
+          'loudness': audio_features['loudness'],
+          'mode': audio_features['mode'],
+          'tempo': audio_features['tempo'],
+          'valence': audio_features['valence']
+        }
+      })
+  
+  return all_tracks
+
 def calc_key_distance(song1_mode, song1_key, song2_mode, song2_key):
   song1_adj_key, song2_adj_key = pitchmap_key(song1_key, song1_mode), pitchmap_key(song2_key, song2_mode)
   if song1_adj_key == song2_adj_key:
@@ -65,19 +92,28 @@ def calc_key_distance(song1_mode, song1_key, song2_mode, song2_key):
     if song1_adj_key in major_pitchmap[song2_adj_key]:
       return 1
     elif song1_adj_key in harmonic_pitchmap[song2_adj_key]:
-      return 2
+      return 4
   
-  return 20
+  return 50
+
+def calc_tempo_distance(song1_tempo, song2_tempo):
+  # need to check if they're similar
+  diff = min(abs(song1_tempo - song2_tempo), abs(max(song1_tempo, song2_tempo) / 2 - min(song1_tempo, song2_tempo)))
+  if diff <= 5:
+    return 0
+  elif diff <= 8:
+    return 5
+  else:
+    return 200
 
 def calc_mix_distance(song1_data, song2_data):
-  # maybe log scale tempo difference for scoring?
   return calc_key_distance(
       song1_mode=song1_data['mode'],
       song1_key=song1_data['key'],
       song2_mode=song2_data['mode'],
       song2_key=song2_data['key']
     ) \
-    + abs(song1_data['tempo'] - song2_data['tempo']) * 0.5 \
+    + calc_tempo_distance(song1_data['tempo'], song2_data['tempo']) \
     + abs(song1_data['valence'] - song2_data['valence']) * 5 \
     + abs(song1_data['energy'] - song2_data['energy']) * 5 \
     + abs(song1_data['danceability'] - song2_data['danceability']) * 5 \
@@ -94,34 +130,28 @@ def adjust_track_key(song_data, pitch_shift):
 
   return song_data
 
-def get_pitch_adjusted_track_data(track_descriptions, track_data, pitch_tolerance):
+def get_pitch_adjusted_track_data(full_track_data, pitch_tolerance):
   all_tracks = []
-  for i in range(len(track_descriptions)):
-    all_tracks.append({
-      'name': track_descriptions[i]['name'],
-      'artists': track_descriptions[i]['artists'],
-      'id': track_descriptions[i]['id'],
-      'audio_features': track_data[i]
-    })
+  all_tracks.extend(full_track_data)
   for i in range(1, pitch_tolerance + 1):
-    for track_ind, track_description in enumerate(track_descriptions):
+    for track_data in full_track_data:
       all_tracks.extend([{
-        'name': track_description['name'] + f' | +{i}',
-        'artists': track_description['artists'],
-        'id': track_description['id'],
-        'audio_features': adjust_track_key(track_data[track_ind], i)
+        'name': track_data['name'] + f' | +{i}',
+        'artists': track_data['artists'],
+        'id': track_data['id'],
+        'audio_features': adjust_track_key(track_data['audio_features'], i)
       }, {
-        'name': track_description['name'] + f' | -{i}',
-        'artists': track_description['artists'],
-        'id': track_description['id'],
-        'audio_features': adjust_track_key(track_data[track_ind], -1 * i)
+        'name': track_data['name'] + f' | -{i}',
+        'artists': track_data['artists'],
+        'id': track_data['id'],
+        'audio_features': adjust_track_key(track_data['audio_features'], -1 * i)
       }])
 
   return all_tracks
 
-def create_weight_matrix(track_descriptions, track_data):
+def create_weight_matrix(full_track_data):
   pitch_shift_tolerance = 2
-  adj_tracks = get_pitch_adjusted_track_data(track_descriptions, track_data, pitch_shift_tolerance)
+  adj_tracks = get_pitch_adjusted_track_data(full_track_data, pitch_shift_tolerance)
   pitch_adj_num_tracks = len(adj_tracks)
   matrix = [[0] * pitch_adj_num_tracks for _ in range(pitch_adj_num_tracks)]
 

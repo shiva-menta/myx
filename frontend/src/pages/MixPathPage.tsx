@@ -41,6 +41,8 @@ function MixPathPage() {
   const tableDefaults = [
     { name: 'Title', value: 'song_name' },
     { name: 'Artists', value: 'artists' },
+    { name: 'BPM', value: 'tempo' },
+    { name: 'Key', value: 'key' },
     { name: 'Instructions', value: 'instruction' },
   ];
 
@@ -50,6 +52,7 @@ function MixPathPage() {
       setPlaylistTracks(data.tracks);
       setPlaylistWeightMatrix(data.weights);
     } else {
+      setMixingInstructions([]);
       setIsLoading(true);
       getPlaylistWeights(playlist_id)
         .then((data) => {
