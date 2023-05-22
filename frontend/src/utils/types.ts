@@ -46,6 +46,33 @@ type MashupDataRemove = {
   instr_uri: string;
 };
 type AcapellaURI = [string, string, number];
+type PlaylistData = {
+  name: string;
+  image: string;
+  link: string;
+  playlist_id: string;
+}
+type SongAudioFeatures = {
+  acousticness: number;
+  danceability: number;
+  energy: number;
+  key: number;
+  loudness: number;
+  mode: number;
+  tempo: number;
+  valence: number;
+}
+type PlaylistTrackData = {
+  name: string;
+  artists: string[];
+  id: string;
+  audio_features: SongAudioFeatures;
+}
+type MixInstructionData = {
+  song_name: string;
+  artists: string[];
+  instruction: string;
+};
 
 export type {
   SongData,
@@ -55,4 +82,8 @@ export type {
   MashupData,
   MashupDataAdd,
   MashupDataRemove,
+  PlaylistData,
+  SongAudioFeatures,
+  PlaylistTrackData,
+  MixInstructionData,
 };

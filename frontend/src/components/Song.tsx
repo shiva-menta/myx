@@ -1,6 +1,7 @@
 // Imports
 import React from 'react';
 import Card from 'react-bootstrap/Card';
+import { cutString } from '../utils/helpers';
 
 // Props Type
 type SongProps = {
@@ -17,14 +18,6 @@ function Song({
   link,
   img,
 }: SongProps) {
-  // Functions
-  function cutString(string: string, maxLength: number) {
-    if (string.length > maxLength) {
-      return `${string.substring(0, maxLength)}...`;
-    }
-    return string;
-  }
-
   // Render Function
   return (
     <a href={link} target="_blank" rel="noopener noreferrer">

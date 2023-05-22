@@ -20,6 +20,7 @@ Backend
 * `python run.py`
 
 Database / State
+* open up Docker Desktop
 * comment out everything below line 8 in `docker-compose.yaml`
 * run `docker-compose up --build`
 
@@ -31,13 +32,13 @@ Frontend
 ### Testing Mode (myx.localhost)
 _This mode is meant for verifying new features work in a containerized environment._
 * open up Docker Desktop
-* backend `.env`: uncomment only testing mode lines
 * `config.py`: comment out appropriate database url
 * frontend `Dockerfile`: comment out myxdj.live and uncomment myx.localhost
 * frontend `nginx.conf`: comment out myxdj.live and uncomment myx.localhost
 * uncomment out all containers in `docker-compose.yaml`
 * run `docker-compose up --build` or `docker-compose up` as needed
 * access the app at myx.localhost!
+* Note: if the models haven't been loaded into the db container yet, create an interactive shell with terminal through `docker exec -it myx-backend-1 sh`, then run `pipenv install`, `pipenv shell`, and `python bootstrap.py`.
 
 ### Deployment Mode (myxdj.live)
 _This mode is meant for deploying actual code to Fly.io._
@@ -54,3 +55,10 @@ _This section is meant to address any commonly reached problems when interacting
 * Browser – (`INVALID_CLIENT: Invalid redirect URI`): The Spotify Web API is not configured properly with the API URL needed to run your app. Add a correct, valid redirect URI to the Web API.
 * Backend – (`KeyError: 'access_token'`): The backend does not have the correct redirect URI to point to after authentication. Make sure to return the correct URI in the backend `.env` file.
 
+## Next Steps
+_This section is meant to layout the next steps for making Myx better._
+* Initiate one HTTPS connection per session & maintain persistent connection.
+* Use async / concurrency to reduce API response time for large playlist audio features.
+* Implement caching / expiration for the /api/authenticate endpoint to minimize backend hits.
+* Determine if double API calls in development logger are real or just debugger glitches.
+* Create "wake-up" function for containers (glitchy on free mode).

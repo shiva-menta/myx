@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AcapellaMatchPage from './pages/AcapellaMatchPage';
 import SavedMashupsPage from './pages/SavedMashupsPage';
+import MixPathPage from './pages/MixPathPage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import DeniedAccessPage from './pages/DeniedAccessPage';
@@ -32,6 +33,16 @@ function App() {
             (
               <RequireAuth>
                 <AcapellaMatchPage />
+              </RequireAuth>
+            )
+          }
+        />
+        <Route
+          path="/mixpath"
+          element={
+            (
+              <RequireAuth>
+                <MixPathPage />
               </RequireAuth>
             )
           }

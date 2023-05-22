@@ -14,8 +14,8 @@ from flask_cors import CORS, cross_origin
 
 from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING
 from utils.maps import input_map
-from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup
-from utils.helpers import pitchmap_key, get_key_range, get_bpm_range
+from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_spot_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup, get_user_playlists, get_playlist_items, get_spotify_songs_audio_features
+from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix, combine_track_info_features
 
 # ––––– App Initialization / Setup –––––
 FRONTEND_REDIRECT_URL = frontend_url + '/#/home'
@@ -73,6 +73,15 @@ def requires_access_token(f):
     get_access_token()
     return f(*args, **kwargs)
   return token_wrapper
+
+def requires_user_token(f):
+  @wraps(f)
+  def decorated_function(*args, **kwargs):
+    response = refresh_user_token(session['user_refresh_token'])
+    if response[1] != 200:
+      return jsonify({"message": "Error in refreshing token."}), response.status_code
+    return f(*args, **kwargs)
+  return decorated_function
 
 def get_match_uris(instr_data, req_data):
   sel_genre = input_map[req_data['genre']] if req_data['genre'] != 'Any' else None
@@ -135,7 +144,7 @@ def refresh_user_token(refresh_token):
   if session['token_expires'] > datetime.datetime.now() + datetime.timedelta(seconds=60):
     return jsonify({"message": "Token is still valid"}), 200
 
-  response = refresh_user_token(refresh_token)
+  response = refresh_spot_user_token(refresh_token)
 
   if response.status_code == 200:
     response_data = response.json()
@@ -302,12 +311,9 @@ spotify_mashup_args.add_argument("acap_name", type=str, help="Instrumental URI i
 @app.route('/add-spotify-mashup', methods=['POST'])
 @login_required
 @requires_access_token
+@requires_user_token
 @cross_origin(supports_credentials=True)
 def add_spotify_mashup():
-  response = refresh_user_token(session['user_refresh_token'])
-  if response[1] != 200:
-    return jsonify({"message": "Error in refreshing token."}), response.status_code
-
   data = spotify_mashup_args.parse_args()
   instr_uri = data['instr_uri']
   instr_name = data['instr_name']
@@ -323,6 +329,49 @@ def add_spotify_mashup():
   if r.status_code != 201:
     return jsonify({"message": "Error in adding tracks to playlist."}), r.status_code
   return jsonify({"message": "Mashup added to Spotify!"}), 200
+
+@app.route('/get-user-playlists', methods=['GET'])
+@login_required
+@requires_access_token
+@requires_user_token
+@cross_origin(supports_credentials=True)
+def get_playlists():
+  res = get_user_playlists(session['user_access_token'])
+  return [{
+    'name': e['name'],
+    'image': e['images'][0]['url'],
+    'link': e['external_urls']['spotify'],
+    'playlist_id': e['id']
+  } for e in res.json()['items']]
+
+@app.route('/get-playlist-weights', methods=['GET'])
+@login_required
+@requires_access_token
+@requires_user_token
+@cross_origin(supports_credentials=True)
+def get_playlist_weights():
+  # get given playlist
+  playlist_id = request.args.get('playlist_id')
+
+  # get songs of given playlist
+  response = get_playlist_items(playlist_id, session['user_access_token'])
+  track_descriptions = [{
+    'name': e['track']['name'],
+    'id': e['track']['id'],
+    'artists': [artist['name'] for artist in e['track']['artists']]
+  } for e in response if e['track']['id']]
+  playlist_data = get_spotify_songs_audio_features(track_descriptions, headers)
+  full_track_data = combine_track_info_features(track_descriptions, playlist_data)
+
+  # create weights of given playlist
+  tracks, weight_matrix = create_weight_matrix(full_track_data)
+
+  # return weights of given playlist
+  return jsonify({
+    'tracks': tracks,
+    'weights': weight_matrix
+  })
+
 
 # ––––– MAIN –––––
 if __name__ == '__main__':
