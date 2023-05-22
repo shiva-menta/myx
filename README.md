@@ -32,13 +32,13 @@ Frontend
 ### Testing Mode (myx.localhost)
 _This mode is meant for verifying new features work in a containerized environment._
 * open up Docker Desktop
-* backend `.env`: uncomment only testing mode lines
 * `config.py`: comment out appropriate database url
 * frontend `Dockerfile`: comment out myxdj.live and uncomment myx.localhost
 * frontend `nginx.conf`: comment out myxdj.live and uncomment myx.localhost
 * uncomment out all containers in `docker-compose.yaml`
 * run `docker-compose up --build` or `docker-compose up` as needed
 * access the app at myx.localhost!
+* Note: if the models haven't been loaded into the db container yet, create an interactive shell with terminal through `docker exec -it myx-backend-1 sh`, then run `pipenv install`, `pipenv shell`, and `python bootstrap.py`.
 
 ### Deployment Mode (myxdj.live)
 _This mode is meant for deploying actual code to Fly.io._
@@ -61,3 +61,4 @@ _This section is meant to layout the next steps for making Myx better._
 * Use async / concurrency to reduce API response time for large playlist audio features.
 * Implement caching / expiration for the /api/authenticate endpoint to minimize backend hits.
 * Determine if double API calls in development logger are real or just debugger glitches.
+* Create "wake-up" function for containers (glitchy on free mode).
