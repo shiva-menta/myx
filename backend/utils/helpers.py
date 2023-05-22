@@ -97,12 +97,12 @@ def calc_key_distance(song1_mode, song1_key, song2_mode, song2_key):
   return 50
 
 def calc_tempo_distance(song1_tempo, song2_tempo):
-  # need to check if they're similar
+  # adjusting for potential 2x OR 1/2x tempos
   diff = min(abs(song1_tempo - song2_tempo), abs(max(song1_tempo, song2_tempo) / 2 - min(song1_tempo, song2_tempo)))
   if diff <= 5:
     return 0
   elif diff <= 8:
-    return 5
+    return 10
   else:
     return 200
 
@@ -114,10 +114,10 @@ def calc_mix_distance(song1_data, song2_data):
       song2_key=song2_data['key']
     ) \
     + calc_tempo_distance(song1_data['tempo'], song2_data['tempo']) \
-    + abs(song1_data['valence'] - song2_data['valence']) * 5 \
-    + abs(song1_data['energy'] - song2_data['energy']) * 5 \
-    + abs(song1_data['danceability'] - song2_data['danceability']) * 5 \
-    + abs(song1_data['acousticness'] - song2_data['acousticness']) * 5
+    + abs(song1_data['valence'] - song2_data['valence']) * 15 \
+    + abs(song1_data['energy'] - song2_data['energy']) * 15 \
+    + abs(song1_data['danceability'] - song2_data['danceability']) * 15 \
+    + abs(song1_data['acousticness'] - song2_data['acousticness']) * 15
 
 def adjust_track_key(song_data, pitch_shift):
   song_data = song_data.copy()

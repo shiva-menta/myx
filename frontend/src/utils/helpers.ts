@@ -73,15 +73,17 @@ const extractSongListData = (data: any) => (
 );
 
 // Mix Path Helpers
-const dijkstras = (
+const mod_dijkstras = (
   firstSongIdx: number,
   secondSongIdx: number,
   numSongs: number,
   playlistWeightMatrix: number[][],
+  pathLengthPenalty: number,
 ) => {
   // Initialization
   const dist = new Array(numSongs).fill(Number.MAX_VALUE);
   const parent = new Array(numSongs).fill(null);
+  const pathLength = new Array(numSongs).fill(0);
 
   dist[firstSongIdx] = 0;
   parent[firstSongIdx] = firstSongIdx;
@@ -101,18 +103,20 @@ const dijkstras = (
     visited.add(node[1]);
     for (let vert = 0; vert < numSongs; vert += 1) {
       newWeight = dist[node[1]]
-        + playlistWeightMatrix[Math.min(vert, node[1])][Math.max(vert, node[1])];
+        + playlistWeightMatrix[Math.min(vert, node[1])][Math.max(vert, node[1])]
+        + pathLength[node[1]] * pathLengthPenalty;
       if (!visited.has(vert) && dist[vert] > newWeight) {
         dist[vert] = newWeight;
         minHeap.decreaseKey(vert, newWeight);
         parent[vert] = node[1];
+        pathLength[vert] = pathLength[node[1]] + 1;
       }
     }
   }
 
   // Return Song Number Path
   const path = [];
-  console.log(dist[secondSongIdx]);
+  // console.log(dist[secondSongIdx]);
   let current = secondSongIdx;
   while (current !== firstSongIdx) {
     path.push(current);
@@ -183,11 +187,12 @@ const calculateMixList = (
   playlistWeightMatrix: number[][],
 ) => {
   // Call Modified Dijkstra's
-  const mixPath = dijkstras(
+  const mixPath = mod_dijkstras(
     firstSongIdx,
     secondSongIdx,
     allSongs.length,
     playlistWeightMatrix,
+    3,
   );
 
   // Create Mixing Instruction List
