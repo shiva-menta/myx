@@ -160,10 +160,10 @@ def get_acapella_data():
 # ––––– Model Loading Functions –––––
 
 
-def load_songs():
-    df = pd.read_csv('src/updated_acapellas.csv')
+def load_songs(csv_file):
+    df = pd.read_csv(csv_file)
 
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         add_acapella({
             "uri": row['uri'],
             "title": row['title'],
@@ -231,7 +231,7 @@ def create_and_load_tables():
 
         if not existing_tables:
             db.create_all()
-            load_songs()
+            load_songs('src/updated_acapellas.csv')
 
 
 # ––––– Runtime –––––

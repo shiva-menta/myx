@@ -17,6 +17,9 @@ flask-migrate = "*"
 gunicorn = "*"
 requests = "*"
 psycopg2-binary = "*"
+pytest = "*"
+pytest-flask = "*"
+fakeredis = "*"
 
 [dev-packages]
 
