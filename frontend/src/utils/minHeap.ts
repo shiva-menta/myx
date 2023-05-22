@@ -55,7 +55,7 @@ class MinHeap {
     this.heapsize += 1;
     this.heap[this.heapsize - 1] = [Number.MAX_VALUE, vertIdx];
     this.vertexMap.set(vertIdx, this.heapsize - 1);
-    this.decreaseKey(this.heapsize - 1, dist);
+    this.decreaseKey(vertIdx, dist);
   }
 
   extractMin() {
