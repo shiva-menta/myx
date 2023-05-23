@@ -339,7 +339,7 @@ def get_playlists():
   res = get_user_playlists(session['user_access_token'])
   return [{
     'name': e['name'],
-    'image': e['images'][0]['url'],
+    'image': e['images'][0]['url'] if len(e['images']) else '',
     'link': e['external_urls']['spotify'],
     'playlist_id': e['id']
   } for e in res.json()['items']]

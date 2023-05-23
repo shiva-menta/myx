@@ -26,7 +26,7 @@ const searchParameters = (accessToken: string) => ({
 // Functions
 const authenticateUser = () => {
   const redirectUri = `${BACKEND_URL}/callback`;
-  const scopes = 'user-read-private user-read-email playlist-modify-private playlist-modify-public';
+  const scopes = 'user-read-private user-read-email playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative';
   const authorizationUrl = `${BASE_URL}authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&scope=${scopes}`;
 
   window.location.assign(authorizationUrl);
