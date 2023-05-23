@@ -548,6 +548,8 @@ table {
     background-color: transparent;
     font-size: 14px;
     color: white;
+    table-layout: fixed;
+    width: 400px;
 }
 thead th {
     background-color: rgba(0, 0, 0, 0.4);
@@ -574,6 +576,7 @@ td, th {
     vertical-align: top;
     text-align: left;
     padding: 10px;
+    word-wrap: break-word;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 tbody tr:last-child > td {
@@ -594,6 +597,12 @@ tbody tr:last-child td:first-child {
 }
 tbody tr:last-child td:last-child {
     border-bottom-right-radius: 10px;
+}
+.col-small {
+    width: 14%;
+}
+.col-large {
+    width: 24%;
 }
 /* #endregion */
 

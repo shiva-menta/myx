@@ -39,11 +39,11 @@ function MixPathPage() {
 
   // Constants
   const tableDefaults = [
-    { name: 'Title', value: 'song_name' },
-    { name: 'Artists', value: 'artists' },
-    { name: 'BPM', value: 'tempo' },
-    { name: 'Key', value: 'key' },
-    { name: 'Instructions', value: 'instruction' },
+    { name: 'Title', value: 'song_name', class: 'col-large' },
+    { name: 'Artists', value: 'artists', class: 'col-large' },
+    { name: 'BPM', value: 'tempo', class: 'col-small' },
+    { name: 'Key', value: 'key', class: 'col-small' },
+    { name: 'Instructions', value: 'instruction', class: 'col-large' },
   ];
 
   const getSelectedPlaylistWeights = async (playlist_id: string) => {
