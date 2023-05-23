@@ -22,8 +22,8 @@ function HomePage() {
       <div className="page-title">[myx home]</div>
       <div className="section-text">
         Welcome to
-        <b> Myx V1: Acapella Match</b>
-        ! Navigate through the pages below. The Myx logo is your home button!
+        <b> Myx V2: Mix Path</b>
+        ! Navigate through the pages below. The Myx logo is your home button.
       </div>
       <div className="page-navigation">
         {pages.map((page) => (
