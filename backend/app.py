@@ -354,6 +354,7 @@ def get_playlists():
 # @requires_user_token
 # @cross_origin(supports_credentials=True)
 async def get_playlist_weights():
+  start_time = time.time()
   # get given playlist
   playlist_id = request.args.get('playlist_id')
   num_songs = request.args.get('num_songs')
@@ -366,14 +367,12 @@ async def get_playlist_weights():
     headers
   )
 
-  
-
   # create weights of given playlist
-  start_time = time.time()
   tracks, weight_matrix = create_weight_matrix(full_track_data)
+
   end_time = time.time()
   execution_time = (end_time - start_time) * 1000
-  print(f"The code executed in {execution_time} ms")
+  print(f"Total Endpoint Runtime: The code executed in {execution_time} ms")
 
   # return weights of given playlist
   return jsonify({

@@ -57,6 +57,7 @@ function MixPathPage() {
       setIsLoading(true);
       getPlaylistWeights(playlist_id, num_songs)
         .then((data) => {
+          console.log(data.weights);
           setPlaylistTracks(data.tracks);
           setPlaylistWeightMatrix(data.weights);
           setPlaylistCache((prevCache) => new Map(prevCache).set(

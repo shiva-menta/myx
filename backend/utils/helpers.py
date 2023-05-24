@@ -1,6 +1,7 @@
 # Imports
 from .maps import major_pitchmap, harmonic_pitchmap
 import re
+from functools import lru_cache
 
 # Functions
 def pitchmap_key(key, mode):
@@ -61,6 +62,13 @@ def extract_song_data(song_data):
 def shorten_song_name(song_name):
   return re.sub(r'\s*\((feat|with)\. [^)]*\)', '', song_name)
 
+def extract_track_description_data(all_track_data):
+  return [{
+    'name': e['track']['name'],
+    'id': e['track']['id'],
+    'artists': [artist['name'] for artist in e['track']['artists']]
+  } for e in all_track_data if e['track']['id']]
+
 def combine_track_info_features(track_descriptions, track_features):
   all_tracks = []
   for i in range(len(track_descriptions)):
@@ -84,6 +92,9 @@ def combine_track_info_features(track_descriptions, track_features):
   
   return all_tracks
 
+# Matrix Helpers
+
+@lru_cache(maxsize=128)
 def calc_key_distance(song1_mode, song1_key, song2_mode, song2_key):
   song1_adj_key, song2_adj_key = pitchmap_key(song1_key, song1_mode), pitchmap_key(song2_key, song2_mode)
   if song1_adj_key == song2_adj_key:
@@ -93,9 +104,10 @@ def calc_key_distance(song1_mode, song1_key, song2_mode, song2_key):
       return 1
     elif song1_adj_key in harmonic_pitchmap[song2_adj_key]:
       return 4
-  
+
   return 50
 
+@lru_cache(maxsize=128)
 def calc_tempo_distance(song1_tempo, song2_tempo):
   # adjusting for potential 2x OR 1/2x tempos
   diff = min(abs(song1_tempo - song2_tempo), abs(max(song1_tempo, song2_tempo) / 2 - min(song1_tempo, song2_tempo)))
@@ -106,6 +118,9 @@ def calc_tempo_distance(song1_tempo, song2_tempo):
   else:
     return 200
 
+def round_nearest_five(n):
+  return round(n / 5) * 5
+
 def calc_mix_distance(song1_data, song2_data):
   return calc_key_distance(
       song1_mode=song1_data['mode'],
@@ -113,7 +128,7 @@ def calc_mix_distance(song1_data, song2_data):
       song2_mode=song2_data['mode'],
       song2_key=song2_data['key']
     ) \
-    + calc_tempo_distance(song1_data['tempo'], song2_data['tempo']) \
+    + calc_tempo_distance(round_nearest_five(song1_data['tempo']), round_nearest_five(song2_data['tempo'])) \
     + abs(song1_data['valence'] - song2_data['valence']) * 15 \
     + abs(song1_data['energy'] - song2_data['energy']) * 15 \
     + abs(song1_data['danceability'] - song2_data['danceability']) * 15 \
@@ -154,17 +169,12 @@ def create_weight_matrix(full_track_data):
   pitch_shift_tolerance = 2
   adj_tracks = get_pitch_adjusted_track_data(full_track_data, pitch_shift_tolerance)
   pitch_adj_num_tracks = len(adj_tracks)
-  matrix = [[0] * pitch_adj_num_tracks for _ in range(pitch_adj_num_tracks)]
+  # matrix = [[0] * pitch_adj_num_tracks for _ in range(pitch_adj_num_tracks)]
+  weights = []
 
   for i in range(pitch_adj_num_tracks):
     for j in range(i + 1, pitch_adj_num_tracks):
-      matrix[i][j] = calc_mix_distance(adj_tracks[i]['audio_features'], adj_tracks[j]['audio_features'])
+      # matrix[i][j] = int(calc_mix_distance(adj_tracks[i]['audio_features'], adj_tracks[j]['audio_features']))
+      weights.append(int(calc_mix_distance(adj_tracks[i]['audio_features'], adj_tracks[j]['audio_features'])))
 
-  return adj_tracks, matrix
-
-def extract_track_description_data(all_track_data):
-  return [{
-    'name': e['track']['name'],
-    'id': e['track']['id'],
-    'artists': [artist['name'] for artist in e['track']['artists']]
-  } for e in all_track_data if e['track']['id']]
+  return adj_tracks, weights
