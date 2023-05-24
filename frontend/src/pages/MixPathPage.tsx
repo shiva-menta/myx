@@ -15,6 +15,7 @@ const noPlaylist = {
   name: '',
   image: 'none',
   link: '',
+  num_songs: 0,
   playlist_id: '',
 };
 
@@ -46,7 +47,7 @@ function MixPathPage() {
     { name: 'Instructions', value: 'instruction', class: 'col-large' },
   ];
 
-  const getSelectedPlaylistWeights = async (playlist_id: string) => {
+  const getSelectedPlaylistWeights = async (playlist_id: string, num_songs: number) => {
     if (playlistCache.has(playlist_id)) {
       const data = playlistCache.get(playlist_id);
       setPlaylistTracks(data.tracks);
@@ -54,7 +55,7 @@ function MixPathPage() {
     } else {
       setMixingInstructions([]);
       setIsLoading(true);
-      getPlaylistWeights(playlist_id)
+      getPlaylistWeights(playlist_id, num_songs)
         .then((data) => {
           setPlaylistTracks(data.tracks);
           setPlaylistWeightMatrix(data.weights);
@@ -75,7 +76,7 @@ function MixPathPage() {
 
   const updateSelectedPlaylist = async (idx: number) => {
     setSelectedPlaylist(playlists[idx]);
-    getSelectedPlaylistWeights(playlists[idx].playlist_id);
+    getSelectedPlaylistWeights(playlists[idx].playlist_id, playlists[idx].num_songs);
   };
 
   const getMixPath = () => {

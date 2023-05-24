@@ -91,8 +91,8 @@ const getUserPlaylists = async () => {
   });
   return playlists.json();
 };
-const getPlaylistWeights = async (playlist_id: string) => {
-  const playlistData = await fetch(`${PLAYLISTS_WEIGHTS_URL}?playlist_id=${playlist_id}`, {
+const getPlaylistWeights = async (playlist_id: string, num_songs: number) => {
+  const playlistData = await fetch(`${PLAYLISTS_WEIGHTS_URL}?playlist_id=${playlist_id}&num_songs=${num_songs}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

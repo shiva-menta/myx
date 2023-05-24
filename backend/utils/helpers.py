@@ -161,3 +161,10 @@ def create_weight_matrix(full_track_data):
       matrix[i][j] = calc_mix_distance(adj_tracks[i]['audio_features'], adj_tracks[j]['audio_features'])
 
   return adj_tracks, matrix
+
+def extract_track_description_data(all_track_data):
+  return [{
+    'name': e['track']['name'],
+    'id': e['track']['id'],
+    'artists': [artist['name'] for artist in e['track']['artists']]
+  } for e in all_track_data if e['track']['id']]

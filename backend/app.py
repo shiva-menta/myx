@@ -5,6 +5,7 @@ import time
 import logging
 from functools import wraps
 from fakeredis import FakeStrictRedis
+import time
 
 from flask import Flask, request, jsonify, redirect, session
 from flask_restful import reqparse
@@ -14,8 +15,8 @@ from flask_cors import CORS, cross_origin
 
 from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING
 from utils.maps import input_map
-from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_spot_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup, get_user_playlists, get_playlist_items, get_spotify_songs_audio_features
-from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix, combine_track_info_features
+from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_spot_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup, get_user_playlists, get_playlist_full_tracks
+from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix
 
 # ––––– App Initialization / Setup –––––
 FRONTEND_REDIRECT_URL = frontend_url + '/#/home'
@@ -343,30 +344,36 @@ def get_playlists():
     'name': e['name'],
     'image': e['images'][0]['url'] if len(e['images']) else 'none',
     'link': e['external_urls']['spotify'],
+    'num_songs': e['tracks']['total'],
     'playlist_id': e['id']
   } for e in res.json()['items']]
 
 @app.route('/get-playlist-weights', methods=['GET'])
-@login_required
-@requires_access_token
-@requires_user_token
-@cross_origin(supports_credentials=True)
-def get_playlist_weights():
+# @login_required
+# @requires_access_token
+# @requires_user_token
+# @cross_origin(supports_credentials=True)
+async def get_playlist_weights():
   # get given playlist
   playlist_id = request.args.get('playlist_id')
+  num_songs = request.args.get('num_songs')
 
   # get songs of given playlist
-  response = get_playlist_items(playlist_id, session['user_access_token'])
-  track_descriptions = [{
-    'name': e['track']['name'],
-    'id': e['track']['id'],
-    'artists': [artist['name'] for artist in e['track']['artists']]
-  } for e in response if e['track']['id']]
-  playlist_data = get_spotify_songs_audio_features(track_descriptions, headers)
-  full_track_data = combine_track_info_features(track_descriptions, playlist_data)
+  full_track_data = await get_playlist_full_tracks(
+    playlist_id,
+    num_songs,
+    session['user_access_token'],
+    headers
+  )
+
+  
 
   # create weights of given playlist
+  start_time = time.time()
   tracks, weight_matrix = create_weight_matrix(full_track_data)
+  end_time = time.time()
+  execution_time = (end_time - start_time) * 1000
+  print(f"The code executed in {execution_time} ms")
 
   # return weights of given playlist
   return jsonify({

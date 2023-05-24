@@ -2,6 +2,9 @@
 import requests
 import base64
 from config import backend_url, CLIENT_ID, CLIENT_SECRET
+from .helpers import extract_track_description_data, combine_track_info_features
+import httpx
+import asyncio
 
 # Creating Session Object
 session = requests.Session()
@@ -62,19 +65,6 @@ def get_spotify_song_audio_features(track_uri, headers):
   r = session.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
   return r.json()
 
-def get_spotify_songs_audio_features(track_descriptions, headers):
-  track_uris = [e['id'] for e in track_descriptions]
-  length = len(track_uris)
-  iterations = (length + 99) // 100
-  all_tracks = []
-
-  for i in range(iterations):
-    curr_uris = ','.join(track_uris[i * 100 : min(length, (i + 1) * 100)])
-    r = session.get(BASE_URL + 'audio-features?ids=' + curr_uris, headers=headers)
-    all_tracks.extend(r.json()['audio_features'])
-  
-  return all_tracks
-
 def get_spotify_song_info(track_uri, headers):
   track_id = track_uri.split(':')[2]
   r = session.get(BASE_URL + 'tracks/' + track_id, headers=headers)
@@ -108,18 +98,50 @@ def get_user_playlists(user_access_token):
     }
   )
 
-def get_playlist_items(playlist_id, user_access_token):
-  all_items, limit = [], 4
-  playlist_url = f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks'
+async def get_playlist_subset_tracks(
+  session,
+  playlist_id,
+  offset,
+  user_access_token,
+  headers
+):
+  # get track descriptions
+  desc_res = await session.get(
+    f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks?limit=100&offset={offset}',
+    headers = {
+      'Authorization': 'Bearer ' + user_access_token
+    })
+  track_descriptions = extract_track_description_data(desc_res.json()['items'])
+  track_ids = [e['id'] for e in track_descriptions]
 
-  while limit and playlist_url:
-    response = session.get(
-      playlist_url,
-      headers={
-        'Authorization': 'Bearer ' + user_access_token
-      }
-    )
-    all_items.extend(response.json()['items'])
-    limit -= 1
-    playlist_url = response.json()['next']
+  # get track audio features
+  feat_res = await session.get(BASE_URL + 'audio-features?ids=' + ','.join(track_ids), headers=headers)
+  track_features = feat_res.json()['audio_features']
+  
+  return combine_track_info_features(track_descriptions, track_features)
+
+async def get_playlist_full_tracks(
+  playlist_id,
+  num_songs,
+  user_access_token,
+  headers
+):
+  all_items, limit = [], 5
+  iterations = min((int(num_songs) + 99) // 100, limit)
+
+  async with httpx.AsyncClient() as async_sess:
+    tasks = []
+    for i in range(iterations):
+      task = asyncio.create_task(get_playlist_subset_tracks(
+        async_sess,
+        playlist_id,
+        i * 100,
+        user_access_token,
+        headers
+      ))
+      tasks.append(task)
+    all_items = await asyncio.gather(*tasks, return_exceptions=True)
+
+  all_items = [item for sublist in all_items for item in sublist]
+
   return all_items
