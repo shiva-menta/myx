@@ -27,6 +27,7 @@ headers = None
 expires_at = None
 
 app = Flask(__name__)
+app.logger.propagate = False
 # change this to PROD_DB when testing / deploying
 if IS_TESTING != 'True':
   app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB
@@ -159,6 +160,7 @@ def login_required(f):
     if request.method == 'OPTIONS':
       return jsonify({"message": "Preflight request"}), 200
     if 'user_info' not in session:
+      print(session)
       return jsonify({"message": "User is not logged in"}), 401
     return f(*args, **kwargs)
   return decorated_function

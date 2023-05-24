@@ -15,6 +15,7 @@ _This mode is meant for developing new features, allowing quick code changes and
 
 Backend
 * switch to DEV_DB in `app.py`
+* set IS_TESTING to `'False'`
 * `cd backend`
 * `pipenv shell`
 * `python run.py`

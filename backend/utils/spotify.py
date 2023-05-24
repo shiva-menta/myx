@@ -3,6 +3,9 @@ import requests
 import base64
 from config import backend_url, CLIENT_ID, CLIENT_SECRET
 
+# Creating Session Object
+session = requests.Session()
+
 # URLs
 AUTH_URL = 'https://accounts.spotify.com/api/token'
 BASE_URL = 'https://api.spotify.com/v1/'
@@ -21,14 +24,14 @@ def get_user_headers(access_token):
 
 # ---- FUNCTIONS ----
 def get_spotify_app_token():
-  return requests.post(AUTH_URL, {
+  return session.post(AUTH_URL, {
     'grant_type': 'client_credentials',
     'client_id': CLIENT_ID,
     'client_secret': CLIENT_SECRET,
   })
 
 def get_user_token(code):
-  return requests.post(AUTH_URL, 
+  return session.post(AUTH_URL, 
     data={
       'grant_type': 'authorization_code',
       'code': code,
@@ -38,7 +41,7 @@ def get_user_token(code):
   )
 
 def get_user_info(user_access_token):
-  return requests.get(
+  return session.get(
     'https://api.spotify.com/v1/me',
     headers={
       'Authorization': 'Bearer ' + user_access_token
@@ -46,7 +49,7 @@ def get_user_info(user_access_token):
   )
 
 def refresh_spot_user_token(refresh_token):
-  return requests.post(AUTH_URL,
+  return session.post(AUTH_URL,
     data={
       'grant_type': 'refresh_token',
       'refresh_token': refresh_token
@@ -56,7 +59,7 @@ def refresh_spot_user_token(refresh_token):
 
 def get_spotify_song_audio_features(track_uri, headers):
   track_id = track_uri.split(':')[2]
-  r = requests.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
+  r = session.get(BASE_URL + 'audio-features/' + track_id, headers=headers)
   return r.json()
 
 def get_spotify_songs_audio_features(track_descriptions, headers):
@@ -67,18 +70,18 @@ def get_spotify_songs_audio_features(track_descriptions, headers):
 
   for i in range(iterations):
     curr_uris = ','.join(track_uris[i * 100 : min(length, (i + 1) * 100)])
-    r = requests.get(BASE_URL + 'audio-features?ids=' + curr_uris, headers=headers)
+    r = session.get(BASE_URL + 'audio-features?ids=' + curr_uris, headers=headers)
     all_tracks.extend(r.json()['audio_features'])
   
   return all_tracks
 
 def get_spotify_song_info(track_uri, headers):
   track_id = track_uri.split(':')[2]
-  r = requests.get(BASE_URL + 'tracks/' + track_id, headers=headers)
+  r = session.get(BASE_URL + 'tracks/' + track_id, headers=headers)
   return r.json()
 
 def create_mashup_playlist(access_token, id, instr_name, acap_name):
-  return requests.post(
+  return session.post(
     BASE_URL + 'users/' + id + '/playlists',
     json={
       "name": "Myxup: " + instr_name + " + " + acap_name,
@@ -89,7 +92,7 @@ def create_mashup_playlist(access_token, id, instr_name, acap_name):
   )
 
 def add_songs_to_mashup(playlist_id, instr_uri, acap_uri, access_token):
-  return requests.post(
+  return session.post(
     BASE_URL + 'playlists/' + playlist_id + '/tracks',
     json={
       "uris": [instr_uri, acap_uri]
@@ -98,7 +101,7 @@ def add_songs_to_mashup(playlist_id, instr_uri, acap_uri, access_token):
   )
 
 def get_user_playlists(user_access_token):
-  return requests.get(
+  return session.get(
     'https://api.spotify.com/v1/me/playlists?limit=50',
     headers={
       'Authorization': 'Bearer ' + user_access_token
@@ -106,11 +109,11 @@ def get_user_playlists(user_access_token):
   )
 
 def get_playlist_items(playlist_id, user_access_token):
-  all_items, limit = [], 3
+  all_items, limit = [], 4
   playlist_url = f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks'
 
-  while (limit and playlist_url):
-    response = requests.get(
+  while limit and playlist_url:
+    response = session.get(
       playlist_url,
       headers={
         'Authorization': 'Bearer ' + user_access_token
@@ -119,5 +122,4 @@ def get_playlist_items(playlist_id, user_access_token):
     all_items.extend(response.json()['items'])
     limit -= 1
     playlist_url = response.json()['next']
-  print(len(all_items))
   return all_items
