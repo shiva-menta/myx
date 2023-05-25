@@ -34,7 +34,11 @@ function RequireAuth({ children }: RequireAuthProps): ReactElement | null {
 
   // Render Function
   if (!authCheckFinished) {
-    return <ScaleLoader color="#ffffff" height={50} width={5} />;
+    return (
+      <div className="loader-container">
+        <ScaleLoader color="#ffffff" height={50} width={5} />
+      </div>
+    );
   } else if (!authenticated) {
     return <Navigate to="/" />;
   } else {
