@@ -23,6 +23,7 @@ httpx = "*"
 flask = {extras = ["async"], version = "*"}
 asgiref = "*"
 flask-compress = "*"
+nest-asyncio = "*"
 
 [dev-packages]
 

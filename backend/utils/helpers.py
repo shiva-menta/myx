@@ -34,6 +34,7 @@ def get_adjusted_key_range(key, diff):
       lo = key - diff
   
   return [tuple([key, "-{}".format(diff)]) for key in major_pitchmap[lo]] + [tuple([key, "+{}".format(diff)]) for key in major_pitchmap[hi]]
+
 def get_key_range(key, input):
   if input == 'Exact':
     return get_adjusted_key_range(key, 0)
@@ -50,6 +51,9 @@ def get_bpm_range(bpm, input):
   else:
     return tuple([bpm - 20, bpm + 20])
 
+def shorten_song_name(song_name):
+  return re.sub(r'\s*\((feat|with)\. [^)]*\)', '', song_name)
+
 def extract_song_data(song_data):
   return {
     'uri': song_data['uri'],
@@ -58,9 +62,6 @@ def extract_song_data(song_data):
     'link': song_data['external_urls']['spotify'],
     'image': song_data['album']['images'][1]['url']
   }
-
-def shorten_song_name(song_name):
-  return re.sub(r'\s*\((feat|with)\. [^)]*\)', '', song_name)
 
 def extract_track_description_data(all_track_data):
   return [{
@@ -93,7 +94,6 @@ def combine_track_info_features(track_descriptions, track_features):
   return all_tracks
 
 # Matrix Helpers
-
 @lru_cache(maxsize=128)
 def calc_key_distance(song1_mode, song1_key, song2_mode, song2_key):
   song1_adj_key, song2_adj_key = pitchmap_key(song1_key, song1_mode), pitchmap_key(song2_key, song2_mode)

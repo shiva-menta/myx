@@ -3,9 +3,9 @@ import redis
 import datetime
 import time
 import logging
+import asyncio
 from functools import wraps
 from fakeredis import FakeStrictRedis
-import time
 
 from flask import Flask, request, jsonify, redirect, session
 from flask_restful import reqparse
@@ -71,20 +71,33 @@ def get_access_token():
     'Authorization': 'Bearer {token}'.format(token=access_token)
   }
 
+def async_cross_origin(f):
+  @wraps(f)
+  @cross_origin(supports_credentials=True)
+  async def decorated_function(*args, **kwargs):
+    return await f(*args, **kwargs)
+  return decorated_function
+
 def requires_access_token(f):
   @wraps(f)
-  def token_wrapper(*args, **kwargs):
+  async def token_wrapper(*args, **kwargs):
     get_access_token()
-    return f(*args, **kwargs)
+    if asyncio.iscoroutinefunction(f):
+      return await f(*args, **kwargs)
+    else:
+      return f(*args, **kwargs)
   return token_wrapper
 
 def requires_user_token(f):
   @wraps(f)
-  def decorated_function(*args, **kwargs):
+  async def decorated_function(*args, **kwargs):
     response = refresh_user_token(session['user_refresh_token'])
     if response[1] != 200:
       return jsonify({"message": "Error in refreshing token."}), response.status_code
-    return f(*args, **kwargs)
+    if asyncio.iscoroutinefunction(f):
+      return await f(*args, **kwargs)
+    else:
+      return f(*args, **kwargs)
   return decorated_function
 
 def get_match_uris(instr_data, req_data):
@@ -159,13 +172,15 @@ def refresh_user_token(refresh_token):
 
 def login_required(f):
   @wraps(f)
-  def decorated_function(*args, **kwargs):
+  async def decorated_function(*args, **kwargs):
     if request.method == 'OPTIONS':
       return jsonify({"message": "Preflight request"}), 200
     if 'user_info' not in session:
-      print(session)
       return jsonify({"message": "User is not logged in"}), 401
-    return f(*args, **kwargs)
+    if asyncio.iscoroutinefunction(f):
+      return await f(*args, **kwargs)
+    else:
+      return f(*args, **kwargs)
   return decorated_function
 
 @app.route('/api/authenticate')
@@ -351,12 +366,10 @@ def get_playlists():
   } for e in res.json()['items']]
 
 @app.route('/get-playlist-weights', methods=['GET'])
-# @login_required
-# @requires_access_token
-# @requires_user_token
-# @cross_origin(supports_credentials=True)
+@login_required
+@requires_access_token
+@requires_user_token
 async def get_playlist_weights():
-  start_time = time.time()
   # get given playlist
   playlist_id = request.args.get('playlist_id')
   num_songs = request.args.get('num_songs')
@@ -371,10 +384,6 @@ async def get_playlist_weights():
 
   # create weights of given playlist
   tracks, weight_matrix = create_weight_matrix(full_track_data)
-
-  end_time = time.time()
-  execution_time = (end_time - start_time) * 1000
-  print(f"Total Endpoint Runtime: The code executed in {execution_time} ms")
 
   # return weights of given playlist
   return jsonify({
