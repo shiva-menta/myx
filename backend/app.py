@@ -12,6 +12,7 @@ from flask_restful import reqparse
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from flask_cors import CORS, cross_origin
+from flask_compress import Compress
 
 from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING
 from utils.maps import input_map
@@ -45,6 +46,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = SECRET_KEY
 logging.basicConfig(level=logging.DEBUG)
 CORS(app, origins=[frontend_url], supports_credentials=True)
+Compress(app)
 db = SQLAlchemy(app)
 sess = Session(app)
 

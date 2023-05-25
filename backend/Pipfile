@@ -22,6 +22,7 @@ fakeredis = "*"
 httpx = "*"
 flask = {extras = ["async"], version = "*"}
 asgiref = "*"
+flask-compress = "*"
 
 [dev-packages]
 
