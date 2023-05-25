@@ -169,12 +169,10 @@ def create_weight_matrix(full_track_data):
   pitch_shift_tolerance = 2
   adj_tracks = get_pitch_adjusted_track_data(full_track_data, pitch_shift_tolerance)
   pitch_adj_num_tracks = len(adj_tracks)
-  # matrix = [[0] * pitch_adj_num_tracks for _ in range(pitch_adj_num_tracks)]
   weights = []
 
   for i in range(pitch_adj_num_tracks):
     for j in range(i + 1, pitch_adj_num_tracks):
-      # matrix[i][j] = int(calc_mix_distance(adj_tracks[i]['audio_features'], adj_tracks[j]['audio_features']))
       weights.append(int(calc_mix_distance(adj_tracks[i]['audio_features'], adj_tracks[j]['audio_features'])))
 
   return adj_tracks, weights

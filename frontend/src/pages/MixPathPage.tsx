@@ -29,7 +29,7 @@ function MixPathPage() {
   const [secondSongIdx, setSecondSongIdx] = useState<number | null>(null);
   const [playlistCache, setPlaylistCache] = useState<Map<string, any>>(new Map());
   const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackData[]>([]);
-  const [playlistWeightMatrix, setPlaylistWeightMatrix] = useState<number[][]>([]);
+  const [playlistWeights, setPlaylistWeights] = useState<number[]>([]);
   const [mixingInstructions, setMixingInstructions] = useState<MixInstructionData[]>([]);
 
   // Effect Hooks
@@ -51,15 +51,14 @@ function MixPathPage() {
     if (playlistCache.has(playlist_id)) {
       const data = playlistCache.get(playlist_id);
       setPlaylistTracks(data.tracks);
-      setPlaylistWeightMatrix(data.weights);
+      setPlaylistWeights(data.weights);
     } else {
       setMixingInstructions([]);
       setIsLoading(true);
       getPlaylistWeights(playlist_id, num_songs)
         .then((data) => {
-          console.log(data.weights);
           setPlaylistTracks(data.tracks);
-          setPlaylistWeightMatrix(data.weights);
+          setPlaylistWeights(data.weights);
           setPlaylistCache((prevCache) => new Map(prevCache).set(
             playlist_id,
             data,
@@ -89,7 +88,7 @@ function MixPathPage() {
       firstSongIdx,
       secondSongIdx,
       playlistTracks,
-      playlistWeightMatrix,
+      playlistWeights,
     ));
   };
 
