@@ -160,12 +160,13 @@ a {
     padding: var(--song-padding);
     text-align: left;
 
-    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
-    transition: 0.15s;
-
     position: relative;
 }
-.song-unit:hover {
+a > .song-unit {
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
+    transition: 0.15s;
+}
+a > .song-unit:hover {
     box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.5);
 }
 .artist-info {
