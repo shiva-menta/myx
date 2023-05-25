@@ -85,7 +85,7 @@ function SavedMashupsPage() {
   // Render Function
   return (
     <div className="saved-mashups-page">
-      <Header />
+      <Header clickable />
       <div className="page-title">[saved mashups]</div>
       {loading
         ? (

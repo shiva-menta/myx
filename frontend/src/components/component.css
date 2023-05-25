@@ -50,12 +50,37 @@ a {
 /* #region Header */
 .header {
     height: 50px;
+    display: flex;
     justify-content: center;
     width: 100%;
 }
 .header img {
+    width: 50px;
+    height: auto;
+}
+.header-hover-container > img {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    opacity: 1;
+}
+.header-hover-container > svg {
+    padding: 7px;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: 0.05s;
+}
+.header-hover-container:hover > svg {
+    opacity: 0.9;
+}
+.header-hover-container:hover > img {
+    opacity: 0.7;
+}
+.header-hover-container {
+    width: 50px;
     height: 50px;
-    width: auto;
+    position: relative;
 }
 /* #endregion */
 

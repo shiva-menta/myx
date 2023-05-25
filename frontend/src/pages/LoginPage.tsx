@@ -9,7 +9,7 @@ function LoginPage() {
   // Render Function
   return (
     <div className="login-page">
-      <Header />
+      <Header clickable={false} />
       <div className="page-title">[myx login]</div>
       <div className="section-text">
         Welcome to

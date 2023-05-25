@@ -95,7 +95,7 @@ function MixPathPage() {
   // Render Function
   return (
     <div className="mix-path-page">
-      <Header />
+      <Header clickable />
       <div className="page-title">[myx path]</div>
       <div className="mix-path-page-content">
         <div className="mix-path-menu">

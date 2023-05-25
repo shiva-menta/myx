@@ -83,7 +83,7 @@ function AcapellaMatchPage() {
   // Render Function
   return (
     <div className="view-container">
-      <Header />
+      <Header clickable />
       {!acapellasLoaded || acapellas.length === 0 || selectedAcapella.uri.length === 0
         ? (
           <SelectAcapellaContainer

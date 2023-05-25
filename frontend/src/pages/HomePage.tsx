@@ -18,7 +18,7 @@ function HomePage() {
   // Render Function
   return (
     <div className="home-page">
-      <Header />
+      <Header clickable={false} />
       <div className="page-title">[myx home]</div>
       <div className="section-text">
         Welcome to
