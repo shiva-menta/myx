@@ -26,6 +26,6 @@ IS_TESTING = get_env_variable('IS_TESTING') or 'False'
 DEV_DB = f'sqlite:///{DB_FILE}'
 
 # Testing Mode
-# PROD_DB = database_url or f'postgresql://{pg_username}:{pg_password}@{pg_host}:{pg_port}/{pg_db}'
+PROD_DB = database_url or f'postgresql://{pg_username}:{pg_password}@{pg_host}:{pg_port}/{pg_db}'
 # Deployment Mode
-PROD_DB = database_url.replace('postgres://', 'postgresql://', 1)
+# PROD_DB = database_url.replace('postgres://', 'postgresql://', 1)
