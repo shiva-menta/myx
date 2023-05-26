@@ -43,6 +43,7 @@ _This mode is meant for verifying new features work in a containerized environme
 
 ### Deployment Mode (myxdj.live)
 _This mode is meant for deploying actual code to Fly.io._
+* change `DEV_DB` to `PROD_DB` in `app.py`
 * `config.py`: comment out appropriate database url
 * frontend `Dockerfile`: comment out myx.localhost and uncomment myxdj.live
 * frontend `nginx.conf`: comment out myx.localhost and uncomment myxdj.live
