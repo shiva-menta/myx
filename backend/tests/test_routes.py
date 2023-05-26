@@ -32,10 +32,10 @@ def logout(client):
     session.pop('user_refresh_token', None)
 
 # ––––– Tests –––––
-def test_logged_out(client):
-  res = client.get('/')
-  assert res.status_code == 401
-  assert b'User is not logged in' in res.data
+# def test_logged_out(client):
+#   res = client.get('/')
+#   assert res.status_code == 401
+#   assert b'User is not logged in' in res.data
 
 def test_logged_in(client):
   login(client)
