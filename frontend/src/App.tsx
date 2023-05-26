@@ -12,6 +12,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './components/component.css';
 
 function App() {
+  const appHeight = () => {
+    const doc = document.documentElement;
+    doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+    console.log(window.innerHeight);
+  };
+  window.addEventListener('resize', appHeight);
+  appHeight();
+
   return (
     <div className="App">
       <Routes>
