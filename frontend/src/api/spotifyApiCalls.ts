@@ -41,13 +41,14 @@ const searchSongs = async (searchInput: string, accessToken: string) => {
 
   return trackIDs.json();
 };
-const getAcapellaDataFromURI = async (trackUri: string, accessToken: string) => {
-  const trackId = trackUri.split(':')[2];
+
+const getMultipleTracksFromURIs = async (trackUris: string[], accessToken: string) => {
   const params = searchParameters(accessToken);
-  const response = await fetch(`${BASE_API_URL}tracks/${trackId}`, params);
+  const response = await fetch(`${BASE_API_URL}tracks?ids=${trackUris.join(',')}`, params);
 
   return response.json();
 };
+
 const getTrackFeaturesFromURIs = async (trackURIs: string[], accessToken: string) => {
   const params = searchParameters(accessToken);
   const response = await fetch(`${BASE_API_URL}audio-features/?ids=${trackURIs.join(',')}`, params);
@@ -59,6 +60,6 @@ export {
   authenticateUser,
   getAccessToken,
   searchSongs,
-  getAcapellaDataFromURI,
+  getMultipleTracksFromURIs,
   getTrackFeaturesFromURIs,
 };

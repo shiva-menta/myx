@@ -47,6 +47,21 @@ const harmonicPitchmap = new Map(Object.entries({
   23: [16, 18, 2],
 }));
 
+// Functions
+const retryUntilSuccess = async (func: any, retries: number = 3, delay: number = 1000) => {
+  for (let i = 0; i < retries; i += 1) {
+    try {
+      const result = await func();
+      return result;
+    } catch (error) {
+      console.log(`Attempt ${i + 1} failed, retrying...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw new Error(`Function failed after ${retries} attempts`);
+};
+
 const formatBPM = (bpm: number) => {
   if (bpm > 0) {
     return `+${bpm.toFixed(1)}`;
@@ -250,4 +265,5 @@ export {
   cutString,
   mod_dijkstras,
   getWeightPosition,
+  retryUntilSuccess,
 };

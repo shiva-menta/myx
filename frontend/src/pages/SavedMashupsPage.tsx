@@ -7,6 +7,7 @@ import ScaleLoader from 'react-spinners/ScaleLoader';
 import Header from '../components/Header';
 import Mashup from '../components/Mashup';
 import { getMashups, addMashupToSpotify, removeSavedMashup } from '../api/backendApiCalls';
+import { retryUntilSuccess } from '../utils/helpers';
 import { MashupData } from '../utils/types';
 
 // Main Component
@@ -31,7 +32,9 @@ function SavedMashupsPage() {
     setAddMarkers(markersArray);
   };
   useEffect(() => {
-    getMashups()
+    retryUntilSuccess(
+      () => getMashups(),
+    )
       .then((data) => {
         updateMashups(data);
         setLoading(false);
@@ -59,7 +62,9 @@ function SavedMashupsPage() {
       instr_uri: mashup.instr_uri,
       instr_name: mashup.instr_song_name,
     };
-    addMashupToSpotify(mashupData)
+    retryUntilSuccess(
+      () => addMashupToSpotify(mashupData),
+    )
       .then(() => {
         setAddMarkers((prevMarkers) => {
           const newMarkers = [...prevMarkers];
@@ -75,7 +80,9 @@ function SavedMashupsPage() {
       instr_uri: mashup.instr_uri,
     };
 
-    removeSavedMashup(mashupData)
+    retryUntilSuccess(
+      () => removeSavedMashup(mashupData),
+    )
       .then(() => {
         setMashups((prevMashups) => prevMashups.filter((_, i) => i !== idx));
         setAddMarkers((prevMarkers) => prevMarkers.filter((_, i) => i !== idx));

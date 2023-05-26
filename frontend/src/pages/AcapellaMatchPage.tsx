@@ -7,7 +7,7 @@ import Header from '../components/Header';
 import DisplayMatchResults from '../components/DisplayMatchResults';
 import SelectAcapellaContainer from '../components/SelectAcapellaContainer';
 
-import { getAccessToken, getAcapellaDataFromURI } from '../api/spotifyApiCalls';
+import { getAccessToken, getMultipleTracksFromURIs } from '../api/spotifyApiCalls';
 import { extractSongData } from '../utils/helpers';
 
 // State Defaults
@@ -54,24 +54,30 @@ function AcapellaMatchPage() {
   // Functions
   const updateAllAcapellaData = async (acapellaURIs: AcapellaURI[]) => {
     const res: AcapellaData[] = [];
+    const trackUris = acapellaURIs.map((data) => (data[0].split(':')[2]));
 
-    for (const data of acapellaURIs) {
-      const songData = await getAcapellaDataFromURI(data[0], accessToken);
-      const songInfo = extractSongData(songData);
-      res.push({
-        artists: songInfo.artists,
-        name: songInfo.name,
-        link: songInfo.link,
-        image: songInfo.image,
-        uri: data[0],
-        key_shift: data[1],
-        bpm_shift: data[2],
+    getMultipleTracksFromURIs(trackUris, accessToken)
+      .then((data) => {
+        const allTrackInfo = data.tracks;
+        for (let i = 0; i < allTrackInfo.length; i += 1) {
+          const trackInfo = extractSongData(allTrackInfo[i]);
+          const acapellaData = acapellaURIs[i];
+          res.push({
+            artists: trackInfo.artists,
+            name: trackInfo.name,
+            link: trackInfo.link,
+            image: trackInfo.image,
+            uri: acapellaData[0],
+            key_shift: acapellaData[1],
+            bpm_shift: acapellaData[2],
+          });
+        }
+
+        setAcapellas(res);
+        setSelectedAcapella(res[0]);
       });
-    }
-
-    setAcapellas(res);
-    setSelectedAcapella(res[0]);
   };
+
   const resetData = () => {
     setSelectedSong(noSong);
     setSelectedAcapella(noAcapella);

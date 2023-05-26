@@ -58,5 +58,7 @@ _This section is meant to address any commonly reached problems when interacting
 
 ## Recent Changes
 _This section is meant to layout the next optimizations to make Myx better._
-* Used `requests.Session()` to maintain HTTPS connection, which implements `urllib3`.
+* Used `requests.Session()` to maintain HTTPS connection, which implements `urllib3`, instead of starting new request per API call.
 * Implemented async route for `get-playlist-weights`, specifically to reduce CPU idle time for Spotify API requests.
+* Changed weight matrix from float[][] to int[], sacrificing minimal accuracy for ~70% package size reduction.
+* Incorporated `flask_compress` to reduce package sizes by ~90%.

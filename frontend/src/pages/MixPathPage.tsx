@@ -7,7 +7,7 @@ import Song from '../components/Song';
 import TypeInDropdown from '../components/TypeInDropdown';
 import MixPathTable from '../components/MixPathTable';
 import { PlaylistData, MixInstructionData, PlaylistTrackData } from '../utils/types';
-import { calculateMixList } from '../utils/helpers';
+import { calculateMixList, retryUntilSuccess } from '../utils/helpers';
 import { getUserPlaylists, getPlaylistWeights } from '../api/backendApiCalls';
 
 // State Defaults
@@ -34,7 +34,9 @@ function MixPathPage() {
 
   // Effect Hooks
   useEffect(() => {
-    getUserPlaylists()
+    retryUntilSuccess(
+      () => getUserPlaylists(),
+    )
       .then((data) => setPlaylists(data));
   }, []);
 
@@ -55,7 +57,9 @@ function MixPathPage() {
     } else {
       setMixingInstructions([]);
       setIsLoading(true);
-      getPlaylistWeights(playlist_id, num_songs)
+      retryUntilSuccess(
+        () => getPlaylistWeights(playlist_id, num_songs),
+      )
         .then((data) => {
           setPlaylistTracks(data.tracks);
           setPlaylistWeights(data.weights);
@@ -105,7 +109,7 @@ function MixPathPage() {
               {!isPlaylistSelected()
                 ? <Song songName="N/A" artistName="N/A" img="none" link="" />
                 : <Song songName={selectedPlaylist.name} artistName="" link={selectedPlaylist.link} img={selectedPlaylist.image} />}
-              <DropdownButton id="dropdown-button" title="">
+              <DropdownButton id="dropdown-button" title="" className={playlists.length === 0 ? '' : 'dropdown-shadow'}>
                 <div className="scrollable-menu">
                   {playlists.map((playlist, idx: number) => (
                     <Dropdown.Item

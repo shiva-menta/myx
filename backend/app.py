@@ -227,9 +227,6 @@ def get_acapellas():
   res = []
   for acapella in acapellas:
     res.append(tuple([acapella.uri, key_dict[acapella.adj_key], acapella.bpm - instr_data['tempo']]))
-  
-  if not res:
-    return jsonify({"message": "No matches found."}), 404
 
   response = jsonify(res)
   return response, 200
