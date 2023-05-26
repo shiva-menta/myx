@@ -2,6 +2,8 @@
 from .maps import major_pitchmap, harmonic_pitchmap
 import re
 from functools import lru_cache
+import time
+import requests
 
 # Functions
 def pitchmap_key(key, mode):
@@ -176,3 +178,14 @@ def create_weight_matrix(full_track_data):
       weights.append(int(calc_mix_distance(adj_tracks[i]['audio_features'], adj_tracks[j]['audio_features'])))
 
   return adj_tracks, weights
+
+# Backend Container Stay Awake Function
+def keep_container_awake(url, interval):
+  while True:
+    try:
+      print("time.sleep called.")
+      response = requests.get(url)
+    except Exception as err:
+      print(f'Error fetching {url} with error: {err}.')
+    finally:
+      time.sleep(interval * 60)

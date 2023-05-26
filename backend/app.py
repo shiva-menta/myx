@@ -6,6 +6,9 @@ import logging
 import asyncio
 from functools import wraps
 from fakeredis import FakeStrictRedis
+from threading import Thread
+import time
+import requests
 
 from flask import Flask, request, jsonify, redirect, session
 from flask_restful import reqparse
@@ -14,10 +17,10 @@ from flask_session import Session
 from flask_cors import CORS, cross_origin
 from flask_compress import Compress
 
-from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING
+from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING, backend_url
 from utils.maps import input_map
 from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_spot_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup, get_user_playlists, get_playlist_full_tracks
-from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix
+from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix, keep_container_awake
 
 # ––––– App Initialization / Setup –––––
 FRONTEND_REDIRECT_URL = frontend_url + '/#/home'
@@ -32,7 +35,7 @@ app = Flask(__name__)
 app.logger.propagate = False
 # change this to PROD_DB when testing / deploying
 if IS_TESTING != 'True':
-  app.config['SQLALCHEMY_DATABASE_URI'] = PROD_DB
+  app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB
   app.config['SESSION_TYPE'] = 'redis'
   app.config['SESSION_REDIS'] = redis.from_url(redis_url)
   app.config['CORS_HEADERS'] = 'Content-Type'
@@ -51,6 +54,9 @@ db = SQLAlchemy(app)
 sess = Session(app)
 
 from models import *
+
+# ––––– Module Wake-Up Function –––––
+# Thread(target=keep_container_awake, args=(backend_url +'/', 25)).start()
 
 # ––––– Functions –––––
 def get_access_token():
@@ -191,7 +197,6 @@ def authenticated():
 # ––––– General Endpoints –––––
 # Intro Endpoint
 @app.route('/', methods=['GET'])
-@login_required
 def main():
   return jsonify({"message": "Welcome to the Myx API!"}), 200
 
