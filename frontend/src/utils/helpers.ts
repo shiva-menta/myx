@@ -48,7 +48,7 @@ const harmonicPitchmap = new Map(Object.entries({
 }));
 
 // Functions
-const retryUntilSuccess = async (func: any, retries: number = 3, delay: number = 1000) => {
+const retryUntilSuccess = async (func: any, retries: number = 5, delay: number = 1500) => {
   for (let i = 0; i < retries; i += 1) {
     try {
       const result = await func();
