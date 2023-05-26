@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
 flask-restful = "*"
 flask-sqlalchemy = "*"
 lxml = "*"
@@ -20,6 +19,11 @@ psycopg2-binary = "*"
 pytest = "*"
 pytest-flask = "*"
 fakeredis = "*"
+httpx = "*"
+flask = {extras = ["async"], version = "*"}
+asgiref = "*"
+flask-compress = "*"
+nest-asyncio = "*"
 
 [dev-packages]
 

@@ -50,6 +50,7 @@ type PlaylistData = {
   name: string;
   image: string;
   link: string;
+  num_songs: number;
   playlist_id: string;
 }
 type SongAudioFeatures = {

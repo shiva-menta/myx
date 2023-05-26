@@ -45,17 +45,48 @@ a {
     overflow-x: hidden;
     overflow-y: scroll;
 }
+.dropdown-shadow > .dropdown-toggle {
+    box-shadow: 0px 3px 3px rgba(255, 255, 255, 0.25) !important;
+}
+.dropdown-shadow:hover > .dropdown-toggle {
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.5) !important;
+}
 /* #endregion */
 
 /* #region Header */
 .header {
     height: 50px;
+    display: flex;
     justify-content: center;
     width: 100%;
 }
 .header img {
+    width: 50px;
+    height: auto;
+}
+.header-hover-container > img {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    opacity: 1;
+}
+.header-hover-container > svg {
+    padding: 7px;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: 0.05s;
+}
+.header-hover-container:hover > svg {
+    opacity: 0.8;
+}
+.header-hover-container:hover > img {
+    opacity: 0.7;
+}
+.header-hover-container {
+    width: 50px;
     height: 50px;
-    width: auto;
+    position: relative;
 }
 /* #endregion */
 
@@ -160,12 +191,13 @@ a {
     padding: var(--song-padding);
     text-align: left;
 
-    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
-    transition: 0.15s;
-
     position: relative;
 }
-.song-unit:hover {
+a > .song-unit {
+    box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
+    transition: 0.15s;
+}
+a > .song-unit:hover {
     box-shadow: 0px 4px 4px rgba(255, 255, 255, 0.5);
 }
 .artist-info {
@@ -503,6 +535,7 @@ a {
     display: flex;
     justify-content: center;
     gap: 2em;
+    width: 100%;
 }
 .mix-path-page-content > * {
     width: 400px;
@@ -548,6 +581,8 @@ table {
     background-color: transparent;
     font-size: 14px;
     color: white;
+    table-layout: fixed;
+    width: 400px;
 }
 thead th {
     background-color: rgba(0, 0, 0, 0.4);
@@ -574,6 +609,7 @@ td, th {
     vertical-align: top;
     text-align: left;
     padding: 10px;
+    word-wrap: break-word;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 tbody tr:last-child > td {
@@ -594,6 +630,12 @@ tbody tr:last-child td:first-child {
 }
 tbody tr:last-child td:last-child {
     border-bottom-right-radius: 10px;
+}
+.col-small {
+    width: 14%;
+}
+.col-large {
+    width: 24%;
 }
 /* #endregion */
 
@@ -694,5 +736,122 @@ tbody tr:last-child td:last-child {
 .page-navigation .nav-icon {
     height: 1.75rem;
     width: 1.75rem;
+}
+/* #endregion */
+
+/* #region Mobile CSS */
+@media screen and (max-width: 500px) {
+    /* General */
+    .App {
+        height: 100%;
+        overflow-y: auto;
+    }
+    .login-page, .home-page, .saved-mashups-page {
+        width: 350px;
+        height: 100vh;
+    }
+    .page-title {
+        font-size: 2.4rem;
+    }
+    .section-text {
+        font-size: 14px;
+    }
+    .loader-container {
+        height: 100vh;
+    }
+    /* Song Card */
+    .song-unit {
+        --song-width: 275px;
+        --song-height: 80px;
+    }
+    /* Login Page */
+    .login-page {
+        padding: 10px;
+    }
+    /* Mix Path Page */
+    .mix-path-page {
+        width: 350px;
+        padding: 2em 0px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .mix-path-menu {
+        gap: 1.25em;
+    }
+    .mix-path-song-select .section-title {
+        padding: 0.25em 0px;
+    }
+    .mix-path-menu > .action-button {
+        margin-top: 0.75em;
+    }
+    .select-playlist-container {
+        gap: 0.75em;
+    }
+    .mix-path-page-content {
+        flex-direction: column;
+    }
+    .mix-path-page-content > * {
+        width: 350px;
+    }
+    .h-300 {
+        height: 275px;
+    }
+    /* Mix Path Table */
+    .table-container {
+        margin-top: 0px;
+        max-height: none;
+    }
+    table {
+        width: 350px;
+        font-size: 12px;
+    }
+    .dropdown-text-box {
+        max-height: 75px;
+    }
+    /* Acapella Match Page */
+    .view-container {
+        padding: 2em 0px;
+        width: 350px;
+        min-height: 100vh;
+    }
+    .dropdown-menu {
+        width: 325px;
+        overflow-x: auto;
+    }
+    .results-page-container {
+        padding-top: 1em;
+        height: 550px;
+    }
+    .plus-container {
+        margin-top: 0.75em;
+        margin-bottom: 0.25em;
+    }
+    .mix-instructions-container {
+        margin-top: 1em;
+    }
+    .results-page-container > .action-button {
+        margin: 1em 0px 0px 0px;
+    }
+    /* Saved Mashups Page */
+    #mashups-container {
+        height: 400px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .mashup-add-container {
+        width: 100%;
+    }
+    .song-title {
+        font-size: 18px;
+    }
+    .artist-title {
+        font-size: 16px !important;
+    }
+    .mashup-unit hr {
+        margin: 0.35em 2em;
+    }
 }
 /* #endregion */

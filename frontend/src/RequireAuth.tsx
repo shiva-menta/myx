@@ -2,8 +2,8 @@
 import React, { useEffect, useState, ReactElement } from 'react';
 import { Navigate } from 'react-router-dom';
 import ScaleLoader from 'react-spinners/ScaleLoader';
-
-const BACKEND_URL = process.env.REACT_APP_API_URL;
+import { authenticateUser } from './api/backendApiCalls';
+import { retryUntilSuccess } from './utils/helpers';
 
 // Prop Type
 type RequireAuthProps = {
@@ -14,27 +14,24 @@ type RequireAuthProps = {
 function RequireAuth({ children }: RequireAuthProps): ReactElement | null {
   const [authenticated, setAuthenticated] = useState(false);
   const [authCheckFinished, setAuthCheckFinished] = useState(false);
-  const apiUrl = `${BACKEND_URL}/api/authenticate`;
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+    retryUntilSuccess(
+      () => authenticateUser(),
+    )
+      .then((data) => {
+        setAuthenticated(data.authenticated);
+        setAuthCheckFinished(true);
       });
-      const data = await response.json();
-      setAuthenticated(data.authenticated);
-      setAuthCheckFinished(true);
-    };
-    checkAuth();
   }, []);
 
   // Render Function
   if (!authCheckFinished) {
-    return <ScaleLoader color="#ffffff" height={50} width={5} />;
+    return (
+      <div className="loader-container">
+        <ScaleLoader color="#ffffff" height={50} width={5} />
+      </div>
+    );
   } else if (!authenticated) {
     return <Navigate to="/" />;
   } else {

@@ -6,6 +6,7 @@ import { cutString } from '../utils/helpers';
 type ColumnDefault = {
   name: string;
   value: string;
+  class: string;
 }
 
 type MixPathTableProps = {
@@ -21,7 +22,7 @@ function MixPathTable({ tableDefaults, instructionList }: MixPathTableProps) {
         <thead>
           <tr>
             {tableDefaults.map((item, idx) => (
-              <th key={item.name}>
+              <th key={item.name} className={item.class}>
                 {item.name}
               </th>
             ))}
@@ -31,7 +32,7 @@ function MixPathTable({ tableDefaults, instructionList }: MixPathTableProps) {
           {instructionList.map((instruction, index) => (
             <tr key={instruction.song_name}>
               {tableDefaults.map((item, idx) => (
-                <td key={item.value}>
+                <td key={item.value} className={item.class}>
                   {item.value !== 'artists'
                     ? instruction[item.value as keyof MixInstructionData]
                     : cutString((instruction[item.value as keyof MixInstructionData] as string[]).join(', '), 25)}

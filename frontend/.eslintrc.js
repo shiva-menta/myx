@@ -43,6 +43,7 @@ module.exports = {
     'guard-for-in': 'off',
     'react/jsx-props-no-spreading': 'off',
     'prefer-destructuring': 'off',
-    'class-methods-use-this': 'off'
+    'class-methods-use-this': 'off',
+    'no-promise-executor-return': 'off',
   },
 };

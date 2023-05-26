@@ -55,4 +55,4 @@ def test_create_weight_matrix():
     pitch_shift_tolerance = 2
     adj_tracks, matrix = create_weight_matrix(full_track_data)
     assert adj_tracks == get_pitch_adjusted_track_data(full_track_data, pitch_shift_tolerance)
-    assert len(matrix) == len(adj_tracks)
+    assert len(matrix) == 10

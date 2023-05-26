@@ -3,6 +3,7 @@ import redis
 import datetime
 import time
 import logging
+import asyncio
 from functools import wraps
 from fakeredis import FakeStrictRedis
 
@@ -11,11 +12,12 @@ from flask_restful import reqparse
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from flask_cors import CORS, cross_origin
+from flask_compress import Compress
 
 from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING
 from utils.maps import input_map
-from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_spot_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup, get_user_playlists, get_playlist_items, get_spotify_songs_audio_features
-from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix, combine_track_info_features
+from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_spot_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup, get_user_playlists, get_playlist_full_tracks
+from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix
 
 # ––––– App Initialization / Setup –––––
 FRONTEND_REDIRECT_URL = frontend_url + '/#/home'
@@ -27,6 +29,7 @@ headers = None
 expires_at = None
 
 app = Flask(__name__)
+app.logger.propagate = False
 # change this to PROD_DB when testing / deploying
 if IS_TESTING != 'True':
   app.config['SQLALCHEMY_DATABASE_URI'] = PROD_DB
@@ -43,6 +46,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = SECRET_KEY
 logging.basicConfig(level=logging.DEBUG)
 CORS(app, origins=[frontend_url], supports_credentials=True)
+Compress(app)
 db = SQLAlchemy(app)
 sess = Session(app)
 
@@ -67,20 +71,33 @@ def get_access_token():
     'Authorization': 'Bearer {token}'.format(token=access_token)
   }
 
+def async_cross_origin(f):
+  @wraps(f)
+  @cross_origin(supports_credentials=True)
+  async def decorated_function(*args, **kwargs):
+    return await f(*args, **kwargs)
+  return decorated_function
+
 def requires_access_token(f):
   @wraps(f)
-  def token_wrapper(*args, **kwargs):
+  async def token_wrapper(*args, **kwargs):
     get_access_token()
-    return f(*args, **kwargs)
+    if asyncio.iscoroutinefunction(f):
+      return await f(*args, **kwargs)
+    else:
+      return f(*args, **kwargs)
   return token_wrapper
 
 def requires_user_token(f):
   @wraps(f)
-  def decorated_function(*args, **kwargs):
+  async def decorated_function(*args, **kwargs):
     response = refresh_user_token(session['user_refresh_token'])
     if response[1] != 200:
       return jsonify({"message": "Error in refreshing token."}), response.status_code
-    return f(*args, **kwargs)
+    if asyncio.iscoroutinefunction(f):
+      return await f(*args, **kwargs)
+    else:
+      return f(*args, **kwargs)
   return decorated_function
 
 def get_match_uris(instr_data, req_data):
@@ -155,12 +172,15 @@ def refresh_user_token(refresh_token):
 
 def login_required(f):
   @wraps(f)
-  def decorated_function(*args, **kwargs):
+  async def decorated_function(*args, **kwargs):
     if request.method == 'OPTIONS':
       return jsonify({"message": "Preflight request"}), 200
     if 'user_info' not in session:
       return jsonify({"message": "User is not logged in"}), 401
-    return f(*args, **kwargs)
+    if asyncio.iscoroutinefunction(f):
+      return await f(*args, **kwargs)
+    else:
+      return f(*args, **kwargs)
   return decorated_function
 
 @app.route('/api/authenticate')
@@ -207,9 +227,6 @@ def get_acapellas():
   res = []
   for acapella in acapellas:
     res.append(tuple([acapella.uri, key_dict[acapella.adj_key], acapella.bpm - instr_data['tempo']]))
-  
-  if not res:
-    return jsonify({"message": "No matches found."}), 404
 
   response = jsonify(res)
   return response, 200
@@ -339,8 +356,9 @@ def get_playlists():
   res = get_user_playlists(session['user_access_token'])
   return [{
     'name': e['name'],
-    'image': e['images'][0]['url'],
+    'image': e['images'][0]['url'] if len(e['images']) else 'none',
     'link': e['external_urls']['spotify'],
+    'num_songs': e['tracks']['total'],
     'playlist_id': e['id']
   } for e in res.json()['items']]
 
@@ -348,20 +366,18 @@ def get_playlists():
 @login_required
 @requires_access_token
 @requires_user_token
-@cross_origin(supports_credentials=True)
-def get_playlist_weights():
+async def get_playlist_weights():
   # get given playlist
   playlist_id = request.args.get('playlist_id')
+  num_songs = request.args.get('num_songs')
 
   # get songs of given playlist
-  response = get_playlist_items(playlist_id, session['user_access_token'])
-  track_descriptions = [{
-    'name': e['track']['name'],
-    'id': e['track']['id'],
-    'artists': [artist['name'] for artist in e['track']['artists']]
-  } for e in response if e['track']['id']]
-  playlist_data = get_spotify_songs_audio_features(track_descriptions, headers)
-  full_track_data = combine_track_info_features(track_descriptions, playlist_data)
+  full_track_data = await get_playlist_full_tracks(
+    playlist_id,
+    num_songs,
+    session['user_access_token'],
+    headers
+  )
 
   # create weights of given playlist
   tracks, weight_matrix = create_weight_matrix(full_track_data)

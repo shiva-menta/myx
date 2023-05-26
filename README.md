@@ -15,6 +15,7 @@ _This mode is meant for developing new features, allowing quick code changes and
 
 Backend
 * switch to DEV_DB in `app.py`
+* set IS_TESTING to `'False'`
 * `cd backend`
 * `pipenv shell`
 * `python run.py`
@@ -42,6 +43,7 @@ _This mode is meant for verifying new features work in a containerized environme
 
 ### Deployment Mode (myxdj.live)
 _This mode is meant for deploying actual code to Fly.io._
+* change `DEV_DB` to `PROD_DB` in `app.py`
 * `config.py`: comment out appropriate database url
 * backend `app.py`: switch DEV_DB to PROD_DB
 * frontend `Dockerfile`: comment out myx.localhost and uncomment myxdj.live
@@ -56,10 +58,9 @@ _This section is meant to address any commonly reached problems when interacting
 * Browser – (`INVALID_CLIENT: Invalid redirect URI`): The Spotify Web API is not configured properly with the API URL needed to run your app. Add a correct, valid redirect URI to the Web API.
 * Backend – (`KeyError: 'access_token'`): The backend does not have the correct redirect URI to point to after authentication. Make sure to return the correct URI in the backend `.env` file.
 
-## Next Steps
-_This section is meant to layout the next steps for making Myx better._
-* Initiate one HTTPS connection per session & maintain persistent connection.
-* Use async / concurrency to reduce API response time for large playlist audio features.
-* Implement caching / expiration for the /api/authenticate endpoint to minimize backend hits.
-* Determine if double API calls in development logger are real or just debugger glitches.
-* Create "wake-up" function for containers (glitchy on free mode).
+## Recent Changes
+_This section is meant to layout the next optimizations to make Myx better._
+* Used `requests.Session()` to maintain HTTPS connection, which implements `urllib3`, instead of starting new request per API call.
+* Implemented async route for `get-playlist-weights`, specifically to reduce CPU idle time for Spotify API requests.
+* Changed weight matrix from float[][] to int[], sacrificing minimal accuracy for ~70% package size reduction.
+* Incorporated `flask_compress` to reduce package sizes by ~90%.

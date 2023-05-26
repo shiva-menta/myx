@@ -47,6 +47,21 @@ const harmonicPitchmap = new Map(Object.entries({
   23: [16, 18, 2],
 }));
 
+// Functions
+const retryUntilSuccess = async (func: any, retries: number = 3, delay: number = 1000) => {
+  for (let i = 0; i < retries; i += 1) {
+    try {
+      const result = await func();
+      return result;
+    } catch (error) {
+      console.log(`Attempt ${i + 1} failed, retrying...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw new Error(`Function failed after ${retries} attempts`);
+};
+
 const formatBPM = (bpm: number) => {
   if (bpm > 0) {
     return `+${bpm.toFixed(1)}`;
@@ -73,11 +88,17 @@ const extractSongListData = (data: any) => (
 );
 
 // Mix Path Helpers
+const getWeightPosition = (
+  i: number,
+  j: number,
+  size: number,
+) => (size * i - ((i * (i + 1)) / 2) + (j - i - 1));
+
 const mod_dijkstras = (
   firstSongIdx: number,
   secondSongIdx: number,
   numSongs: number,
-  playlistWeightMatrix: number[][],
+  playlistWeights: number[],
   pathLengthPenalty: number,
 ) => {
   // Initialization
@@ -103,7 +124,11 @@ const mod_dijkstras = (
     visited.add(node[1]);
     for (let vert = 0; vert < numSongs; vert += 1) {
       newWeight = dist[node[1]]
-        + playlistWeightMatrix[Math.min(vert, node[1])][Math.max(vert, node[1])]
+        + playlistWeights[getWeightPosition(
+          Math.min(vert, node[1]),
+          Math.max(vert, node[1]),
+          numSongs,
+        )]
         + pathLength[node[1]] * pathLengthPenalty;
       if (!visited.has(vert) && dist[vert] > newWeight) {
         dist[vert] = newWeight;
@@ -184,14 +209,15 @@ const calculateMixList = (
   firstSongIdx: number,
   secondSongIdx: number,
   allSongs: PlaylistTrackData[],
-  playlistWeightMatrix: number[][],
+  playlistWeights: number[],
 ) => {
   // Call Modified Dijkstra's
+  const numSongs = allSongs.length;
   const mixPath = mod_dijkstras(
     firstSongIdx,
     secondSongIdx,
-    allSongs.length,
-    playlistWeightMatrix,
+    numSongs,
+    playlistWeights,
     3,
   );
 
@@ -208,7 +234,11 @@ const calculateMixList = (
     instructionList.push(createMixInstruction(
       currSong,
       nextSong,
-      playlistWeightMatrix[Math.min(songIdx, nextSongIdx)][Math.max(songIdx, nextSongIdx)],
+      playlistWeights[getWeightPosition(
+        Math.min(songIdx, nextSongIdx),
+        Math.max(songIdx, nextSongIdx),
+        numSongs,
+      )],
     ));
     songIdx = nextSongIdx;
     currSong = nextSong;
@@ -234,4 +264,6 @@ export {
   calculateMixList,
   cutString,
   mod_dijkstras,
+  getWeightPosition,
+  retryUntilSuccess,
 };
