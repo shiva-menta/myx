@@ -9,7 +9,7 @@ import FeatureDropdowns from './FeatureDropdowns';
 
 import { searchSongs, getTrackFeaturesFromURIs } from '../api/spotifyApiCalls';
 import { SongData, SongResultData, AcapellaURI } from '../utils/types';
-import { extractSongListData } from '../utils/helpers';
+import { extractSongListData, retryUntilSuccess } from '../utils/helpers';
 import { getMatchingAcapellas } from '../api/backendApiCalls';
 
 // Type Declarations
@@ -65,20 +65,26 @@ function SelectAcapellaContainer({
   );
   const getAcapellas = () => {
     if (isSongSelected() && dropdownData.every((item) => item !== '')) {
-      getMatchingAcapellas(
-        selectedSong.uri,
-        dropdownData[3],
-        dropdownData[0],
-        dropdownData[1],
-        dropdownData[2],
-        selectedSong.energy,
+      retryUntilSuccess(
+        () => getMatchingAcapellas(
+          selectedSong.uri,
+          dropdownData[3],
+          dropdownData[0],
+          dropdownData[1],
+          dropdownData[2],
+          selectedSong.energy,
+        ),
       )
         .then((data) => {
           updateAcapellaState(data);
+          if (data.length === 0) {
+            setDropdownWarning(true);
+            setErrorMessage('No results found. Please try again.');
+          }
         })
         .catch(() => {
           setDropdownWarning(true);
-          setErrorMessage('No results found. Please try again.');
+          setErrorMessage('Error finding database results.');
         });
     } else {
       setDropdownWarning(true);
@@ -133,7 +139,7 @@ function SelectAcapellaContainer({
               onKeyDown={(evt) => { if (evt.key === 'Enter') { search(); } }}
             />
           </div>
-          <DropdownButton id="dropdown-button" title="">
+          <DropdownButton id="dropdown-button" title="" className={songResults.length === 0 ? '' : 'dropdown-shadow'}>
             {isSongSelected() && songResults.map((song, idx: number) => (
               <Dropdown.Item onClick={() => { updateSelectedSong(idx); }} key={song.name}>{`${song.name} - ${song.artists.join(', ')}`}</Dropdown.Item>
             ))}

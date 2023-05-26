@@ -8,7 +8,7 @@ import { AiOutlinePlus } from 'react-icons/ai';
 
 import Song from './Song';
 import { addMashupToDB } from '../api/backendApiCalls';
-import { formatBPM } from '../utils/helpers';
+import { formatBPM, retryUntilSuccess } from '../utils/helpers';
 import { SongResultData, AcapellaData } from '../utils/types';
 
 // Type Declarations
@@ -40,7 +40,7 @@ function DisplayMatchResults({
 
   // Functions
   function addMashup() {
-    if (selectedAcapella !== undefined && selectedSong !== undefined) {
+    if (!mashupAdded && selectedAcapella !== undefined && selectedSong !== undefined) {
       const body = {
         acap_uri: selectedAcapella.uri,
         acap_song_name: selectedAcapella.name,
@@ -54,7 +54,9 @@ function DisplayMatchResults({
         instr_link: selectedSong.link,
       };
 
-      addMashupToDB(body)
+      retryUntilSuccess(
+        () => addMashupToDB(body),
+      )
         .then(() => {
           console.log('Success!');
         })
@@ -77,7 +79,7 @@ function DisplayMatchResults({
       </div>
       <div className="acapella-container">
         <div className="section-title">acapella</div>
-        <DropdownButton id="dropdown-button" title="">
+        <DropdownButton id="dropdown-button" title="" className={acapellas.length === 0 ? '' : 'dropdown-shadow'}>
           {acapellas.map((song, idx: number) => (
             <Dropdown.Item onClick={() => { updateSelectedAcapella(idx); }} key={song.name}>{`${song.name} - ${song.artists.join(', ')}`}</Dropdown.Item>
           ))}

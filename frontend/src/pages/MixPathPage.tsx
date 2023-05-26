@@ -7,7 +7,7 @@ import Song from '../components/Song';
 import TypeInDropdown from '../components/TypeInDropdown';
 import MixPathTable from '../components/MixPathTable';
 import { PlaylistData, MixInstructionData, PlaylistTrackData } from '../utils/types';
-import { calculateMixList } from '../utils/helpers';
+import { calculateMixList, retryUntilSuccess } from '../utils/helpers';
 import { getUserPlaylists, getPlaylistWeights } from '../api/backendApiCalls';
 
 // State Defaults
@@ -15,6 +15,7 @@ const noPlaylist = {
   name: '',
   image: 'none',
   link: '',
+  num_songs: 0,
   playlist_id: '',
 };
 
@@ -28,36 +29,40 @@ function MixPathPage() {
   const [secondSongIdx, setSecondSongIdx] = useState<number | null>(null);
   const [playlistCache, setPlaylistCache] = useState<Map<string, any>>(new Map());
   const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackData[]>([]);
-  const [playlistWeightMatrix, setPlaylistWeightMatrix] = useState<number[][]>([]);
+  const [playlistWeights, setPlaylistWeights] = useState<number[]>([]);
   const [mixingInstructions, setMixingInstructions] = useState<MixInstructionData[]>([]);
 
   // Effect Hooks
   useEffect(() => {
-    getUserPlaylists()
+    retryUntilSuccess(
+      () => getUserPlaylists(),
+    )
       .then((data) => setPlaylists(data));
   }, []);
 
   // Constants
   const tableDefaults = [
-    { name: 'Title', value: 'song_name' },
-    { name: 'Artists', value: 'artists' },
-    { name: 'BPM', value: 'tempo' },
-    { name: 'Key', value: 'key' },
-    { name: 'Instructions', value: 'instruction' },
+    { name: 'Title', value: 'song_name', class: 'col-large' },
+    { name: 'Artists', value: 'artists', class: 'col-large' },
+    { name: 'BPM', value: 'tempo', class: 'col-small' },
+    { name: 'Key', value: 'key', class: 'col-small' },
+    { name: 'Instructions', value: 'instruction', class: 'col-large' },
   ];
 
-  const getSelectedPlaylistWeights = async (playlist_id: string) => {
+  const getSelectedPlaylistWeights = async (playlist_id: string, num_songs: number) => {
     if (playlistCache.has(playlist_id)) {
       const data = playlistCache.get(playlist_id);
       setPlaylistTracks(data.tracks);
-      setPlaylistWeightMatrix(data.weights);
+      setPlaylistWeights(data.weights);
     } else {
       setMixingInstructions([]);
       setIsLoading(true);
-      getPlaylistWeights(playlist_id)
+      retryUntilSuccess(
+        () => getPlaylistWeights(playlist_id, num_songs),
+      )
         .then((data) => {
           setPlaylistTracks(data.tracks);
-          setPlaylistWeightMatrix(data.weights);
+          setPlaylistWeights(data.weights);
           setPlaylistCache((prevCache) => new Map(prevCache).set(
             playlist_id,
             data,
@@ -75,7 +80,7 @@ function MixPathPage() {
 
   const updateSelectedPlaylist = async (idx: number) => {
     setSelectedPlaylist(playlists[idx]);
-    getSelectedPlaylistWeights(playlists[idx].playlist_id);
+    getSelectedPlaylistWeights(playlists[idx].playlist_id, playlists[idx].num_songs);
   };
 
   const getMixPath = () => {
@@ -87,14 +92,14 @@ function MixPathPage() {
       firstSongIdx,
       secondSongIdx,
       playlistTracks,
-      playlistWeightMatrix,
+      playlistWeights,
     ));
   };
 
   // Render Function
   return (
     <div className="mix-path-page">
-      <Header />
+      <Header clickable />
       <div className="page-title">[myx path]</div>
       <div className="mix-path-page-content">
         <div className="mix-path-menu">
@@ -104,7 +109,7 @@ function MixPathPage() {
               {!isPlaylistSelected()
                 ? <Song songName="N/A" artistName="N/A" img="none" link="" />
                 : <Song songName={selectedPlaylist.name} artistName="" link={selectedPlaylist.link} img={selectedPlaylist.image} />}
-              <DropdownButton id="dropdown-button" title="">
+              <DropdownButton id="dropdown-button" title="" className={playlists.length === 0 ? '' : 'dropdown-shadow'}>
                 <div className="scrollable-menu">
                   {playlists.map((playlist, idx: number) => (
                     <Dropdown.Item

@@ -8,8 +8,20 @@ const ACAPELLAS_URL = `${BACKEND_URL}/get-acapellas?`;
 const SPOT_MASHUPS_URL = `${BACKEND_URL}/add-spotify-mashup`;
 const PLAYLISTS_URL = `${BACKEND_URL}/get-user-playlists`;
 const PLAYLISTS_WEIGHTS_URL = `${BACKEND_URL}/get-playlist-weights`;
+const AUTHENTICATE_URL = `${BACKEND_URL}/api/authenticate`;
 
 // Functions
+const authenticateUser = async () => {
+  const response = await fetch(AUTHENTICATE_URL, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  return response.json();
+};
 const getMashups = async () => {
   const mashups = await fetch(MASHUPS_URL, {
     method: 'GET',
@@ -91,8 +103,8 @@ const getUserPlaylists = async () => {
   });
   return playlists.json();
 };
-const getPlaylistWeights = async (playlist_id: string) => {
-  const playlistData = await fetch(`${PLAYLISTS_WEIGHTS_URL}?playlist_id=${playlist_id}`, {
+const getPlaylistWeights = async (playlist_id: string, num_songs: number) => {
+  const playlistData = await fetch(`${PLAYLISTS_WEIGHTS_URL}?playlist_id=${playlist_id}&num_songs=${num_songs}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -103,6 +115,7 @@ const getPlaylistWeights = async (playlist_id: string) => {
 };
 
 export {
+  authenticateUser,
   getMashups,
   addMashupToSpotify,
   removeSavedMashup,

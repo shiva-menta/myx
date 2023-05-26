@@ -19,8 +19,8 @@ function Song({
   img,
 }: SongProps) {
   // Render Function
-  return (
-    <a href={link} target="_blank" rel="noopener noreferrer">
+  if (img === 'none') {
+    return (
       <Card className="song-unit">
         <div className="artist-info">
           <div className="song-title">{cutString(songName, 30)}</div>
@@ -30,8 +30,22 @@ function Song({
           <Card.Img src={img === 'none' ? require(`../images/${img}.png`) : img} />
         </div>
       </Card>
-    </a>
-  );
+    );
+  } else {
+    return (
+      <a href={link} target="_blank" rel="noopener noreferrer">
+        <Card className="song-unit">
+          <div className="artist-info">
+            <div className="song-title">{cutString(songName, 30)}</div>
+            <div className="artist-title">{cutString(artistName, 25)}</div>
+          </div>
+          <div className="song-image-container">
+            <Card.Img src={img === 'none' ? require(`../images/${img}.png`) : img} />
+          </div>
+        </Card>
+      </a>
+    );
+  }
 }
 
 export default Song;
