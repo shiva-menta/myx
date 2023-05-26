@@ -17,8 +17,7 @@
     --side-padding: 10vw;
     --button-sizing: 50px;
     --button-radius: 15px;
-
-    --dropdown-radius:
+    --app-height: 100%;
 }
 .view-container {
     width: 400px;
@@ -749,6 +748,7 @@ tbody tr:last-child td:last-child {
     .login-page, .home-page, .saved-mashups-page {
         width: 350px;
         height: 100vh;
+        height: var(--app-height);
     }
     .page-title {
         font-size: 2.4rem;
@@ -758,6 +758,7 @@ tbody tr:last-child td:last-child {
     }
     .loader-container {
         height: 100vh;
+        height: var(--app-height);
     }
     /* Song Card */
     .song-unit {
@@ -773,6 +774,7 @@ tbody tr:last-child td:last-child {
         width: 350px;
         padding: 2em 0px;
         min-height: 100vh;
+        min-height: var(--app-height);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -816,6 +818,7 @@ tbody tr:last-child td:last-child {
         padding: 2em 0px;
         width: 350px;
         min-height: 100vh;
+        min-height: var(--app-height);
     }
     .dropdown-menu {
         width: 325px;
@@ -853,5 +856,16 @@ tbody tr:last-child td:last-child {
     .mashup-unit hr {
         margin: 0.35em 2em;
     }
+    .mashup-action-button > svg {
+        color: black;
+    }
+    .mashup-action-button svg {
+        min-width: 20px;
+        min-height: 20px;
+    }
+    .mashup-action-button .icon-sign {
+        min-width: 10px !important;
+        min-height: 10px !important;
+    }    
 }
 /* #endregion */

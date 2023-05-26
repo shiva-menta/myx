@@ -116,7 +116,7 @@ function SavedMashupsPage() {
                   <div className="mashup-action-button-container">
                     <button className="mashup-action-button" onClick={() => { if (!addMarkers[index]) { addToSpotify(index); } }}>
                       <FaSpotify className="add-mashup-spotify-icon" size={20} />
-                      {addMarkers[index] ? <FaCheck className="add-mashup-spotify-icon" size={10} /> : <FaPlus className="add-mashup-spotify-icon" size={10} />}
+                      {addMarkers[index] ? <FaCheck className="add-mashup-spotify-icon icon-sign" size={10} /> : <FaPlus className="add-mashup-spotify-icon icon-sign" size={10} />}
                     </button>
                     <button className="mashup-action-button" onClick={() => { removeMashup(index); }}>
                       <CgPlayListRemove className="remove-mashup-spotify-icon" size={20} />
