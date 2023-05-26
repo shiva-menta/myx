@@ -35,7 +35,7 @@ app = Flask(__name__)
 app.logger.propagate = False
 # change this to PROD_DB when testing / deploying
 if IS_TESTING != 'True':
-  app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB
+  app.config['SQLALCHEMY_DATABASE_URI'] = PROD_DB
   app.config['SESSION_TYPE'] = 'redis'
   app.config['SESSION_REDIS'] = redis.from_url(redis_url)
   app.config['CORS_HEADERS'] = 'Content-Type'
@@ -56,7 +56,7 @@ sess = Session(app)
 from models import *
 
 # ––––– Module Wake-Up Function –––––
-# Thread(target=keep_container_awake, args=(backend_url +'/', 25)).start()
+Thread(target=keep_container_awake, args=(backend_url +'/', 25)).start()
 
 # ––––– Functions –––––
 def get_access_token():
