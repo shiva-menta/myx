@@ -745,7 +745,7 @@ tbody tr:last-child td:last-child {
         height: 100%;
         overflow-y: auto;
     }
-    .login-page, .home-page, .saved-mashups-page {
+    .login-page, .home-page, .saved-mashups-page, .denied-access-page {
         width: 350px;
         height: 100vh;
         height: var(--app-height);
@@ -866,6 +866,12 @@ tbody tr:last-child td:last-child {
     .mashup-action-button .icon-sign {
         min-width: 10px !important;
         min-height: 10px !important;
-    }    
+    }
+    /* Denied Access Page */
+    .denied-access-page {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 /* #endregion */
