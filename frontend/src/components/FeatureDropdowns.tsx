@@ -39,7 +39,7 @@ function FeatureDropdowns({ callback }: FeatureDropdownsProps) {
   // Render Function
   return (
     <div className="feature-dropdowns">
-      <div className="section-title">2. pick acapella parameters...</div>
+      <div className="section-title">2. pick acapella parameters</div>
       <Stack direction="horizontal">
         {dropdowns.map((dropdown) => (
           <Dropdown

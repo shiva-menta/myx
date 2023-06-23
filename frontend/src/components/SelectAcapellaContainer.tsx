@@ -126,7 +126,7 @@ function SelectAcapellaContainer({
       <div className="page-title">[acapella match]</div>
       <div className="song-select-container">
         <div className="tooltip-title-container">
-          <div className="section-title">1. choose instrumental...</div>
+          <div className="section-title">1. choose instrumental</div>
           <DescriptionTooltip page="match" />
         </div>
         <div className="song-select">
@@ -159,7 +159,7 @@ function SelectAcapellaContainer({
         {dropdownWarning && <div className="warning">{errorMessage}</div>}
       </div>
       <div className="match">
-        <div className="section-title">3. match...</div>
+        <div className="section-title">3. match</div>
         <button className="action-button" onClick={() => { getAcapellas(); }}>match</button>
       </div>
     </div>

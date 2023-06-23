@@ -91,12 +91,21 @@ def add_songs_to_mashup(playlist_id, instr_uri, acap_uri, access_token):
   )
 
 def get_user_playlists(user_access_token):
-  return session.get(
-    'https://api.spotify.com/v1/me/playlists?limit=50',
-    headers={
-      'Authorization': 'Bearer ' + user_access_token
-    }
-  )
+  limit = 3
+  all_playlists = []
+  next_url = 'https://api.spotify.com/v1/me/playlists?limit=50'
+  while next_url and limit:
+    limit -= 1
+    res = session.get(
+      next_url,
+      headers={
+        'Authorization': 'Bearer ' + user_access_token
+      }
+    )
+    next_url = res.json()['next']
+    all_playlists.extend(res.json()['items'])
+  
+  return all_playlists
 
 async def get_playlist_subset_tracks(
   session,

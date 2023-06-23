@@ -359,13 +359,15 @@ def add_spotify_mashup():
 @cross_origin(supports_credentials=True)
 def get_playlists():
   res = get_user_playlists(session['user_access_token'])
-  return [{
+  formatted_playlists = [{
     'name': e['name'],
     'image': e['images'][0]['url'] if len(e['images']) else 'none',
     'link': e['external_urls']['spotify'],
     'num_songs': e['tracks']['total'],
     'playlist_id': e['id']
-  } for e in res.json()['items']]
+  } for e in res]
+  formatted_playlists.sort(key=lambda x: x['name'])
+  return formatted_playlists
 
 @app.route('/get-playlist-weights', methods=['GET'])
 @login_required

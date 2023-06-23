@@ -106,7 +106,7 @@ function MixPathPage() {
         <div className="mix-path-menu">
           <div>
             <div className="tooltip-title-container">
-              <div className="section-title">1. choose playlist...</div>
+              <div className="section-title">1. choose playlist</div>
               <DescriptionTooltip page="mix-path" />
             </div>
             <div className="select-playlist-container">
@@ -132,11 +132,11 @@ function MixPathPage() {
             : (
               <div className="mix-path-menu h-300">
                 <div className="mix-path-song-select">
-                  <div className="section-title">2. choose first song...</div>
+                  <div className="section-title">2. choose first song</div>
                   <TypeInDropdown onChangeFunc={setFirstSongIdx} results={playlistTracks} defaultText="Set first song..." />
                 </div>
                 <div className="mix-path-song-select">
-                  <div className="section-title">3. choose second song...</div>
+                  <div className="section-title">3. choose second song</div>
                   <TypeInDropdown onChangeFunc={setSecondSongIdx} results={playlistTracks} defaultText="Set second song..." />
                 </div>
                 <button className="action-button" onClick={() => { getMixPath(); }}>blend</button>
