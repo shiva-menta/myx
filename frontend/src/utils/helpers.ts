@@ -141,7 +141,6 @@ const mod_dijkstras = (
 
   // Return Song Number Path
   const path = [];
-  // console.log(dist[secondSongIdx]);
   let current = secondSongIdx;
   while (current !== firstSongIdx) {
     path.push(current);

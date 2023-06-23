@@ -417,6 +417,15 @@ a > .song-unit:hover {
 }
 /* #endregion */
 
+/* #region Tooltip Title Container */
+.tooltip-title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75em;
+}
+/* #endregion */
+
 /* #region Mashups Page */
 /* General */
 .saved-mashups-page {

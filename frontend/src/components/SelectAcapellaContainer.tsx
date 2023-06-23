@@ -11,6 +11,7 @@ import { searchSongs, getTrackFeaturesFromURIs } from '../api/spotifyApiCalls';
 import { SongData, SongResultData, AcapellaURI } from '../utils/types';
 import { extractSongListData, retryUntilSuccess } from '../utils/helpers';
 import { getMatchingAcapellas } from '../api/backendApiCalls';
+import DescriptionTooltip from './DescriptionTooltip';
 
 // Type Declarations
 type SelectAcapellaContainerProps = {
@@ -124,7 +125,10 @@ function SelectAcapellaContainer({
     <div className="select-page-container">
       <div className="page-title">[acapella match]</div>
       <div className="song-select-container">
-        <div className="section-title">1. choose instrumental...</div>
+        <div className="tooltip-title-container">
+          <div className="section-title">1. choose instrumental...</div>
+          <DescriptionTooltip page="match" />
+        </div>
         <div className="song-select">
           <div className="song-search-bar">
             <button className="search-button" onClick={() => { search(); }}>
