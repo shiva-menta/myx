@@ -56,7 +56,7 @@ sess = Session(app)
 from models import *
 
 # ––––– Module Wake-Up Function –––––
-Thread(target=keep_container_awake, args=(backend_url +'/', 15)).start()
+Thread(target=keep_container_awake, args=(backend_url +'/', 10)).start()
 
 # ––––– Functions –––––
 def get_access_token():
