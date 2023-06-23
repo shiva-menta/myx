@@ -1,2 +1,2 @@
-export const MIX_PATH_DESCRIPTION = 'Choose a starting and target track. Our tool will then curate a seamless mix for you based on the songs in your selected playlist.';
-export const ACAPELLA_MATCH_DESCRIPTION = 'Specify an instrumental track. Our algorithm will find a compatible acapella for it, according to your set parameters.';
+export const MIX_PATH_DESCRIPTION = 'Choose a starting and target track. Our tool will then curate a seamless mix for you based on the songs in your selected playlist. End numbers on songs represent pitch adjustments.';
+export const ACAPELLA_MATCH_DESCRIPTION = 'Specify an instrumental track. Our algorithm will find a compatible acapella for it, based on your parameters. You can then add this mashup to your saved library.';
