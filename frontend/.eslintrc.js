@@ -45,5 +45,6 @@ module.exports = {
     'prefer-destructuring': 'off',
     'class-methods-use-this': 'off',
     'no-promise-executor-return': 'off',
+    'jsx-a11y/anchor-is-valid': 'off',
   },
 };

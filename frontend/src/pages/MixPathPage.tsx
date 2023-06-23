@@ -9,6 +9,7 @@ import MixPathTable from '../components/MixPathTable';
 import { PlaylistData, MixInstructionData, PlaylistTrackData } from '../utils/types';
 import { calculateMixList, retryUntilSuccess } from '../utils/helpers';
 import { getUserPlaylists, getPlaylistWeights } from '../api/backendApiCalls';
+import DescriptionTooltip from '../components/DescriptionTooltip';
 
 // State Defaults
 const noPlaylist = {
@@ -104,7 +105,10 @@ function MixPathPage() {
       <div className="mix-path-page-content">
         <div className="mix-path-menu">
           <div>
-            <div className="section-title">1. choose playlist...</div>
+            <div className="tooltip-title-container">
+              <div className="section-title">1. choose playlist...</div>
+              <DescriptionTooltip page="mix-path" />
+            </div>
             <div className="select-playlist-container">
               {!isPlaylistSelected()
                 ? <Song songName="N/A" artistName="N/A" img="none" link="" />
