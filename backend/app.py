@@ -151,7 +151,7 @@ def callback():
   
   response = get_user_info(user_access_token)
 
-  if response.status_code == 403:
+  if response.status_code >= 400:
     return redirect(FRONTEND_ACCESS_DENIED_URL)
 
   user_info = response.json()
