@@ -9,6 +9,7 @@ from fakeredis import FakeStrictRedis
 from threading import Thread
 import time
 import requests
+import hashlib
 
 from flask import Flask, request, jsonify, redirect, session
 from flask_restful import reqparse
@@ -18,6 +19,7 @@ from flask_cors import CORS, cross_origin
 from flask_compress import Compress
 
 from config import DEV_DB, PROD_DB, redis_url, frontend_url, SECRET_KEY, IS_TESTING, backend_url
+from utils.allow_list import allow_list
 from utils.maps import input_map
 from utils.spotify import get_spotify_song_audio_features, get_spotify_app_token, refresh_spot_user_token, get_user_info, get_user_token, create_mashup_playlist, add_songs_to_mashup, get_user_playlists, get_playlist_full_tracks
 from utils.helpers import pitchmap_key, get_key_range, get_bpm_range, create_weight_matrix, keep_container_awake
@@ -151,10 +153,15 @@ def callback():
   
   response = get_user_info(user_access_token)
 
+  # Temporary Validation Check 
   if response.status_code >= 400:
     return redirect(FRONTEND_ACCESS_DENIED_URL)
 
   user_info = response.json()
+
+  # hacky solution to incorrect behavior from first time auth Spotify (no approval on developer console)
+  if hashlib.sha256(user_info['email'].encode()).hexdigest() not in allow_list:
+    return redirect(FRONTEND_ACCESS_DENIED_URL)
   
   session['user_info'] = user_info
   session['user_access_token'] = user_access_token
