@@ -77,10 +77,11 @@ function SelectAcapellaContainer({
         ),
       )
         .then((data) => {
-          updateAcapellaState(data);
           if (data.length === 0) {
             setDropdownWarning(true);
             setErrorMessage('No results found. Please try again.');
+          } else {
+            updateAcapellaState(data);
           }
         })
         .catch(() => {

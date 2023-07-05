@@ -72,7 +72,7 @@ const formatBPM = (bpm: number) => {
 const formatKey = (key: number, mode: number) => (12 * (1 - mode) + key);
 const cutString = (string: string, maxLength: number) => {
   if (string.length > maxLength) {
-    return `${string.substring(0, maxLength)}...`;
+    return `${string.substring(0, maxLength)}..`;
   }
   return string;
 };
