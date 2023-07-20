@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BiHomeAlt } from 'react-icons/bi';
 import MyxDisc from '../images/Disc.png';
+import Footer from './Footer';
 
 type HomeProps = {
   clickable: boolean;

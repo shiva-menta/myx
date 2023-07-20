@@ -5,6 +5,7 @@ import { RxMixerHorizontal } from 'react-icons/rx';
 import { RiPlayListLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 // Main Component
 function HomePage() {

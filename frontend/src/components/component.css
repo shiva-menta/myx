@@ -160,9 +160,10 @@ a {
     background-color: rgba(255, 255, 255, 0.25);
     font-family: var(--font-primary);
     font-size: 12px;
+    line-height: 16px;
     padding: 0.15em 0.75em;
     color: white;
-    margin: 0.75em;
+    margin: 1em;
 
     width: 250px;
 }
@@ -170,7 +171,7 @@ a {
 
 /* #region Song */
 .song-unit {
-    --song-width: 300px;
+    --song-width: 325px;
     --song-height: 90px;
     --song-padding: 0.75em;
 
@@ -208,12 +209,12 @@ a > .song-unit:hover {
 }
 .song-title {
     font-weight: var(--font-primary-weight);
-    font-size: 20px;
-    margin-bottom: 0.1em;
+    font-size: 16px;
+    line-height: 16px;
 }
 .artist-title {
     font-weight: var(--font-secondary-weight);
-    font-size: 14px;
+    font-size: 13px;
 }
 .song-image-container {
     height: var(--song-image-size);
@@ -223,7 +224,20 @@ a > .song-unit:hover {
     --song-image-size: calc(var(--song-height) - 2 * var(--song-padding));
     height: var(--song-image-size);
     width: auto;
-    border-radius: 5px;
+    border-radius: 0px;
+}
+.spotify-song-icon {
+    height: 21px;
+    width: 21px;
+}
+.spotify-direct {
+    font-weight: 200;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0.6em;
 }
 /* #endregion */
 
@@ -492,6 +506,7 @@ a > .song-unit:hover {
     font-family: var(--font-primary);
     line-height: normal;
     color: white;
+    font-size: 20px;
     white-space: nowrap;
 }
 .mashup-unit .artist-title {
@@ -657,15 +672,15 @@ tbody tr:last-child td:last-child {
     width: 400px;
 }
 .spotify-auth-button {
-    background-color: #1DB954;
+    background-color: #191414;
     font-weight: bold;
-    color: #191414;
+    color: #1DB954;
     
     padding: 0.75em 1em;
     border-radius: 2em;
     text-align: center;
     text-decoration: none;
-    border: #1DB954 2px solid;
+    border: #191414 2px solid;
 
     display: flex;
     justify-self: center;
@@ -744,6 +759,23 @@ tbody tr:last-child td:last-child {
 .page-navigation .nav-icon {
     height: 1.75rem;
     width: 1.75rem;
+}
+/* #endregion */
+
+/* #region Footer */
+.footer-container {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+}
+.footer-text {
+    color: var(--black-color);
+    font-weight: 500;
+    font-size: 1rem;
+}
+.footer-img {
+    height: auto;
+    width: 85px;
 }
 /* #endregion */
 
