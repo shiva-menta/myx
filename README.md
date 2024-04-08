@@ -34,19 +34,19 @@ Frontend
 _This mode is meant for verifying new features work in a containerized environment._
 * open up Docker Desktop
 * `config.py`: comment out appropriate database url
-* frontend `Dockerfile`: comment out myxdj.live and uncomment myx.localhost
-* frontend `nginx.conf`: comment out myxdj.live and uncomment myx.localhost
+* frontend `Dockerfile`: comment out myxdj.org and uncomment myx.localhost
+* frontend `nginx.conf`: comment out myxdj.org and uncomment myx.localhost
 * uncomment out all containers in `docker-compose.yaml`
 * run `docker-compose up --build` or `docker-compose up` as needed
 * access the app at myx.localhost!
 * Note: if the models haven't been loaded into the db container yet, create an interactive shell with terminal through `docker exec -it myx-backend-1 sh`, then run `pipenv install`, `pipenv shell`, and `python bootstrap.py`.
 
-### Deployment Mode (myxdj.live)
+### Deployment Mode (myxdj.org)
 _This mode is meant for deploying actual code to Fly.io._
 * `config.py`: comment out appropriate database url
 * backend `app.py`: switch DEV_DB to PROD_DB, comment out `keep_container_awake` thread
-* frontend `Dockerfile`: comment out myx.localhost and uncomment myxdj.live
-* frontend `nginx.conf`: comment out myx.localhost and uncomment myxdj.live
+* frontend `Dockerfile`: comment out myx.localhost and uncomment myxdj.org
+* frontend `nginx.conf`: comment out myx.localhost and uncomment myxdj.org
 
 ## Testing Instructions
 For `backend` testing, run `IS_TESTING=True pytest` within your pipenv shell.
