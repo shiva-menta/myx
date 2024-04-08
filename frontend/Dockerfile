@@ -9,7 +9,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . ./
-RUN REACT_APP_API_URL=https://myxdj.live/api npm run build
+RUN REACT_APP_API_URL=https://myxdj.org/api npm run build
 # RUN REACT_APP_API_URL=http://myx.localhost/api npm run build
 
 FROM nginx:latest

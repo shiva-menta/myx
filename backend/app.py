@@ -160,8 +160,8 @@ def callback():
   user_info = response.json()
 
   # hacky solution to incorrect behavior from first time auth Spotify (no approval on developer console)
-  if hashlib.sha256(user_info['email'].encode()).hexdigest() not in allow_list:
-    return redirect(FRONTEND_ACCESS_DENIED_URL)
+  # if hashlib.sha256(user_info['email'].encode()).hexdigest() not in allow_list:
+  #   return redirect(FRONTEND_ACCESS_DENIED_URL)
   
   session['user_info'] = user_info
   session['user_access_token'] = user_access_token
