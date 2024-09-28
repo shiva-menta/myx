@@ -147,8 +147,6 @@ def callback():
   code = request.args.get('code')
   response = get_user_token(code)
   
-  print(response.json())
-  
   user_access_token = response.json()['access_token']
   user_refresh_token = response.json()['refresh_token']
   expires_in = response.json()['expires_in']
