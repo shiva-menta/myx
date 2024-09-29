@@ -91,6 +91,7 @@ def add_songs_to_mashup(playlist_id, instr_uri, acap_uri, access_token):
   )
 
 def get_user_playlists(user_access_token):
+  print(user_access_token)
   limit = 3
   all_playlists = []
   next_url = 'https://api.spotify.com/v1/me/playlists?limit=50'
@@ -103,6 +104,7 @@ def get_user_playlists(user_access_token):
       }
     )
     next_url = res.json()['next']
+    print(res.json())
     all_playlists.extend(res.json()['items'])
   
   return all_playlists
