@@ -29,6 +29,8 @@ const authenticateUser = () => {
   const scopes = 'user-read-private user-read-email playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative';
   const authorizationUrl = `${BASE_URL}authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&scope=${scopes}`;
 
+  console.log(authorizationUrl);
+
   window.location.assign(authorizationUrl);
 };
 const getAccessToken = async () => {
