@@ -34,6 +34,10 @@ def get_spotify_app_token():
   })
 
 def get_user_token(code):
+  print(AUTH_URL)
+  print(code)
+  print(client_headers)
+  print(REDIRECT_URI)
   return session.post(AUTH_URL, 
     data={
       'grant_type': 'authorization_code',
