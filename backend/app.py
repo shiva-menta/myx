@@ -368,7 +368,7 @@ def get_playlists():
   res = get_user_playlists(session['user_access_token'])
   formatted_playlists = [{
     'name': e['name'],
-    'image': e['images'][0]['url'] if len(e['images']) else 'none',
+    'image': e['images'][0]['url'] if e['images'] and len(e['images']) else 'none',
     'link': e['external_urls']['spotify'],
     'num_songs': e['tracks']['total'],
     'playlist_id': e['id']
